@@ -1,0 +1,673 @@
+openapi: 3.0.3
+info:
+  title: AI Trading System API
+  description: API for cryptocurrency trading simulation and backtesting
+  version: 1.0.0
+  contact:
+    name: AI Trading System
+    url: https://ai-trading.bizkit.dev
+
+servers:
+  - url: https://ai-trading.bizkit.dev/api
+    description: Production server
+  - url: http://localhost:4321/api
+    description: Development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    TradingUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+          minLength: 3
+          maxLength: 50
+        default_capital:
+          type: number
+          minimum: 0
+          maximum: 1000000
+        risk_tolerance:
+          type: string
+          enum: [low, medium, high]
+        preferred_coins:
+          type: array
+          items:
+            type: string
+          maxItems: 10
+        notification_settings:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TradingRun:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          nullable: true
+        session_type:
+          type: string
+          enum: [simulation, backtest]
+        coin_symbol:
+          type: string
+          example: "BTC"
+        starting_capital:
+          type: number
+          minimum: 0
+        final_capital:
+          type: number
+          minimum: 0
+        total_trades:
+          type: integer
+          minimum: 0
+        winning_trades:
+          type: integer
+          minimum: 0
+        win_rate:
+          type: number
+          minimum: 0
+          maximum: 100
+        total_return:
+          type: number
+        max_drawdown:
+          type: number
+        session_start:
+          type: string
+          format: date-time
+        session_end:
+          type: string
+          format: date-time
+          nullable: true
+        time_period_start:
+          type: string
+          format: date-time
+          nullable: true
+        time_period_end:
+          type: string
+          format: date-time
+          nullable: true
+        ai_model_version:
+          type: string
+        parameters:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    Trade:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          nullable: true
+        trade_type:
+          type: string
+          enum: [buy, sell]
+        coin_symbol:
+          type: string
+        quantity:
+          type: number
+          minimum: 0
+        price:
+          type: number
+          minimum: 0
+        total_value:
+          type: number
+        fee:
+          type: number
+          minimum: 0
+        net_value:
+          type: number
+        portfolio_value_before:
+          type: number
+        portfolio_value_after:
+          type: number
+        profit_loss:
+          type: number
+          nullable: true
+        trade_reason:
+          type: string
+          enum: [ai_signal, stop_loss, take_profit, manual]
+        ai_confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        market_price:
+          type: number
+          minimum: 0
+        execution_time:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    MarketData:
+      type: object
+      properties:
+        coin_symbol:
+          type: string
+        current_price:
+          type: number
+          minimum: 0
+        price_change_24h:
+          type: number
+        volume_24h:
+          type: number
+        market_cap:
+          type: number
+        sentiment_score:
+          type: number
+          minimum: -1
+          maximum: 1
+        fear_greed_index:
+          type: integer
+          minimum: 0
+          maximum: 100
+        last_updated:
+          type: string
+          format: date-time
+        historical_data:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              price:
+                type: number
+              volume:
+                type: number
+
+    AIPrediction:
+      type: object
+      properties:
+        coin_symbol:
+          type: string
+        predicted_price:
+          type: number
+          minimum: 0
+        predicted_direction:
+          type: string
+          enum: [up, down, hold]
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        prediction_horizon:
+          type: integer
+          minimum: 1
+          maximum: 60
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+
+paths:
+  /user/profile:
+    get:
+      summary: Get current user's trading profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradingUser'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update user's trading profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                  minLength: 3
+                  maxLength: 50
+                default_capital:
+                  type: number
+                  minimum: 0
+                  maximum: 1000000
+                risk_tolerance:
+                  type: string
+                  enum: [low, medium, high]
+                preferred_coins:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 10
+                notification_settings:
+                  type: object
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradingUser'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /runs:
+    get:
+      summary: Get user's trading runs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: session_type
+          in: query
+          schema:
+            type: string
+            enum: [simulation, backtest]
+      responses:
+        '200':
+          description: Trading runs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  runs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TradingRun'
+                  total:
+                    type: integer
+                  has_more:
+                    type: boolean
+
+    post:
+      summary: Start a new trading run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - session_type
+                - coin_symbol
+                - starting_capital
+              properties:
+                session_type:
+                  type: string
+                  enum: [simulation, backtest]
+                coin_symbol:
+                  type: string
+                starting_capital:
+                  type: number
+                  minimum: 0
+                time_period_start:
+                  type: string
+                  format: date-time
+                time_period_end:
+                  type: string
+                  format: date-time
+                parameters:
+                  type: object
+                  properties:
+                    stop_loss_percent:
+                      type: number
+                      default: 2.0
+                    take_profit_percent:
+                      type: number
+                      default: 5.0
+      responses:
+        '201':
+          description: Trading run started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradingRun'
+
+  /runs/{runId}:
+    get:
+      summary: Get specific trading run details
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Trading run details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradingRun'
+
+    patch:
+      summary: Update trading run (typically to end session)
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session_end:
+                  type: string
+                  format: date-time
+                final_capital:
+                  type: number
+      responses:
+        '200':
+          description: Trading run updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradingRun'
+
+  /runs/{runId}/trades:
+    get:
+      summary: Get trades for a specific run
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Trades retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trades:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Trade'
+                  total:
+                    type: integer
+
+    post:
+      summary: Execute a new trade
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - trade_type
+                - coin_symbol
+                - quantity
+                - trade_reason
+              properties:
+                trade_type:
+                  type: string
+                  enum: [buy, sell]
+                coin_symbol:
+                  type: string
+                quantity:
+                  type: number
+                  minimum: 0
+                trade_reason:
+                  type: string
+                  enum: [ai_signal, stop_loss, take_profit, manual]
+                ai_confidence:
+                  type: number
+                  minimum: 0
+                  maximum: 1
+      responses:
+        '201':
+          description: Trade executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trade'
+
+  /market/{coinSymbol}:
+    get:
+      summary: Get current market data for a cryptocurrency
+      parameters:
+        - name: coinSymbol
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "BTC"
+      responses:
+        '200':
+          description: Market data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketData'
+
+  /market/{coinSymbol}/history:
+    get:
+      summary: Get historical market data
+      parameters:
+        - name: coinSymbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: interval
+          in: query
+          schema:
+            type: string
+            enum: [1h, 4h, 1d]
+            default: "1h"
+      responses:
+        '200':
+          description: Historical data retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  coin_symbol:
+                    type: string
+                  interval:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                        open:
+                          type: number
+                        high:
+                          type: number
+                        low:
+                          type: number
+                        close:
+                          type: number
+                        volume:
+                          type: number
+
+  /predictions/{coinSymbol}:
+    get:
+      summary: Get AI prediction for a cryptocurrency
+      parameters:
+        - name: coinSymbol
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: horizon
+          in: query
+          schema:
+            type: integer
+            minimum: 5
+            maximum: 60
+            default: 15
+          description: Prediction horizon in minutes
+      responses:
+        '200':
+          description: AI prediction retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIPrediction'
+
+  /backtest:
+    post:
+      summary: Run backtesting simulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - coin_symbol
+                - start_date
+                - end_date
+                - starting_capital
+              properties:
+                coin_symbol:
+                  type: string
+                start_date:
+                  type: string
+                  format: date-time
+                end_date:
+                  type: string
+                  format: date-time
+                starting_capital:
+                  type: number
+                  minimum: 0
+                parameters:
+                  type: object
+                  properties:
+                    stop_loss_percent:
+                      type: number
+                      default: 2.0
+                    take_profit_percent:
+                      type: number
+                      default: 5.0
+                    ai_model_version:
+                      type: string
+      responses:
+        '200':
+          description: Backtest completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradingRun'
+
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string

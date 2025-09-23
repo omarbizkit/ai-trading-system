@@ -1,11 +1,11 @@
 <!--
 Sync Impact Report:
-- Version change: Template → 1.0.0 (initial constitution creation)
-- Modified principles: All 5 principles extracted from context/constitution.md
-- Added sections: Deployment & Infrastructure, Testing & Maintenance, Build & Deployment Configuration, Git Workflow, AI Development Safety Protocol
-- Removed sections: None (template sections were placeholders)
+- Version change: 1.0.0 → 1.1.0 (new trading policy principle added)
+- Modified principles: Added "Paper Trading Only" as sixth core principle
+- Added sections: Trading Operations Policy under Core Principles
+- Removed sections: None
 - Templates requiring updates:
-  ✅ plan-template.md: Constitution check reference updated
+  ✅ plan-template.md: Constitution check reference maintained
   ✅ spec-template.md: Requirements alignment maintained
   ✅ tasks-template.md: Task categorization aligns with principles
 - Follow-up TODOs: None - all placeholders resolved
@@ -29,6 +29,30 @@ The system will be built with modularity in mind, with a clear separation betwee
 
 ### Simplicity & Maintainability
 The codebase will be kept simple, readable, and well-documented. YAGNI (You Ain't Gonna Need It) principles will be applied to avoid over-engineering and ensure the project is easy to maintain and understand.
+
+### Paper Trading Only
+The AI Trading System MUST operate exclusively with simulated (paper) trading for showcase purposes. Real money trading capabilities are explicitly prohibited in the initial release and MUST be displayed as "Coming Soon" features where referenced. This ensures legal compliance, reduces liability risks, and maintains focus on demonstrating technical capabilities rather than financial services.
+
+**Rationale**: This constraint eliminates regulatory complexity, removes financial liability concerns, and ensures the project remains focused on showcasing technical skills in AI/ML, real-time data processing, and user experience design rather than becoming a financial product.
+
+## Trading Operations Policy
+
+### Simulation Environment
+- All trading operations MUST use simulated capital and virtual portfolios
+- Starting capital defaults to $10,000 (configurable per user session)
+- Trade executions MUST use real market prices but process no actual transactions
+- Portfolio tracking and performance metrics MUST reflect simulated results only
+
+### Real Trading References
+- Any UI elements referencing real trading MUST display "Coming Soon" status
+- Documentation and help text MUST clearly indicate simulation-only operation
+- API endpoints for real trading may be designed but MUST return not-implemented responses
+- Marketing materials MUST emphasize paper trading and educational purpose
+
+### Data Handling
+- User trade history and performance data may be stored for portfolio demonstration
+- No financial account connections or payment processing integration permitted
+- All displayed prices and market data MUST be clearly labeled as for simulation purposes
 
 ## Deployment & Infrastructure
 
@@ -106,4 +130,4 @@ Constitution violations must be explicitly documented in the "Complexity Trackin
 
 All PRs and reviews must verify compliance with these principles. Complexity must be justified against constitutional requirements. Use agent-specific guidance files (CLAUDE.md, GEMINI.md, etc.) for runtime development guidance while maintaining constitutional compliance.
 
-**Version**: 1.0.0 | **Ratified**: 2025-09-22 | **Last Amended**: 2025-09-22
+**Version**: 1.1.0 | **Ratified**: 2025-09-22 | **Last Amended**: 2025-09-23
