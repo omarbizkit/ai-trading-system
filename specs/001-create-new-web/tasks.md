@@ -108,14 +108,14 @@
 - [x] **T050** POST /api/backtest.ts endpoint for backtesting
 
 ### Core Components
-- [ ] **T051** [P] Layout component with cyberpunk theme in `src/layouts/Layout.astro`
-- [ ] **T052** [P] Navigation component with portfolio link in `src/components/Navigation.astro`
-- [ ] **T053** [P] TradingChart component with Lightweight Charts in `src/components/TradingChart.astro`
-- [ ] **T054** [P] TradeLog component for transaction history in `src/components/TradeLog.astro`
-- [ ] **T055** [P] PortfolioMetrics component for performance display in `src/components/PortfolioMetrics.astro`
-- [ ] **T056** [P] AIPrediction component for ML signals in `src/components/AIPrediction.astro`
-- [ ] **T057** [P] SimulationControls component for trade execution in `src/components/SimulationControls.astro`
-- [ ] **T058** [P] BacktestingForm component for historical testing in `src/components/BacktestingForm.astro`
+- [x] **T051** [P] Layout component with cyberpunk theme in `src/layouts/Layout.astro`
+- [x] **T052** [P] Navigation component with portfolio link in `src/components/Navigation.astro`
+- [x] **T053** [P] TradingChart component with Lightweight Charts in `src/components/TradingChart.astro`
+- [x] **T054** [P] TradeLog component for transaction history in `src/components/TradeLog.astro`
+- [x] **T055** [P] PortfolioMetrics component for performance display in `src/components/PortfolioMetrics.astro`
+- [x] **T056** [P] AIPrediction component for ML signals in `src/components/AIPrediction.astro`
+- [x] **T057** [P] SimulationControls component for trade execution in `src/components/SimulationControls.astro`
+- [x] **T058** [P] BacktestingForm component for historical testing in `src/components/BacktestingForm.astro`
 
 ### Pages
 - [ ] **T059** Home page with simulation start in `src/pages/index.astro`

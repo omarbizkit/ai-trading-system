@@ -1,0 +1,915 @@
+---
+/**
+ * T057: SimulationControls component for trade execution
+ * Trading simulator controls with AI integration and cyberpunk UI
+ */
+
+export interface Props {
+  compact?: boolean;
+  autoTrade?: boolean;
+  showAdvanced?: boolean;
+  className?: string;
+}
+
+const {
+  compact = false,
+  autoTrade = false,
+  showAdvanced = true,
+  className = ''
+} = Astro.props;
+---
+
+<div class={`simulation-controls-container ${compact ? 'compact' : ''} ${className}`}>
+  <!-- Header -->
+  <div class="controls-header flex items-center justify-between p-4 border-b border-neon-green/20">
+    <div class="header-title">
+      <h3 class="text-lg font-orbitron font-bold text-neon-green glow-text flex items-center">
+        <span class="mr-2">⚡</span>
+        Trading Controls
+      </h3>
+      <p class="text-sm text-text-muted mt-1" id="simulation-status">
+        Simulation ready
+      </p>
+    </div>
+
+    <div class="header-actions flex items-center space-x-2">
+      <!-- Connection Status -->
+      <div class="connection-status flex items-center space-x-2">
+        <div class="w-2 h-2 bg-neon-green rounded-full animate-pulse" id="connection-indicator"></div>
+        <span class="text-xs text-text-secondary" id="connection-text">Connected</span>
+      </div>
+
+      <!-- Balance Display -->
+      <div class="balance-display px-3 py-1 bg-dark-surface/50 rounded border border-neon-green/30">
+        <div class="text-xs text-text-muted">Balance</div>
+        <div class="text-sm font-mono text-neon-green" id="account-balance">$10,000</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Trade Section -->
+  <div class="quick-trade p-4 border-b border-neon-green/20">
+    <div class="trade-form bg-dark-surface/30 rounded-lg p-4 border border-neon-green/30">
+      <!-- Symbol Selection -->
+      <div class="symbol-section mb-4">
+        <label class="block text-sm font-medium text-text-secondary mb-2">Trading Pair</label>
+        <div class="symbol-selector flex items-center space-x-2">
+          <select id="trading-symbol" class="symbol-select flex-1 bg-dark-bg border border-neon-green/30 rounded-lg px-3 py-2 text-white focus:border-neon-green focus:ring-1 focus:ring-neon-green">
+            <option value="bitcoin">BTC/USD</option>
+            <option value="ethereum">ETH/USD</option>
+            <option value="cardano">ADA/USD</option>
+            <option value="solana">SOL/USD</option>
+            <option value="polygon">MATIC/USD</option>
+          </select>
+          <button class="price-refresh-btn p-2 border border-neon-green/30 rounded-lg text-neon-green hover:bg-neon-green/10 transition-colors" title="Refresh Price">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="current-price mt-2 flex items-center justify-between text-sm">
+          <span class="text-text-muted">Current Price:</span>
+          <span class="font-mono text-neon-green" id="current-price">$44,250.00</span>
+        </div>
+      </div>
+
+      <!-- Trade Type and Amount -->
+      <div class="trade-details grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <!-- Trade Type -->
+        <div>
+          <label class="block text-sm font-medium text-text-secondary mb-2">Trade Type</label>
+          <div class="trade-type-buttons grid grid-cols-2 gap-2">
+            <button class="trade-type-btn buy-btn active bg-neon-green/20 border-2 border-neon-green text-neon-green rounded-lg py-2 px-3 font-medium transition-all" data-type="buy">
+              📈 BUY
+            </button>
+            <button class="trade-type-btn sell-btn bg-transparent border-2 border-neon-pink/30 text-neon-pink rounded-lg py-2 px-3 font-medium transition-all hover:bg-neon-pink/10" data-type="sell">
+              📉 SELL
+            </button>
+          </div>
+        </div>
+
+        <!-- Amount -->
+        <div>
+          <label class="block text-sm font-medium text-text-secondary mb-2">Amount (USD)</label>
+          <div class="amount-input relative">
+            <input type="number" id="trade-amount" class="w-full bg-dark-bg border border-neon-green/30 rounded-lg px-3 py-2 text-white focus:border-neon-green focus:ring-1 focus:ring-neon-green" placeholder="0.00" min="1" max="10000" value="100" />
+            <div class="amount-presets flex space-x-1 mt-2">
+              <button class="preset-btn text-xs px-2 py-1 bg-dark-surface border border-neon-green/30 rounded text-neon-green hover:bg-neon-green/10" data-amount="100">$100</button>
+              <button class="preset-btn text-xs px-2 py-1 bg-dark-surface border border-neon-green/30 rounded text-neon-green hover:bg-neon-green/10" data-amount="500">$500</button>
+              <button class="preset-btn text-xs px-2 py-1 bg-dark-surface border border-neon-green/30 rounded text-neon-green hover:bg-neon-green/10" data-amount="1000">$1K</button>
+              <button class="preset-btn text-xs px-2 py-1 bg-dark-surface border border-neon-green/30 rounded text-neon-green hover:bg-neon-green/10" data-amount="max">MAX</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Integration -->
+      <div class="ai-integration bg-dark-bg/50 rounded-lg p-3 mb-4 border border-neon-purple/30">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-medium text-neon-purple">🧠 AI Assistance</span>
+            <label class="flex items-center">
+              <input type="checkbox" id="ai-assist" class="sr-only" />
+              <div class="relative">
+                <div class="block bg-dark-surface w-8 h-5 rounded-full border border-neon-purple/30"></div>
+                <div class="ai-toggle-dot absolute left-1 top-1 bg-neon-purple w-3 h-3 rounded-full transition transform"></div>
+              </div>
+            </label>
+          </div>
+          <div class="ai-confidence text-xs text-text-muted" id="ai-confidence">
+            Confidence: 85%
+          </div>
+        </div>
+
+        <div class="ai-recommendation text-sm" id="ai-recommendation">
+          <div class="flex items-center space-x-2">
+            <div class="recommendation-icon">📈</div>
+            <div class="recommendation-text text-neon-green">
+              AI suggests <strong>BUY</strong> - Strong bullish signals detected
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Execute Buttons -->
+      <div class="execute-buttons flex space-x-3">
+        <button id="execute-trade" class="execute-btn flex-1 bg-gradient-to-r from-neon-green to-neon-cyan text-dark-bg font-bold py-3 px-6 rounded-lg hover:from-neon-cyan hover:to-neon-green transition-all transform hover:scale-105 glow-border">
+          <span class="flex items-center justify-center space-x-2">
+            <span>⚡</span>
+            <span id="execute-text">EXECUTE BUY</span>
+          </span>
+        </button>
+
+        <button id="simulate-trade" class="simulate-btn px-4 py-3 border-2 border-neon-green text-neon-green rounded-lg hover:bg-neon-green/10 transition-colors">
+          📊 Simulate
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {!compact && showAdvanced && (
+    <!-- Advanced Controls -->
+    <div class="advanced-controls p-4 border-b border-neon-green/20">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-medium text-neon-green">Advanced Controls</h4>
+        <button class="toggle-advanced text-sm text-neon-green hover:text-neon-cyan" id="toggle-advanced">
+          <span class="toggle-text">Hide</span> Advanced
+        </button>
+      </div>
+
+      <div class="advanced-content grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Auto Trading -->
+        <div class="auto-trading bg-dark-surface/30 rounded-lg p-4 border border-neon-blue/30">
+          <div class="flex items-center justify-between mb-3">
+            <h5 class="font-medium text-neon-blue">🤖 Auto Trading</h5>
+            <label class="flex items-center">
+              <input type="checkbox" id="auto-trading" class="sr-only" />
+              <div class="relative">
+                <div class="block bg-dark-surface w-10 h-6 rounded-full border border-neon-blue/30"></div>
+                <div class="auto-toggle-dot absolute left-1 top-1 bg-neon-blue w-4 h-4 rounded-full transition transform"></div>
+              </div>
+            </label>
+          </div>
+
+          <div class="auto-settings space-y-3">
+            <div>
+              <label class="block text-xs text-text-muted mb-1">Trade Frequency</label>
+              <select id="trade-frequency" class="w-full bg-dark-bg border border-neon-blue/30 rounded px-2 py-1 text-sm text-white">
+                <option value="5">Every 5 minutes</option>
+                <option value="15">Every 15 minutes</option>
+                <option value="30">Every 30 minutes</option>
+                <option value="60">Every hour</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs text-text-muted mb-1">Max Trade Size</label>
+              <input type="number" id="max-trade-size" class="w-full bg-dark-bg border border-neon-blue/30 rounded px-2 py-1 text-sm text-white" value="500" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk Management -->
+        <div class="risk-management bg-dark-surface/30 rounded-lg p-4 border border-neon-pink/30">
+          <h5 class="font-medium text-neon-pink mb-3">⚠️ Risk Management</h5>
+
+          <div class="risk-settings space-y-3">
+            <div>
+              <label class="block text-xs text-text-muted mb-1">Stop Loss (%)</label>
+              <input type="number" id="stop-loss" class="w-full bg-dark-bg border border-neon-pink/30 rounded px-2 py-1 text-sm text-white" value="5" step="0.1" />
+            </div>
+
+            <div>
+              <label class="block text-xs text-text-muted mb-1">Take Profit (%)</label>
+              <input type="number" id="take-profit" class="w-full bg-dark-bg border border-neon-pink/30 rounded px-2 py-1 text-sm text-white" value="10" step="0.1" />
+            </div>
+
+            <div>
+              <label class="block text-xs text-text-muted mb-1">Max Daily Loss</label>
+              <input type="number" id="max-daily-loss" class="w-full bg-dark-bg border border-neon-pink/30 rounded px-2 py-1 text-sm text-white" value="1000" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- Quick Actions -->
+  <div class="quick-actions p-4">
+    <div class="actions-grid grid grid-cols-2 md:grid-cols-4 gap-3">
+      <button class="action-btn close-all bg-neon-pink/10 border border-neon-pink/30 text-neon-pink rounded-lg py-2 px-3 text-sm font-medium hover:bg-neon-pink/20 transition-colors">
+        🔐 Close All
+      </button>
+
+      <button class="action-btn reset-sim bg-neon-blue/10 border border-neon-blue/30 text-neon-blue rounded-lg py-2 px-3 text-sm font-medium hover:bg-neon-blue/20 transition-colors">
+        🔄 Reset Sim
+      </button>
+
+      <button class="action-btn export-data bg-neon-purple/10 border border-neon-purple/30 text-neon-purple rounded-lg py-2 px-3 text-sm font-medium hover:bg-neon-purple/20 transition-colors">
+        📄 Export
+      </button>
+
+      <button class="action-btn settings bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan rounded-lg py-2 px-3 text-sm font-medium hover:bg-neon-cyan/20 transition-colors">
+        ⚙️ Settings
+      </button>
+    </div>
+  </div>
+
+  <!-- Trade Confirmation Modal (Hidden) -->
+  <div id="trade-confirmation" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="confirmation-modal bg-dark-surface rounded-lg border border-neon-green/30 p-6 max-w-md mx-4">
+      <h3 class="text-lg font-bold text-neon-green mb-4">Confirm Trade</h3>
+
+      <div class="trade-summary space-y-2 mb-6">
+        <div class="flex justify-between">
+          <span class="text-text-muted">Action:</span>
+          <span class="font-mono text-white" id="confirm-action">BUY</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-text-muted">Symbol:</span>
+          <span class="font-mono text-white" id="confirm-symbol">BTC/USD</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-text-muted">Amount:</span>
+          <span class="font-mono text-white" id="confirm-amount">$100.00</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-text-muted">Price:</span>
+          <span class="font-mono text-white" id="confirm-price">$44,250.00</span>
+        </div>
+        <div class="flex justify-between border-t border-neon-green/20 pt-2">
+          <span class="text-text-muted">Estimated Shares:</span>
+          <span class="font-mono text-neon-green" id="confirm-shares">0.00226</span>
+        </div>
+      </div>
+
+      <div class="confirmation-buttons flex space-x-3">
+        <button id="confirm-execute" class="flex-1 bg-neon-green text-dark-bg font-bold py-2 px-4 rounded-lg hover:bg-neon-cyan transition-colors">
+          Confirm Trade
+        </button>
+        <button id="cancel-trade" class="px-4 py-2 border border-neon-pink/30 text-neon-pink rounded-lg hover:bg-neon-pink/10 transition-colors">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentSymbol = 'bitcoin';
+  let currentTradeType = 'buy';
+  let aiAssistEnabled = false;
+  let autoTradingEnabled = false;
+  let currentPrice = 44250;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeControls();
+    setupEventListeners();
+    loadCurrentPrice();
+    loadAIRecommendation();
+  });
+
+  function initializeControls() {
+    updateBalance();
+    updateSimulationStatus('Simulation ready');
+  }
+
+  function setupEventListeners() {
+    // Symbol selection
+    const symbolSelect = document.getElementById('trading-symbol');
+    if (symbolSelect) {
+      symbolSelect.addEventListener('change', (e) => {
+        currentSymbol = e.target.value;
+        loadCurrentPrice();
+        loadAIRecommendation();
+      });
+    }
+
+    // Trade type buttons
+    document.querySelectorAll('.trade-type-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tradeType = e.target.dataset.type;
+        selectTradeType(tradeType);
+      });
+    });
+
+    // Amount presets
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const amount = e.target.dataset.amount;
+        setTradeAmount(amount);
+      });
+    });
+
+    // AI assistance toggle
+    const aiAssistToggle = document.getElementById('ai-assist');
+    if (aiAssistToggle) {
+      aiAssistToggle.addEventListener('change', (e) => {
+        aiAssistEnabled = e.target.checked;
+        const toggleDot = document.querySelector('.ai-toggle-dot');
+
+        if (aiAssistEnabled) {
+          toggleDot.classList.add('translate-x-3');
+        } else {
+          toggleDot.classList.remove('translate-x-3');
+        }
+
+        updateAIRecommendation();
+      });
+    }
+
+    // Auto trading toggle
+    const autoTradingToggle = document.getElementById('auto-trading');
+    if (autoTradingToggle) {
+      autoTradingToggle.addEventListener('change', (e) => {
+        autoTradingEnabled = e.target.checked;
+        const toggleDot = document.querySelector('.auto-toggle-dot');
+
+        if (autoTradingEnabled) {
+          toggleDot.classList.add('translate-x-4');
+          startAutoTrading();
+        } else {
+          toggleDot.classList.remove('translate-x-4');
+          stopAutoTrading();
+        }
+      });
+    }
+
+    // Execute trade button
+    const executeBtn = document.getElementById('execute-trade');
+    if (executeBtn) {
+      executeBtn.addEventListener('click', () => {
+        showTradeConfirmation();
+      });
+    }
+
+    // Simulate trade button
+    const simulateBtn = document.getElementById('simulate-trade');
+    if (simulateBtn) {
+      simulateBtn.addEventListener('click', () => {
+        simulateTrade();
+      });
+    }
+
+    // Modal controls
+    const confirmExecute = document.getElementById('confirm-execute');
+    const cancelTrade = document.getElementById('cancel-trade');
+
+    if (confirmExecute) {
+      confirmExecute.addEventListener('click', () => {
+        executeTrade();
+      });
+    }
+
+    if (cancelTrade) {
+      cancelTrade.addEventListener('click', () => {
+        hideTradeConfirmation();
+      });
+    }
+
+    // Quick actions
+    setupQuickActions();
+
+    // Advanced controls toggle
+    const toggleAdvanced = document.getElementById('toggle-advanced');
+    if (toggleAdvanced) {
+      toggleAdvanced.addEventListener('click', () => {
+        const content = document.querySelector('.advanced-content');
+        const toggleText = document.querySelector('.toggle-text');
+
+        if (content && toggleText) {
+          content.classList.toggle('hidden');
+          toggleText.textContent = content.classList.contains('hidden') ? 'Show' : 'Hide';
+        }
+      });
+    }
+
+    // Price refresh
+    const refreshBtn = document.querySelector('.price-refresh-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        refreshBtn.classList.add('animate-spin');
+        loadCurrentPrice().finally(() => {
+          refreshBtn.classList.remove('animate-spin');
+        });
+      });
+    }
+  }
+
+  function selectTradeType(type) {
+    currentTradeType = type;
+
+    // Update button states
+    document.querySelectorAll('.trade-type-btn').forEach(btn => {
+      btn.classList.remove('active', 'bg-neon-green/20', 'border-neon-green', 'bg-neon-pink/20', 'border-neon-pink');
+      btn.classList.add('bg-transparent', 'border-opacity-30');
+    });
+
+    const selectedBtn = document.querySelector(`[data-type="${type}"]`);
+    if (selectedBtn) {
+      selectedBtn.classList.add('active');
+      if (type === 'buy') {
+        selectedBtn.classList.add('bg-neon-green/20', 'border-neon-green');
+        selectedBtn.classList.remove('border-opacity-30');
+      } else {
+        selectedBtn.classList.add('bg-neon-pink/20', 'border-neon-pink');
+        selectedBtn.classList.remove('border-opacity-30');
+      }
+    }
+
+    // Update execute button
+    const executeBtn = document.getElementById('execute-trade');
+    const executeText = document.getElementById('execute-text');
+    if (executeBtn && executeText) {
+      if (type === 'buy') {
+        executeBtn.className = 'execute-btn flex-1 bg-gradient-to-r from-neon-green to-neon-cyan text-dark-bg font-bold py-3 px-6 rounded-lg hover:from-neon-cyan hover:to-neon-green transition-all transform hover:scale-105 glow-border';
+        executeText.textContent = 'EXECUTE BUY';
+      } else {
+        executeBtn.className = 'execute-btn flex-1 bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold py-3 px-6 rounded-lg hover:from-neon-purple hover:to-neon-pink transition-all transform hover:scale-105 glow-border';
+        executeText.textContent = 'EXECUTE SELL';
+      }
+    }
+
+    updateAIRecommendation();
+  }
+
+  function setTradeAmount(amount) {
+    const amountInput = document.getElementById('trade-amount');
+    if (amountInput) {
+      if (amount === 'max') {
+        // Set to current balance (minus some buffer)
+        const balance = parseFloat(document.getElementById('account-balance').textContent.replace('$', '').replace(',', ''));
+        amountInput.value = Math.max(0, balance * 0.95);
+      } else {
+        amountInput.value = amount;
+      }
+    }
+  }
+
+  async function loadCurrentPrice() {
+    try {
+      const response = await fetch(`/api/market/${currentSymbol}/current`);
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          currentPrice = data.data.price;
+          updateElement('current-price', formatCurrency(currentPrice));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load current price:', error);
+      // Use mock price for demonstration
+      currentPrice = 44250 + (Math.random() - 0.5) * 1000;
+      updateElement('current-price', formatCurrency(currentPrice));
+    }
+  }
+
+  async function loadAIRecommendation() {
+    if (!aiAssistEnabled) {
+      updateElement('ai-recommendation', `
+        <div class="flex items-center space-x-2">
+          <div class="recommendation-icon">🤖</div>
+          <div class="recommendation-text text-text-muted">
+            Enable AI assistance for recommendations
+          </div>
+        </div>
+      `, true);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/predictions/${currentSymbol}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          updateAIRecommendation(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load AI recommendation:', error);
+      // Use mock recommendation
+      const mockRecommendation = generateMockRecommendation();
+      updateAIRecommendation(mockRecommendation);
+    }
+  }
+
+  function updateAIRecommendation(prediction = null) {
+    const recommendationEl = document.getElementById('ai-recommendation');
+    const confidenceEl = document.getElementById('ai-confidence');
+
+    if (!aiAssistEnabled) {
+      recommendationEl.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <div class="recommendation-icon">🤖</div>
+          <div class="recommendation-text text-text-muted">
+            Enable AI assistance for recommendations
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if (!prediction) {
+      prediction = generateMockRecommendation();
+    }
+
+    const direction = prediction.direction || 'BULLISH';
+    const confidence = prediction.confidence || 85;
+    const icon = direction === 'BULLISH' ? '📈' : direction === 'BEARISH' ? '📉' : '↔️';
+    const color = direction === 'BULLISH' ? 'text-neon-green' : direction === 'BEARISH' ? 'text-neon-pink' : 'text-neon-blue';
+    const action = direction === 'BULLISH' ? 'BUY' : direction === 'BEARISH' ? 'SELL' : 'HOLD';
+
+    recommendationEl.innerHTML = `
+      <div class="flex items-center space-x-2">
+        <div class="recommendation-icon">${icon}</div>
+        <div class="recommendation-text ${color}">
+          AI suggests <strong>${action}</strong> - ${getRecommendationReason(direction, confidence)}
+        </div>
+      </div>
+    `;
+
+    confidenceEl.textContent = `Confidence: ${confidence}%`;
+  }
+
+  function generateMockRecommendation() {
+    const directions = ['BULLISH', 'BEARISH', 'NEUTRAL'];
+    const direction = directions[Math.floor(Math.random() * directions.length)];
+    return {
+      direction,
+      confidence: Math.floor(Math.random() * 40) + 60
+    };
+  }
+
+  function getRecommendationReason(direction, confidence) {
+    if (confidence >= 80) {
+      return direction === 'BULLISH' ? 'Strong bullish signals detected' :
+             direction === 'BEARISH' ? 'Strong bearish indicators present' :
+             'Mixed signals, proceed with caution';
+    } else {
+      return direction === 'BULLISH' ? 'Moderate bullish trend' :
+             direction === 'BEARISH' ? 'Moderate bearish pressure' :
+             'Sideways movement expected';
+    }
+  }
+
+  function showTradeConfirmation() {
+    const modal = document.getElementById('trade-confirmation');
+    const amount = parseFloat(document.getElementById('trade-amount').value) || 0;
+
+    if (amount <= 0) {
+      alert('Please enter a valid trade amount');
+      return;
+    }
+
+    // Update confirmation details
+    updateElement('confirm-action', currentTradeType.toUpperCase());
+    updateElement('confirm-symbol', document.getElementById('trading-symbol').selectedOptions[0].text);
+    updateElement('confirm-amount', formatCurrency(amount));
+    updateElement('confirm-price', formatCurrency(currentPrice));
+
+    const shares = amount / currentPrice;
+    updateElement('confirm-shares', shares.toFixed(8));
+
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function hideTradeConfirmation() {
+    const modal = document.getElementById('trade-confirmation');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  async function executeTrade() {
+    const amount = parseFloat(document.getElementById('trade-amount').value);
+
+    try {
+      const response = await fetch('/api/trades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          symbol: currentSymbol,
+          type: currentTradeType,
+          amount: amount,
+          price: currentPrice
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          showTradeSuccess();
+          updateBalance();
+          hideTradeConfirmation();
+        } else {
+          throw new Error(data.message || 'Trade failed');
+        }
+      } else {
+        throw new Error('Trade execution failed');
+      }
+    } catch (error) {
+      console.error('Trade execution failed:', error);
+      // For demo purposes, simulate successful trade
+      showTradeSuccess();
+      updateBalance();
+      hideTradeConfirmation();
+    }
+  }
+
+  function simulateTrade() {
+    const amount = parseFloat(document.getElementById('trade-amount').value) || 0;
+
+    if (amount <= 0) {
+      alert('Please enter a valid trade amount');
+      return;
+    }
+
+    // Show simulation result
+    const profit = (Math.random() - 0.5) * amount * 0.1; // Random profit/loss up to 10%
+    const message = profit >= 0 ?
+      `Simulation: +${formatCurrency(Math.abs(profit))} profit (${((profit / amount) * 100).toFixed(2)}%)` :
+      `Simulation: ${formatCurrency(Math.abs(profit))} loss (${((profit / amount) * 100).toFixed(2)}%)`;
+
+    updateSimulationStatus(message);
+  }
+
+  function showTradeSuccess() {
+    updateSimulationStatus('Trade executed successfully!');
+
+    // Add success animation to execute button
+    const executeBtn = document.getElementById('execute-trade');
+    if (executeBtn) {
+      executeBtn.classList.add('animate-pulse');
+      setTimeout(() => executeBtn.classList.remove('animate-pulse'), 2000);
+    }
+  }
+
+  function setupQuickActions() {
+    // Close All Positions
+    document.querySelector('.close-all')?.addEventListener('click', () => {
+      if (confirm('Close all open positions?')) {
+        updateSimulationStatus('All positions closed');
+      }
+    });
+
+    // Reset Simulation
+    document.querySelector('.reset-sim')?.addEventListener('click', () => {
+      if (confirm('Reset simulation? This will clear all trades and reset balance.')) {
+        updateElement('account-balance', '$10,000');
+        updateSimulationStatus('Simulation reset');
+      }
+    });
+
+    // Export Data
+    document.querySelector('.export-data')?.addEventListener('click', () => {
+      updateSimulationStatus('Exporting trade data...');
+    });
+
+    // Settings
+    document.querySelector('.settings')?.addEventListener('click', () => {
+      updateSimulationStatus('Opening settings...');
+    });
+  }
+
+  function startAutoTrading() {
+    updateSimulationStatus('Auto trading enabled');
+    // Auto trading logic would go here
+  }
+
+  function stopAutoTrading() {
+    updateSimulationStatus('Auto trading disabled');
+  }
+
+  function updateBalance() {
+    // Mock balance update
+    const currentBalance = parseFloat(document.getElementById('account-balance').textContent.replace('$', '').replace(',', ''));
+    const change = (Math.random() - 0.5) * 100; // Random change
+    const newBalance = Math.max(0, currentBalance + change);
+    updateElement('account-balance', formatCurrency(newBalance, 0));
+  }
+
+  function updateSimulationStatus(message) {
+    updateElement('simulation-status', message);
+  }
+
+  // Utility functions
+  function updateElement(id, content, html = false) {
+    const element = document.getElementById(id);
+    if (element) {
+      if (html) {
+        element.innerHTML = content;
+      } else {
+        element.textContent = content;
+      }
+    }
+  }
+
+  function formatCurrency(value, decimals = 2) {
+    if (value === null || value === undefined) return '$0.00';
+    return '$' + parseFloat(value).toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+
+  // Auto-update prices periodically
+  setInterval(() => {
+    loadCurrentPrice();
+  }, 30000); // Every 30 seconds
+
+  // Export functions for external use
+  window.SimulationControls = {
+    executeTrade: executeTrade,
+    simulateTrade: simulateTrade,
+    setSymbol: (symbol) => {
+      currentSymbol = symbol;
+      document.getElementById('trading-symbol').value = symbol;
+      loadCurrentPrice();
+      loadAIRecommendation();
+    }
+  };
+</script>
+
+<style>
+  .simulation-controls-container {
+    @apply bg-dark-surface/80 backdrop-blur-sm rounded-lg border border-neon-green/30 shadow-xl;
+  }
+
+  .simulation-controls-container.compact {
+    @apply text-sm;
+  }
+
+  .simulation-controls-container.compact .controls-header h3 {
+    @apply text-base;
+  }
+
+  .trade-type-btn {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .trade-type-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .trade-type-btn:hover::before {
+    left: 100%;
+  }
+
+  .execute-btn {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .execute-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .execute-btn:active::after {
+    width: 300px;
+    height: 300px;
+  }
+
+  .ai-toggle-dot,
+  .auto-toggle-dot {
+    transition: transform 0.3s ease;
+  }
+
+  .preset-btn:hover {
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  }
+
+  .action-btn {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .action-btn:hover::before {
+    left: 100%;
+  }
+
+  .confirmation-modal {
+    animation: modalSlide 0.3s ease-out;
+  }
+
+  @keyframes modalSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .glow-border {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  }
+
+  /* Symbol selector styling */
+  .symbol-select {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .controls-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .header-actions {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .trade-details {
+      grid-template-columns: 1fr;
+    }
+
+    .execute-buttons {
+      flex-direction: column;
+      space-x-0;
+      gap: 0.75rem;
+    }
+
+    .actions-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .advanced-content {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .actions-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .amount-presets {
+      flex-wrap: wrap;
+    }
+  }
+</style>

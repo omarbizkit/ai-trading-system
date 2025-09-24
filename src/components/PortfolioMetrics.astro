@@ -1,0 +1,648 @@
+---
+/**
+ * T055: PortfolioMetrics component for performance display
+ * Real-time portfolio performance metrics with cyberpunk styling and animations
+ */
+
+export interface Props {
+  runId?: string;
+  showChart?: boolean;
+  compact?: boolean;
+  refreshInterval?: number;
+  className?: string;
+}
+
+const { 
+  runId,
+  showChart = true,
+  compact = false,
+  refreshInterval = 30000, // 30 seconds
+  className = ''
+} = Astro.props;
+---
+
+<div class={`portfolio-metrics-container ${compact ? 'compact' : ''} ${className}`}>
+  <!-- Header -->
+  <div class="metrics-header flex items-center justify-between p-4 border-b border-neon-cyan/20">
+    <div class="header-title">
+      <h3 class="text-lg font-orbitron font-bold text-neon-cyan glow-text">
+        Portfolio Performance
+      </h3>
+      <p class="text-sm text-text-muted mt-1" id="last-updated">
+        Loading...
+      </p>
+    </div>
+    
+    <div class="header-actions flex items-center space-x-2">
+      <!-- Auto-refresh toggle -->
+      <label class="flex items-center space-x-2 text-sm">
+        <input 
+          type="checkbox" 
+          id="auto-refresh" 
+          class="sr-only"
+          checked
+        />
+        <div class="relative">
+          <div class="block bg-dark-surface w-10 h-6 rounded-full border border-neon-cyan/30"></div>
+          <div class="toggle-dot absolute left-1 top-1 bg-neon-cyan w-4 h-4 rounded-full transition transform"></div>
+        </div>
+        <span class="text-text-secondary">Auto-refresh</span>
+      </label>
+      
+      <!-- Refresh button -->
+      <button 
+        id="refresh-metrics"
+        class="p-2 text-neon-cyan hover:text-neon-pink border border-neon-cyan/30 rounded-lg hover:border-neon-pink/30 transition-colors duration-300"
+        title="Refresh Metrics"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Loading State -->
+  <div id="metrics-loading" class="p-8 text-center">
+    <div class="animate-spin inline-block w-8 h-8 border-4 border-neon-cyan border-t-transparent rounded-full mb-4"></div>
+    <p class="text-neon-cyan font-rajdhani">Loading portfolio metrics...</p>
+  </div>
+  
+  <!-- Metrics Content -->
+  <div id="metrics-content" class="hidden">
+    <!-- Key Metrics Grid -->
+    <div class={`metrics-grid p-4 ${compact ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'} grid gap-4`}>
+      <!-- Portfolio Value -->
+      <div class="metric-card bg-dark-surface/50 rounded-lg p-4 border border-neon-cyan/30 hover:border-neon-cyan/50 transition-colors">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-text-muted">Portfolio Value</span>
+          <div class="w-2 h-2 bg-neon-cyan rounded-full animate-pulse"></div>
+        </div>
+        <div class="text-2xl font-bold text-white font-mono" id="portfolio-value">
+          $0.00
+        </div>
+        <div class="text-sm mt-1" id="portfolio-change">
+          <span class="text-text-muted">+$0.00 (0.00%)</span>
+        </div>
+      </div>
+      
+      <!-- Total Return -->
+      <div class="metric-card bg-dark-surface/50 rounded-lg p-4 border border-neon-purple/30 hover:border-neon-purple/50 transition-colors">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-text-muted">Total Return</span>
+          <svg class="w-4 h-4 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+          </svg>
+        </div>
+        <div class="text-2xl font-bold font-mono" id="total-return">
+          0.00%
+        </div>
+        <div class="text-sm mt-1" id="return-amount">
+          <span class="text-text-muted">+$0.00</span>
+        </div>
+      </div>
+      
+      <!-- Win Rate -->
+      <div class="metric-card bg-dark-surface/50 rounded-lg p-4 border border-neon-green/30 hover:border-neon-green/50 transition-colors">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-text-muted">Win Rate</span>
+          <svg class="w-4 h-4 text-neon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="text-2xl font-bold text-neon-green font-mono" id="win-rate">
+          0%
+        </div>
+        <div class="text-sm mt-1" id="win-stats">
+          <span class="text-text-muted">0/0 trades</span>
+        </div>
+      </div>
+      
+      <!-- Max Drawdown -->
+      <div class="metric-card bg-dark-surface/50 rounded-lg p-4 border border-neon-pink/30 hover:border-neon-pink/50 transition-colors">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-text-muted">Max Drawdown</span>
+          <svg class="w-4 h-4 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+          </svg>
+        </div>
+        <div class="text-2xl font-bold text-neon-pink font-mono" id="max-drawdown">
+          0.00%
+        </div>
+        <div class="text-sm mt-1" id="drawdown-amount">
+          <span class="text-text-muted">-$0.00</span>
+        </div>
+      </div>
+    </div>
+    
+    {!compact && (
+      <!-- Additional Metrics -->
+      <div class="additional-metrics p-4 border-t border-neon-cyan/20">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div class="metric-item">
+            <span class="text-text-muted block mb-1">Total Trades</span>
+            <span class="text-white font-mono text-lg" id="total-trades">0</span>
+          </div>
+          <div class="metric-item">
+            <span class="text-text-muted block mb-1">Avg Trade Size</span>
+            <span class="text-white font-mono text-lg" id="avg-trade-size">$0.00</span>
+          </div>
+          <div class="metric-item">
+            <span class="text-text-muted block mb-1">Best Trade</span>
+            <span class="text-neon-green font-mono text-lg" id="best-trade">+$0.00</span>
+          </div>
+          <div class="metric-item">
+            <span class="text-text-muted block mb-1">Worst Trade</span>
+            <span class="text-neon-pink font-mono text-lg" id="worst-trade">-$0.00</span>
+          </div>
+          <div class="metric-item">
+            <span class="text-text-muted block mb-1">Profit Factor</span>
+            <span class="text-neon-purple font-mono text-lg" id="profit-factor">0.00</span>
+          </div>
+          <div class="metric-item">
+            <span class="text-text-muted block mb-1">Sharpe Ratio</span>
+            <span class="text-neon-blue font-mono text-lg" id="sharpe-ratio">0.00</span>
+          </div>
+          <div class="metric-item">
+            <span class="text-text-muted block mb-1">Active Since</span>
+            <span class="text-white font-mono text-lg" id="active-since">-</span>
+          </div>
+          <div class="metric-item">
+            <span class="text-text-muted block mb-1">Last Trade</span>
+            <span class="text-white font-mono text-lg" id="last-trade">-</span>
+          </div>
+        </div>
+      </div>
+    )}
+    
+    {showChart && !compact && (
+      <!-- Performance Chart -->
+      <div class="performance-chart p-4 border-t border-neon-cyan/20">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="text-lg font-medium text-neon-cyan">Performance Chart</h4>
+          <div class="chart-controls flex items-center space-x-2">
+            <button class="chart-period-btn active px-2 py-1 text-xs rounded border border-neon-cyan/30 text-neon-cyan" data-period="1d">1D</button>
+            <button class="chart-period-btn px-2 py-1 text-xs rounded border border-neon-cyan/30 text-text-secondary hover:text-neon-cyan" data-period="7d">7D</button>
+            <button class="chart-period-btn px-2 py-1 text-xs rounded border border-neon-cyan/30 text-text-secondary hover:text-neon-cyan" data-period="30d">30D</button>
+          </div>
+        </div>
+        
+        <div class="chart-container bg-dark-bg/50 rounded-lg border border-neon-cyan/20 p-4" style="height: 200px;">
+          <canvas id="performance-chart" class="w-full h-full"></canvas>
+        </div>
+      </div>
+    )}
+  </div>
+  
+  <!-- Error State -->
+  <div id="metrics-error" class="hidden p-8 text-center">
+    <div class="text-neon-pink text-4xl mb-4">⚠</div>
+    <p class="text-neon-pink font-rajdhani mb-4" id="error-message">Failed to load portfolio metrics</p>
+    <button class="px-4 py-2 bg-neon-cyan text-dark-bg rounded-lg hover:bg-neon-pink transition-colors" onclick="location.reload()">
+      Retry
+    </button>
+  </div>
+</div>
+
+<script>
+  let refreshTimer = null;
+  let performanceChart = null;
+  let currentRunId = null;
+  let autoRefreshEnabled = true;
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get component configuration
+    const container = document.querySelector('.portfolio-metrics-container');
+    if (container) {
+      const runIdAttr = container.closest('[data-run-id]');
+      currentRunId = runIdAttr?.dataset.runId || null;
+    }
+    
+    // Initialize portfolio metrics
+    initializePortfolioMetrics();
+    
+    // Setup event listeners
+    setupEventListeners();
+  });
+  
+  async function initializePortfolioMetrics() {
+    try {
+      await loadMetrics();
+      if (autoRefreshEnabled) {
+        startAutoRefresh();
+      }
+    } catch (error) {
+      console.error('Failed to initialize portfolio metrics:', error);
+      showError('Failed to load portfolio metrics');
+    }
+  }
+  
+  async function loadMetrics() {
+    const loadingElement = document.getElementById('metrics-loading');
+    const contentElement = document.getElementById('metrics-content');
+    const errorElement = document.getElementById('metrics-error');
+    
+    if (loadingElement) loadingElement.classList.remove('hidden');
+    if (contentElement) contentElement.classList.add('hidden');
+    if (errorElement) errorElement.classList.add('hidden');
+    
+    try {
+      let url = '/api/runs';
+      if (currentRunId) {
+        url += `/${currentRunId}?include_performance=true`;
+      } else {
+        url += '?include_stats=true&active_only=false&limit=1';
+      }
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        let runData, statsData;
+        
+        if (currentRunId) {
+          runData = data.data;
+          statsData = data.data.performance;
+        } else {
+          runData = data.data[0] || null;
+          statsData = data.stats;
+        }
+        
+        if (runData || statsData) {
+          updateMetricsDisplay(runData, statsData);
+          updateLastUpdated();
+          
+          if (performanceChart) {
+            updatePerformanceChart(runData);
+          }
+          
+          if (contentElement) contentElement.classList.remove('hidden');
+        } else {
+          throw new Error('No portfolio data available');
+        }
+      } else {
+        throw new Error(data.message || 'Failed to load metrics');
+      }
+      
+    } catch (error) {
+      console.error('Failed to load metrics:', error);
+      showError(error.message);
+    } finally {
+      if (loadingElement) loadingElement.classList.add('hidden');
+    }
+  }
+  
+  function updateMetricsDisplay(runData, statsData) {
+    // Portfolio Value
+    if (runData) {
+      const currentValue = runData.final_capital || runData.starting_capital;
+      updateElement('portfolio-value', formatCurrency(currentValue));
+      
+      const change = currentValue - runData.starting_capital;
+      const changePercent = (change / runData.starting_capital) * 100;
+      const changeColor = change >= 0 ? 'text-neon-green' : 'text-neon-pink';
+      
+      updateElement('portfolio-change', `
+        <span class="${changeColor}">
+          ${change >= 0 ? '+' : ''}${formatCurrency(Math.abs(change))} 
+          (${change >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)
+        </span>
+      `, true);
+    }
+    
+    // Total Return
+    const totalReturn = runData?.total_return || 0;
+    const returnColor = totalReturn >= 0 ? 'text-neon-green' : 'text-neon-pink';
+    updateElementClass('total-return', returnColor);
+    updateElement('total-return', `${totalReturn >= 0 ? '+' : ''}${totalReturn.toFixed(2)}%`);
+    
+    if (runData) {
+      const returnAmount = (runData.final_capital || runData.starting_capital) - runData.starting_capital;
+      updateElement('return-amount', `
+        <span class="${returnColor}">
+          ${returnAmount >= 0 ? '+' : ''}${formatCurrency(Math.abs(returnAmount))}
+        </span>
+      `, true);
+    }
+    
+    // Win Rate
+    const winRate = runData?.win_rate || statsData?.overall_win_rate || 0;
+    updateElement('win-rate', `${winRate.toFixed(1)}%`);
+    
+    const totalTrades = runData?.total_trades || statsData?.total_trades || 0;
+    const winningTrades = Math.round((winRate / 100) * totalTrades);
+    updateElement('win-stats', `<span class="text-text-muted">${winningTrades}/${totalTrades} trades</span>`, true);
+    
+    // Max Drawdown
+    const maxDrawdown = (runData?.max_drawdown || 0) * 100;
+    updateElement('max-drawdown', `${maxDrawdown.toFixed(2)}%`);
+    
+    if (runData) {
+      const drawdownAmount = runData.starting_capital * (runData.max_drawdown || 0);
+      updateElement('drawdown-amount', `<span class="text-text-muted">-${formatCurrency(drawdownAmount)}</span>`, true);
+    }
+    
+    // Additional metrics (if not compact)
+    if (!document.querySelector('.portfolio-metrics-container.compact')) {
+      updateElement('total-trades', totalTrades.toString());
+      
+      const avgTradeSize = totalTrades > 0 ? (runData?.starting_capital || 10000) / totalTrades : 0;
+      updateElement('avg-trade-size', formatCurrency(avgTradeSize));
+      
+      updateElement('best-trade', `+${formatCurrency(statsData?.best_return || 0)}`);
+      updateElement('worst-trade', `-${formatCurrency(Math.abs(statsData?.worst_return || 0))}`);
+      
+      updateElement('profit-factor', (statsData?.profit_factor || 0).toFixed(2));
+      updateElement('sharpe-ratio', (statsData?.sharpe_ratio || 0).toFixed(2));
+      
+      if (runData) {
+        updateElement('active-since', formatDate(runData.session_start));
+        updateElement('last-trade', runData.session_end ? formatDate(runData.session_end) : 'Active');
+      }
+    }
+  }
+  
+  function setupEventListeners() {
+    // Auto-refresh toggle
+    const autoRefreshToggle = document.getElementById('auto-refresh');
+    if (autoRefreshToggle) {
+      autoRefreshToggle.addEventListener('change', function(e) {
+        autoRefreshEnabled = e.target.checked;
+        const toggleDot = document.querySelector('.toggle-dot');
+        
+        if (autoRefreshEnabled) {
+          toggleDot.classList.add('translate-x-4');
+          startAutoRefresh();
+        } else {
+          toggleDot.classList.remove('translate-x-4');
+          stopAutoRefresh();
+        }
+      });
+      
+      // Set initial state
+      if (autoRefreshEnabled) {
+        const toggleDot = document.querySelector('.toggle-dot');
+        toggleDot.classList.add('translate-x-4');
+      }
+    }
+    
+    // Refresh button
+    const refreshButton = document.getElementById('refresh-metrics');
+    if (refreshButton) {
+      refreshButton.addEventListener('click', () => {
+        refreshButton.classList.add('animate-spin');
+        loadMetrics().finally(() => {
+          refreshButton.classList.remove('animate-spin');
+        });
+      });
+    }
+    
+    // Chart period buttons
+    document.querySelectorAll('.chart-period-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const period = e.target.dataset.period;
+        
+        // Update active state
+        document.querySelectorAll('.chart-period-btn').forEach(btn => {
+          btn.classList.remove('active', 'text-neon-cyan', 'bg-neon-cyan/10');
+          btn.classList.add('text-text-secondary');
+        });
+        
+        e.target.classList.add('active', 'text-neon-cyan', 'bg-neon-cyan/10');
+        e.target.classList.remove('text-text-secondary');
+        
+        // Update chart (if implemented)
+        if (performanceChart) {
+          updatePerformanceChart(null, period);
+        }
+      });
+    });
+    
+    // Add hover effects to metric cards
+    document.querySelectorAll('.metric-card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        if (window.cyberpunk) {
+          window.cyberpunk.glow(card);
+        }
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.boxShadow = '';
+      });
+    });
+  }
+  
+  function startAutoRefresh() {
+    if (refreshTimer) {
+      clearInterval(refreshTimer);
+    }
+    
+    const refreshInterval = parseInt(document.querySelector('.portfolio-metrics-container')?.dataset.refreshInterval || '30000');
+    
+    refreshTimer = setInterval(() => {
+      if (autoRefreshEnabled) {
+        loadMetrics();
+      }
+    }, refreshInterval);
+  }
+  
+  function stopAutoRefresh() {
+    if (refreshTimer) {
+      clearInterval(refreshTimer);
+      refreshTimer = null;
+    }
+  }
+  
+  function updatePerformanceChart(runData, period = '1d') {
+    // Placeholder for chart implementation
+    // Would integrate with Chart.js or similar library
+    console.log('Performance chart update:', { runData, period });
+  }
+  
+  function updateLastUpdated() {
+    const lastUpdatedElement = document.getElementById('last-updated');
+    if (lastUpdatedElement) {
+      const now = new Date();
+      lastUpdatedElement.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+    }
+  }
+  
+  function showError(message) {
+    const loadingElement = document.getElementById('metrics-loading');
+    const contentElement = document.getElementById('metrics-content');
+    const errorElement = document.getElementById('metrics-error');
+    const errorMessage = document.getElementById('error-message');
+    
+    if (loadingElement) loadingElement.classList.add('hidden');
+    if (contentElement) contentElement.classList.add('hidden');
+    if (errorElement) errorElement.classList.remove('hidden');
+    if (errorMessage) errorMessage.textContent = message;
+  }
+  
+  // Utility functions
+  function updateElement(id, content, html = false) {
+    const element = document.getElementById(id);
+    if (element) {
+      if (html) {
+        element.innerHTML = content;
+      } else {
+        element.textContent = content;
+      }
+    }
+  }
+  
+  function updateElementClass(id, className) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.className = element.className.replace(/(text-neon-\w+)/g, '') + ' ' + className;
+    }
+  }
+  
+  function formatCurrency(value, decimals = 2) {
+    if (value === null || value === undefined) return '$0.00';
+    return '$' + parseFloat(value).toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+  
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
+  
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    stopAutoRefresh();
+  });
+  
+  // Export functions for external use
+  window.PortfolioMetrics = {
+    refresh: loadMetrics,
+    setRunId: (runId) => {
+      currentRunId = runId;
+      loadMetrics();
+    },
+    setAutoRefresh: (enabled) => {
+      autoRefreshEnabled = enabled;
+      const toggle = document.getElementById('auto-refresh');
+      if (toggle) {
+        toggle.checked = enabled;
+        toggle.dispatchEvent(new Event('change'));
+      }
+    }
+  };
+</script>
+
+<style>
+  .portfolio-metrics-container {
+    @apply bg-dark-surface/80 backdrop-blur-sm rounded-lg border border-neon-cyan/30 shadow-xl;
+  }
+  
+  .portfolio-metrics-container.compact {
+    @apply text-sm;
+  }
+  
+  .portfolio-metrics-container.compact .metrics-header h3 {
+    @apply text-base;
+  }
+  
+  .portfolio-metrics-container.compact .metric-card {
+    @apply p-3;
+  }
+  
+  .portfolio-metrics-container.compact .metric-card .text-2xl {
+    @apply text-lg;
+  }
+  
+  .metric-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .metric-card:hover::before {
+    left: 100%;
+  }
+  
+  .metric-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .toggle-dot {
+    transition: transform 0.3s ease;
+  }
+  
+  .chart-period-btn.active {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.5);
+  }
+  
+  /* Animations for metrics updates */
+  .metric-card .text-2xl,
+  .metric-card .text-lg {
+    transition: all 0.3s ease;
+  }
+  
+  .metric-card.updated {
+    animation: pulse-glow 0.6s ease-out;
+  }
+  
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4); }
+    100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .metrics-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .header-actions {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .metrics-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    .additional-metrics .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .metrics-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .additional-metrics .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

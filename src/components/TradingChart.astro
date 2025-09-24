@@ -1,0 +1,608 @@
+---
+/**
+ * T053: TradingChart component with Lightweight Charts
+ * Advanced trading chart with real-time data, technical indicators, and cyberpunk styling
+ */
+
+export interface Props {
+  coinSymbol: string;
+  height?: number;
+  showControls?: boolean;
+  showVolume?: boolean;
+  interval?: '1h' | '4h' | '1d';
+  className?: string;
+}
+
+const { 
+  coinSymbol = 'BTC', 
+  height = 400, 
+  showControls = true, 
+  showVolume = true,
+  interval = '1d',
+  className = ''
+} = Astro.props;
+---
+
+<div class={`trading-chart-container ${className}`}>
+  <!-- Chart Header -->
+  <div class="chart-header flex items-center justify-between p-4 border-b border-neon-cyan/20">
+    <div class="chart-title">
+      <h3 class="text-xl font-orbitron font-bold text-neon-cyan glow-text">
+        {coinSymbol.toUpperCase()}/USD
+      </h3>
+      <div class="flex items-center space-x-4 mt-1">
+        <span class="price-display text-2xl font-bold text-white" id="current-price">
+          $0.00
+        </span>
+        <span class="price-change text-sm" id="price-change">
+          <span class="change-percent">+0.00%</span>
+          <span class="change-amount">+$0.00</span>
+        </span>
+      </div>
+    </div>
+    
+    {showControls && (
+      <div class="chart-controls flex items-center space-x-2">
+        <!-- Timeframe Selector -->
+        <div class="timeframe-selector flex bg-dark-surface rounded-lg border border-neon-cyan/30 overflow-hidden">
+          {['1h', '4h', '1d'].map((tf) => (
+            <button 
+              class={`px-3 py-1 text-sm font-medium transition-all duration-300 ${
+                tf === interval 
+                  ? 'bg-neon-cyan text-dark-bg' 
+                  : 'text-neon-cyan hover:bg-neon-cyan/10'
+              }`}
+              data-timeframe={tf}
+            >
+              {tf.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        
+        <!-- Chart Type Selector -->
+        <div class="chart-type-selector">
+          <select class="bg-dark-surface border border-neon-cyan/30 text-neon-cyan rounded-lg px-3 py-1 text-sm focus:border-neon-cyan focus:outline-none">
+            <option value="candlestick">Candlestick</option>
+            <option value="line">Line</option>
+            <option value="area">Area</option>
+          </select>
+        </div>
+        
+        <!-- Indicators Toggle -->
+        <button class="indicators-btn p-2 text-neon-cyan hover:text-neon-pink border border-neon-cyan/30 rounded-lg hover:border-neon-pink/30 transition-colors duration-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </button>
+        
+        <!-- Fullscreen Toggle -->
+        <button class="fullscreen-btn p-2 text-neon-cyan hover:text-neon-pink border border-neon-cyan/30 rounded-lg hover:border-neon-pink/30 transition-colors duration-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+          </svg>
+        </button>
+      </div>
+    )}
+  </div>
+  
+  <!-- Chart Container -->
+  <div class="chart-wrapper relative bg-dark-bg/50">
+    <div 
+      id={`trading-chart-${coinSymbol.toLowerCase()}`}
+      class="trading-chart"
+      style={`height: ${height}px`}
+      data-coin-symbol={coinSymbol}
+      data-interval={interval}
+      data-show-volume={showVolume}
+    >
+      <!-- Loading State -->
+      <div class="chart-loading absolute inset-0 flex items-center justify-center">
+        <div class="text-center">
+          <div class="animate-spin inline-block w-8 h-8 border-4 border-neon-cyan border-t-transparent rounded-full mb-4"></div>
+          <p class="text-neon-cyan font-rajdhani">Loading Chart Data...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chart Overlay Info -->
+    <div class="chart-overlay absolute top-4 left-4 bg-dark-surface/80 backdrop-blur-sm rounded-lg border border-neon-cyan/20 p-3 opacity-0 transition-opacity duration-300" id="chart-tooltip">
+      <div class="text-xs space-y-1">
+        <div class="flex justify-between space-x-4">
+          <span class="text-text-muted">Open:</span>
+          <span class="text-white font-mono" id="tooltip-open">$0.00</span>
+        </div>
+        <div class="flex justify-between space-x-4">
+          <span class="text-text-muted">High:</span>
+          <span class="text-neon-green font-mono" id="tooltip-high">$0.00</span>
+        </div>
+        <div class="flex justify-between space-x-4">
+          <span class="text-text-muted">Low:</span>
+          <span class="text-neon-pink font-mono" id="tooltip-low">$0.00</span>
+        </div>
+        <div class="flex justify-between space-x-4">
+          <span class="text-text-muted">Close:</span>
+          <span class="text-white font-mono" id="tooltip-close">$0.00</span>
+        </div>
+        <div class="flex justify-between space-x-4">
+          <span class="text-text-muted">Volume:</span>
+          <span class="text-neon-purple font-mono" id="tooltip-volume">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Technical Indicators Panel (Initially Hidden) -->
+  <div class="indicators-panel bg-dark-surface/80 border-t border-neon-cyan/20 p-4 hidden" id="indicators-panel">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div class="indicator-item">
+        <span class="text-text-muted block mb-1">RSI (14)</span>
+        <span class="text-neon-cyan font-mono" id="rsi-value">--</span>
+      </div>
+      <div class="indicator-item">
+        <span class="text-text-muted block mb-1">MACD</span>
+        <span class="text-neon-purple font-mono" id="macd-value">--</span>
+      </div>
+      <div class="indicator-item">
+        <span class="text-text-muted block mb-1">MA (50)</span>
+        <span class="text-neon-green font-mono" id="ma50-value">--</span>
+      </div>
+      <div class="indicator-item">
+        <span class="text-text-muted block mb-1">MA (200)</span>
+        <span class="text-neon-blue font-mono" id="ma200-value">--</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Import Lightweight Charts library
+  import('https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js')
+    .then(() => {
+      initializeTradingChart();
+    })
+    .catch(error => {
+      console.error('Failed to load Lightweight Charts:', error);
+      showChartError('Failed to load chart library');
+    });
+  
+  let chart = null;
+  let candlestickSeries = null;
+  let volumeSeries = null;
+  let currentCoinSymbol = '';
+  let currentInterval = '1d';
+  let isFullscreen = false;
+  
+  function initializeTradingChart() {
+    const chartContainer = document.querySelector('.trading-chart');
+    if (!chartContainer || !window.LightweightCharts) return;
+    
+    currentCoinSymbol = chartContainer.dataset.coinSymbol || 'BTC';
+    currentInterval = chartContainer.dataset.interval || '1d';
+    const showVolume = chartContainer.dataset.showVolume === 'true';
+    
+    // Create chart with cyberpunk theme
+    chart = window.LightweightCharts.createChart(chartContainer, {
+      width: chartContainer.clientWidth,
+      height: parseInt(chartContainer.style.height) || 400,
+      layout: {
+        background: {
+          type: 'solid',
+          color: '#0a0a0a',
+        },
+        textColor: '#ffffff',
+        fontSize: 12,
+        fontFamily: 'Rajdhani, sans-serif',
+      },
+      grid: {
+        vertLines: {
+          color: '#00ffff20',
+        },
+        horzLines: {
+          color: '#00ffff20',
+        },
+      },
+      crosshair: {
+        mode: window.LightweightCharts.CrosshairMode.Normal,
+        vertLine: {
+          color: '#00ffff80',
+          width: 1,
+          style: window.LightweightCharts.LineStyle.Dashed,
+        },
+        horzLine: {
+          color: '#00ffff80',
+          width: 1,
+          style: window.LightweightCharts.LineStyle.Dashed,
+        },
+      },
+      rightPriceScale: {
+        borderColor: '#00ffff40',
+        textColor: '#ffffff',
+      },
+      timeScale: {
+        borderColor: '#00ffff40',
+        textColor: '#ffffff',
+        timeVisible: true,
+        secondsVisible: false,
+      },
+      watermark: {
+        visible: true,
+        fontSize: 48,
+        horzAlign: 'center',
+        vertAlign: 'center',
+        color: '#00ffff10',
+        text: `${currentCoinSymbol}/USD`,
+        fontFamily: 'Orbitron, monospace',
+      },
+    });
+    
+    // Add candlestick series
+    candlestickSeries = chart.addCandlestickSeries({
+      upColor: '#00ff00',
+      downColor: '#ff00ff',
+      borderDownColor: '#ff00ff',
+      borderUpColor: '#00ff00',
+      wickDownColor: '#ff00ff',
+      wickUpColor: '#00ff00',
+    });
+    
+    // Add volume series if enabled
+    if (showVolume) {
+      volumeSeries = chart.addHistogramSeries({
+        color: '#9d4edd40',
+        priceFormat: {
+          type: 'volume',
+        },
+        priceScaleId: 'volume',
+        scaleMargins: {
+          top: 0.8,
+          bottom: 0,
+        },
+      });
+    }
+    
+    // Load initial data
+    loadChartData(currentCoinSymbol, currentInterval);
+    
+    // Setup event listeners
+    setupChartEventListeners();
+    
+    // Setup periodic updates
+    setupRealTimeUpdates();
+    
+    // Hide loading state
+    const loadingState = chartContainer.querySelector('.chart-loading');
+    if (loadingState) {
+      loadingState.style.display = 'none';
+    }
+  }
+  
+  async function loadChartData(coinSymbol, interval) {
+    try {
+      // Fetch historical data from our API
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - (interval === '1h' ? 7 : interval === '4h' ? 30 : 90));
+      
+      const response = await fetch(
+        `/api/market/${coinSymbol}/history?` + new URLSearchParams({
+          from: startDate.toISOString().split('T')[0],
+          to: endDate.toISOString().split('T')[0],
+          interval: interval,
+          format: 'ohlc'
+        })
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        const chartData = data.data.map(point => ({
+          time: new Date(point.timestamp).getTime() / 1000,
+          open: point.open,
+          high: point.high,
+          low: point.low,
+          close: point.close
+        }));
+        
+        const volumeData = data.data.map(point => ({
+          time: new Date(point.timestamp).getTime() / 1000,
+          value: point.volume,
+          color: point.close >= point.open ? '#00ff0040' : '#ff00ff40'
+        }));
+        
+        candlestickSeries.setData(chartData);
+        if (volumeSeries) {
+          volumeSeries.setData(volumeData);
+        }
+        
+        // Update current price display
+        const latestPoint = data.data[data.data.length - 1];
+        if (latestPoint) {
+          updatePriceDisplay(latestPoint.close, latestPoint.open);
+        }
+        
+        // Calculate and display technical indicators
+        updateTechnicalIndicators(data.data);
+      }
+      
+    } catch (error) {
+      console.error('Failed to load chart data:', error);
+      showChartError(`Failed to load data for ${coinSymbol}`);
+    }
+  }
+  
+  function setupChartEventListeners() {
+    if (!chart) return;
+    
+    // Crosshair move event for tooltip
+    chart.subscribeCrosshairMove(param => {
+      const tooltip = document.getElementById('chart-tooltip');
+      if (!tooltip || !param.time) {
+        if (tooltip) tooltip.style.opacity = '0';
+        return;
+      }
+      
+      const data = param.seriesData.get(candlestickSeries);
+      if (data) {
+        updateTooltip(data);
+        tooltip.style.opacity = '1';
+      }
+    });
+    
+    // Timeframe selector
+    document.querySelectorAll('[data-timeframe]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const newInterval = e.target.dataset.timeframe;
+        if (newInterval !== currentInterval) {
+          // Update active state
+          document.querySelectorAll('[data-timeframe]').forEach(btn => {
+            btn.classList.remove('bg-neon-cyan', 'text-dark-bg');
+            btn.classList.add('text-neon-cyan', 'hover:bg-neon-cyan/10');
+          });
+          e.target.classList.add('bg-neon-cyan', 'text-dark-bg');
+          e.target.classList.remove('text-neon-cyan', 'hover:bg-neon-cyan/10');
+          
+          currentInterval = newInterval;
+          loadChartData(currentCoinSymbol, currentInterval);
+        }
+      });
+    });
+    
+    // Indicators panel toggle
+    const indicatorsBtn = document.querySelector('.indicators-btn');
+    const indicatorsPanel = document.getElementById('indicators-panel');
+    if (indicatorsBtn && indicatorsPanel) {
+      indicatorsBtn.addEventListener('click', () => {
+        indicatorsPanel.classList.toggle('hidden');
+        indicatorsBtn.classList.toggle('text-neon-pink');
+      });
+    }
+    
+    // Fullscreen toggle
+    const fullscreenBtn = document.querySelector('.fullscreen-btn');
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener('click', toggleFullscreen);
+    }
+    
+    // Responsive resize
+    const resizeObserver = new ResizeObserver(entries => {
+      if (chart && entries[0]) {
+        const { width, height } = entries[0].contentRect;
+        chart.applyOptions({ width: width > 0 ? width : undefined });
+      }
+    });
+    
+    const chartContainer = document.querySelector('.trading-chart');
+    if (chartContainer) {
+      resizeObserver.observe(chartContainer);
+    }
+  }
+  
+  function updatePriceDisplay(currentPrice, previousPrice) {
+    const priceElement = document.getElementById('current-price');
+    const changeElement = document.getElementById('price-change');
+    
+    if (priceElement) {
+      priceElement.textContent = `$${currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    
+    if (changeElement && previousPrice) {
+      const change = currentPrice - previousPrice;
+      const changePercent = (change / previousPrice) * 100;
+      const isPositive = change >= 0;
+      
+      changeElement.innerHTML = `
+        <span class="change-percent ${isPositive ? 'text-neon-green' : 'text-neon-pink'}">
+          ${isPositive ? '+' : ''}${changePercent.toFixed(2)}%
+        </span>
+        <span class="change-amount ${isPositive ? 'text-neon-green' : 'text-neon-pink'}">
+          ${isPositive ? '+' : ''}$${Math.abs(change).toFixed(2)}
+        </span>
+      `;
+    }
+  }
+  
+  function updateTooltip(data) {
+    const elements = {
+      open: document.getElementById('tooltip-open'),
+      high: document.getElementById('tooltip-high'),
+      low: document.getElementById('tooltip-low'),
+      close: document.getElementById('tooltip-close'),
+      volume: document.getElementById('tooltip-volume')
+    };
+    
+    if (elements.open) elements.open.textContent = `$${data.open?.toFixed(2) || '0.00'}`;
+    if (elements.high) elements.high.textContent = `$${data.high?.toFixed(2) || '0.00'}`;
+    if (elements.low) elements.low.textContent = `$${data.low?.toFixed(2) || '0.00'}`;
+    if (elements.close) elements.close.textContent = `$${data.close?.toFixed(2) || '0.00'}`;
+    if (elements.volume) elements.volume.textContent = data.volume?.toLocaleString() || '0';
+  }
+  
+  function updateTechnicalIndicators(data) {
+    if (data.length < 14) return; // Need minimum data for indicators
+    
+    // Simple RSI calculation (simplified)
+    const rsi = calculateRSI(data.map(d => d.close), 14);
+    const rsiElement = document.getElementById('rsi-value');
+    if (rsiElement && rsi) {
+      rsiElement.textContent = rsi.toFixed(2);
+      rsiElement.className = `font-mono ${
+        rsi > 70 ? 'text-neon-pink' : rsi < 30 ? 'text-neon-green' : 'text-neon-cyan'
+      }`;
+    }
+    
+    // Moving averages
+    const ma50 = calculateMA(data.map(d => d.close), 50);
+    const ma200 = calculateMA(data.map(d => d.close), 200);
+    
+    const ma50Element = document.getElementById('ma50-value');
+    const ma200Element = document.getElementById('ma200-value');
+    
+    if (ma50Element && ma50) ma50Element.textContent = `$${ma50.toFixed(2)}`;
+    if (ma200Element && ma200) ma200Element.textContent = `$${ma200.toFixed(2)}`;
+  }
+  
+  function calculateRSI(prices, period) {
+    if (prices.length < period + 1) return null;
+    
+    const changes = prices.slice(1).map((price, i) => price - prices[i]);
+    const gains = changes.map(change => change > 0 ? change : 0);
+    const losses = changes.map(change => change < 0 ? Math.abs(change) : 0);
+    
+    const avgGain = gains.slice(-period).reduce((sum, gain) => sum + gain, 0) / period;
+    const avgLoss = losses.slice(-period).reduce((sum, loss) => sum + loss, 0) / period;
+    
+    if (avgLoss === 0) return 100;
+    const rs = avgGain / avgLoss;
+    return 100 - (100 / (1 + rs));
+  }
+  
+  function calculateMA(prices, period) {
+    if (prices.length < period) return null;
+    const recentPrices = prices.slice(-period);
+    return recentPrices.reduce((sum, price) => sum + price, 0) / period;
+  }
+  
+  function setupRealTimeUpdates() {
+    // Update chart data every 30 seconds
+    setInterval(() => {
+      if (currentCoinSymbol) {
+        updateCurrentPrice();
+      }
+    }, 30000);
+  }
+  
+  async function updateCurrentPrice() {
+    try {
+      const response = await fetch(`/api/market/${currentCoinSymbol}?format=summary`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          // Update price display without reloading entire chart
+          updatePriceDisplay(data.data.current_price, data.data.current_price);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to update current price:', error);
+    }
+  }
+  
+  function toggleFullscreen() {
+    const container = document.querySelector('.trading-chart-container');
+    if (!container) return;
+    
+    if (!isFullscreen) {
+      container.classList.add('fullscreen-chart');
+      chart?.applyOptions({ 
+        width: window.innerWidth,
+        height: window.innerHeight - 100
+      });
+      isFullscreen = true;
+    } else {
+      container.classList.remove('fullscreen-chart');
+      chart?.applyOptions({ 
+        width: container.clientWidth,
+        height: parseInt(container.querySelector('.trading-chart')?.style.height) || 400
+      });
+      isFullscreen = false;
+    }
+  }
+  
+  function showChartError(message) {
+    const chartContainer = document.querySelector('.trading-chart');
+    if (chartContainer) {
+      chartContainer.innerHTML = `
+        <div class="flex items-center justify-center h-full text-center">
+          <div>
+            <div class="text-neon-pink text-4xl mb-4">⚠</div>
+            <p class="text-neon-pink font-rajdhani">${message}</p>
+            <button class="mt-4 px-4 py-2 bg-neon-cyan text-dark-bg rounded-lg hover:bg-neon-pink transition-colors" onclick="location.reload()">
+              Retry
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+</script>
+
+<style>
+  .trading-chart-container {
+    @apply bg-dark-surface/80 backdrop-blur-sm rounded-lg border border-neon-cyan/30 shadow-xl;
+  }
+  
+  .fullscreen-chart {
+    @apply fixed inset-0 z-50 bg-dark-bg;
+  }
+  
+  .chart-wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .trading-chart {
+    width: 100%;
+    position: relative;
+  }
+  
+  .chart-overlay {
+    backdrop-filter: blur(10px);
+  }
+  
+  .indicators-panel {
+    border-top: 1px solid rgba(0, 255, 255, 0.2);
+  }
+  
+  /* Chart control animations */
+  .chart-controls button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.2);
+  }
+  
+  .timeframe-selector button.active {
+    background: var(--neon-cyan);
+    color: var(--dark-bg);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .chart-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .chart-controls {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .trading-chart {
+      height: 300px !important;
+    }
+  }
+</style>

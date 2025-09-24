@@ -1,0 +1,619 @@
+---
+/**
+ * T056: AIPrediction component for ML signals
+ * AI model predictions and confidence levels with cyberpunk visualization
+ */
+
+export interface Props {
+  symbol?: string;
+  compact?: boolean;
+  showHistory?: boolean;
+  refreshInterval?: number;
+  className?: string;
+}
+
+const {
+  symbol = 'bitcoin',
+  compact = false,
+  showHistory = true,
+  refreshInterval = 60000, // 1 minute
+  className = ''
+} = Astro.props;
+---
+
+<div class={`ai-prediction-container ${compact ? 'compact' : ''} ${className}`} data-symbol={symbol}>
+  <!-- Header -->
+  <div class="prediction-header flex items-center justify-between p-4 border-b border-neon-purple/20">
+    <div class="header-title">
+      <h3 class="text-lg font-orbitron font-bold text-neon-purple glow-text flex items-center">
+        <span class="mr-2">🧠</span>
+        AI Prediction Engine
+      </h3>
+      <p class="text-sm text-text-muted mt-1" id="prediction-status">
+        Initializing neural network...
+      </p>
+    </div>
+
+    <div class="header-actions flex items-center space-x-2">
+      <!-- Confidence indicator -->
+      <div class="confidence-indicator flex items-center space-x-2">
+        <div class="w-2 h-2 bg-neon-purple rounded-full animate-pulse"></div>
+        <span class="text-xs text-text-secondary">AI Active</span>
+      </div>
+
+      <!-- Model version -->
+      <div class="model-info text-xs text-text-muted px-2 py-1 bg-dark-surface/50 rounded border border-neon-purple/30">
+        v2.1.3
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="prediction-loading" class="p-8 text-center">
+    <div class="relative w-16 h-16 mx-auto mb-4">
+      <div class="absolute inset-0 border-4 border-neon-purple/20 rounded-full"></div>
+      <div class="absolute inset-0 border-4 border-neon-purple border-t-transparent rounded-full animate-spin"></div>
+      <div class="absolute inset-2 border-2 border-neon-pink/20 rounded-full"></div>
+      <div class="absolute inset-2 border-2 border-neon-pink border-b-transparent rounded-full animate-spin animation-delay-150"></div>
+    </div>
+    <p class="text-neon-purple font-rajdhani">Processing market data...</p>
+  </div>
+
+  <!-- Prediction Content -->
+  <div id="prediction-content" class="hidden">
+    <!-- Current Prediction -->
+    <div class="current-prediction p-4 border-b border-neon-purple/20">
+      <div class="prediction-card bg-gradient-to-br from-dark-surface/50 to-dark-card/50 rounded-lg p-6 border border-neon-purple/30 relative overflow-hidden">
+        <div class="prediction-glow absolute inset-0 bg-gradient-to-r from-neon-purple/10 via-neon-pink/10 to-neon-purple/10 animate-pulse"></div>
+
+        <div class="relative z-10">
+          <!-- Prediction Direction -->
+          <div class="text-center mb-6">
+            <div class="prediction-signal text-6xl mb-2" id="prediction-signal">📈</div>
+            <div class="prediction-direction text-2xl font-bold font-orbitron mb-1" id="prediction-direction">BULLISH</div>
+            <div class="prediction-timeframe text-sm text-text-muted" id="prediction-timeframe">Next 4 hours</div>
+          </div>
+
+          <!-- Confidence and Price Target -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="confidence-display text-center p-4 bg-dark-bg/30 rounded-lg border border-neon-purple/20">
+              <div class="text-sm text-text-muted mb-1">Confidence</div>
+              <div class="text-3xl font-bold text-neon-purple font-mono" id="confidence-level">85%</div>
+              <div class="confidence-bar mt-2 w-full bg-dark-surface rounded-full h-2">
+                <div class="confidence-fill bg-gradient-to-r from-neon-purple to-neon-pink h-2 rounded-full transition-all duration-1000" style="width: 85%" id="confidence-bar"></div>
+              </div>
+            </div>
+
+            <div class="price-target text-center p-4 bg-dark-bg/30 rounded-lg border border-neon-green/20">
+              <div class="text-sm text-text-muted mb-1">Price Target</div>
+              <div class="text-2xl font-bold text-neon-green font-mono" id="price-target">$45,250</div>
+              <div class="text-sm text-text-muted mt-1" id="price-change">+2.4% from current</div>
+            </div>
+          </div>
+
+          <!-- Key Signals -->
+          <div class="key-signals grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <div class="signal-item text-center p-2 bg-dark-bg/20 rounded border border-neon-cyan/20">
+              <div class="signal-icon text-lg mb-1">📊</div>
+              <div class="signal-name text-text-muted">Technical</div>
+              <div class="signal-value text-neon-cyan font-mono" id="technical-signal">+0.7</div>
+            </div>
+            <div class="signal-item text-center p-2 bg-dark-bg/20 rounded border border-neon-blue/20">
+              <div class="signal-icon text-lg mb-1">📰</div>
+              <div class="signal-name text-text-muted">Sentiment</div>
+              <div class="signal-value text-neon-blue font-mono" id="sentiment-signal">+0.3</div>
+            </div>
+            <div class="signal-item text-center p-2 bg-dark-bg/20 rounded border border-neon-green/20">
+              <div class="signal-icon text-lg mb-1">🌊</div>
+              <div class="signal-name text-text-muted">Volume</div>
+              <div class="signal-value text-neon-green font-mono" id="volume-signal">+0.5</div>
+            </div>
+            <div class="signal-item text-center p-2 bg-dark-bg/20 rounded border border-neon-pink/20">
+              <div class="signal-icon text-lg mb-1">⚡</div>
+              <div class="signal-name text-text-muted">Momentum</div>
+              <div class="signal-value text-neon-pink font-mono" id="momentum-signal">+0.4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {!compact && showHistory && (
+      <!-- Prediction History -->
+      <div class="prediction-history p-4">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="text-lg font-medium text-neon-purple">Recent Predictions</h4>
+          <div class="accuracy-badge px-2 py-1 bg-neon-green/20 text-neon-green rounded text-sm font-mono">
+            Accuracy: <span id="prediction-accuracy">73.2%</span>
+          </div>
+        </div>
+
+        <div class="history-list space-y-3" id="history-list">
+          <!-- History items will be populated by JavaScript -->
+        </div>
+
+        <div class="text-center mt-4">
+          <button class="load-more-btn px-4 py-2 text-sm text-neon-purple border border-neon-purple/30 rounded-lg hover:bg-neon-purple/10 transition-colors">
+            Load More Predictions
+          </button>
+        </div>
+      </div>
+    )}
+
+    {!compact && (
+      <!-- Model Performance -->
+      <div class="model-performance p-4 border-t border-neon-purple/20">
+        <h4 class="text-lg font-medium text-neon-purple mb-4">Model Performance</h4>
+
+        <div class="performance-grid grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div class="perf-item text-center">
+            <div class="text-text-muted mb-1">24h Accuracy</div>
+            <div class="text-neon-green font-mono text-lg" id="accuracy-24h">76.4%</div>
+          </div>
+          <div class="perf-item text-center">
+            <div class="text-text-muted mb-1">7d Accuracy</div>
+            <div class="text-neon-cyan font-mono text-lg" id="accuracy-7d">68.9%</div>
+          </div>
+          <div class="perf-item text-center">
+            <div class="text-text-muted mb-1">Predictions</div>
+            <div class="text-neon-blue font-mono text-lg" id="total-predictions">2,847</div>
+          </div>
+          <div class="perf-item text-center">
+            <div class="text-text-muted mb-1">Last Update</div>
+            <div class="text-white font-mono text-lg" id="last-model-update">2m ago</div>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+
+  <!-- Error State -->
+  <div id="prediction-error" class="hidden p-8 text-center">
+    <div class="text-neon-pink text-4xl mb-4">🚫</div>
+    <p class="text-neon-pink font-rajdhani mb-4" id="error-message">AI model unavailable</p>
+    <button class="px-4 py-2 bg-neon-purple text-white rounded-lg hover:bg-neon-pink transition-colors" onclick="location.reload()">
+      Restart AI Engine
+    </button>
+  </div>
+</div>
+
+<script>
+  let predictionTimer = null;
+  let currentSymbol = 'bitcoin';
+  let autoRefreshEnabled = true;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get component configuration
+    const container = document.querySelector('.ai-prediction-container');
+    if (container) {
+      currentSymbol = container.dataset.symbol || 'bitcoin';
+    }
+
+    // Initialize AI prediction
+    initializePrediction();
+
+    // Setup auto-refresh
+    startPredictionUpdates();
+  });
+
+  async function initializePrediction() {
+    try {
+      await loadPrediction();
+      await loadHistory();
+    } catch (error) {
+      console.error('Failed to initialize AI prediction:', error);
+      showError('Failed to load AI predictions');
+    }
+  }
+
+  async function loadPrediction() {
+    const loadingElement = document.getElementById('prediction-loading');
+    const contentElement = document.getElementById('prediction-content');
+    const errorElement = document.getElementById('prediction-error');
+
+    if (loadingElement) loadingElement.classList.remove('hidden');
+    if (contentElement) contentElement.classList.add('hidden');
+    if (errorElement) errorElement.classList.add('hidden');
+
+    try {
+      const response = await fetch(`/api/predictions/${currentSymbol}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        updatePredictionDisplay(data.data);
+        updateStatus('Neural network active - prediction generated');
+
+        if (contentElement) contentElement.classList.remove('hidden');
+      } else {
+        throw new Error(data.message || 'No prediction data available');
+      }
+
+    } catch (error) {
+      console.error('Failed to load prediction:', error);
+
+      // Fallback to mock data for demonstration
+      const mockPrediction = generateMockPrediction();
+      updatePredictionDisplay(mockPrediction);
+      updateStatus('Demo mode - using simulated AI predictions');
+
+      if (contentElement) contentElement.classList.remove('hidden');
+    } finally {
+      if (loadingElement) loadingElement.classList.add('hidden');
+    }
+  }
+
+  async function loadHistory() {
+    if (document.querySelector('.ai-prediction-container.compact')) {
+      return; // Skip history in compact mode
+    }
+
+    try {
+      const response = await fetch(`/api/predictions/${currentSymbol}/history?limit=5`);
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          updateHistoryDisplay(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load prediction history:', error);
+
+      // Use mock history for demonstration
+      const mockHistory = generateMockHistory();
+      updateHistoryDisplay(mockHistory);
+    }
+  }
+
+  function updatePredictionDisplay(prediction) {
+    // Direction and signal
+    const direction = prediction.direction || 'BULLISH';
+    const signal = direction === 'BULLISH' ? '📈' : direction === 'BEARISH' ? '📉' : '↔️';
+
+    updateElement('prediction-signal', signal);
+    updateElement('prediction-direction', direction);
+    updateElement('prediction-timeframe', prediction.timeframe || 'Next 4 hours');
+
+    // Update direction color
+    const directionElement = document.getElementById('prediction-direction');
+    if (directionElement) {
+      directionElement.className = direction === 'BULLISH' ? 'prediction-direction text-2xl font-bold font-orbitron mb-1 text-neon-green' :
+                                  direction === 'BEARISH' ? 'prediction-direction text-2xl font-bold font-orbitron mb-1 text-neon-pink' :
+                                  'prediction-direction text-2xl font-bold font-orbitron mb-1 text-neon-blue';
+    }
+
+    // Confidence
+    const confidence = prediction.confidence || 85;
+    updateElement('confidence-level', `${confidence}%`);
+
+    const confidenceBar = document.getElementById('confidence-bar');
+    if (confidenceBar) {
+      confidenceBar.style.width = `${confidence}%`;
+      confidenceBar.className = `confidence-fill h-2 rounded-full transition-all duration-1000 ${
+        confidence >= 80 ? 'bg-gradient-to-r from-neon-green to-neon-cyan' :
+        confidence >= 60 ? 'bg-gradient-to-r from-neon-purple to-neon-pink' :
+        'bg-gradient-to-r from-neon-pink to-neon-purple'
+      }`;
+    }
+
+    // Price target
+    const currentPrice = prediction.current_price || 44150;
+    const targetPrice = prediction.target_price || 45250;
+    const priceChange = ((targetPrice - currentPrice) / currentPrice) * 100;
+
+    updateElement('price-target', formatCurrency(targetPrice, 0));
+    updateElement('price-change', `${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(1)}% from current`);
+
+    // Key signals
+    const signals = prediction.signals || {
+      technical: 0.7,
+      sentiment: 0.3,
+      volume: 0.5,
+      momentum: 0.4
+    };
+
+    updateElement('technical-signal', signals.technical >= 0 ? `+${signals.technical.toFixed(1)}` : signals.technical.toFixed(1));
+    updateElement('sentiment-signal', signals.sentiment >= 0 ? `+${signals.sentiment.toFixed(1)}` : signals.sentiment.toFixed(1));
+    updateElement('volume-signal', signals.volume >= 0 ? `+${signals.volume.toFixed(1)}` : signals.volume.toFixed(1));
+    updateElement('momentum-signal', signals.momentum >= 0 ? `+${signals.momentum.toFixed(1)}` : signals.momentum.toFixed(1));
+
+    // Update signal colors based on values
+    updateSignalColors();
+  }
+
+  function updateHistoryDisplay(history) {
+    const historyList = document.getElementById('history-list');
+    if (!historyList || !history.length) return;
+
+    historyList.innerHTML = '';
+
+    history.forEach(item => {
+      const historyItem = createHistoryItem(item);
+      historyList.appendChild(historyItem);
+    });
+
+    // Update accuracy
+    const accuracy = calculateAccuracy(history);
+    updateElement('prediction-accuracy', `${accuracy.toFixed(1)}%`);
+  }
+
+  function createHistoryItem(item) {
+    const div = document.createElement('div');
+    div.className = 'history-item flex items-center justify-between p-3 bg-dark-surface/30 rounded-lg border border-neon-purple/20';
+
+    const direction = item.direction || 'BULLISH';
+    const accuracy = item.accurate ? '✅' : '❌';
+    const timeAgo = formatTimeAgo(item.created_at);
+
+    div.innerHTML = `
+      <div class="flex items-center space-x-3">
+        <div class="text-lg">${direction === 'BULLISH' ? '📈' : '📉'}</div>
+        <div>
+          <div class="font-medium ${direction === 'BULLISH' ? 'text-neon-green' : 'text-neon-pink'}">${direction}</div>
+          <div class="text-sm text-text-muted">${item.confidence}% confidence</div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-lg">${accuracy}</div>
+        <div class="text-xs text-text-muted">${timeAgo}</div>
+      </div>
+    `;
+
+    return div;
+  }
+
+  function updateSignalColors() {
+    const signals = ['technical', 'sentiment', 'volume', 'momentum'];
+
+    signals.forEach(signal => {
+      const element = document.getElementById(`${signal}-signal`);
+      if (element) {
+        const value = parseFloat(element.textContent);
+        const colorClass = value >= 0.5 ? 'text-neon-green' :
+                          value >= 0 ? 'text-neon-cyan' :
+                          value >= -0.5 ? 'text-neon-pink' : 'text-neon-pink';
+
+        element.className = `signal-value font-mono ${colorClass}`;
+      }
+    });
+  }
+
+  function startPredictionUpdates() {
+    const refreshInterval = parseInt(document.querySelector('.ai-prediction-container')?.dataset.refreshInterval || '60000');
+
+    predictionTimer = setInterval(() => {
+      if (autoRefreshEnabled) {
+        loadPrediction();
+      }
+    }, refreshInterval);
+  }
+
+  function generateMockPrediction() {
+    const directions = ['BULLISH', 'BEARISH', 'NEUTRAL'];
+    const direction = directions[Math.floor(Math.random() * directions.length)];
+
+    return {
+      direction,
+      confidence: Math.floor(Math.random() * 40) + 60, // 60-100%
+      timeframe: 'Next 4 hours',
+      current_price: 44150 + Math.floor(Math.random() * 1000) - 500,
+      target_price: 44150 + (direction === 'BULLISH' ? Math.floor(Math.random() * 2000) + 500 : -Math.floor(Math.random() * 2000) - 500),
+      signals: {
+        technical: (Math.random() - 0.5) * 2,
+        sentiment: (Math.random() - 0.5) * 2,
+        volume: (Math.random() - 0.5) * 2,
+        momentum: (Math.random() - 0.5) * 2
+      }
+    };
+  }
+
+  function generateMockHistory() {
+    const history = [];
+    const now = new Date();
+
+    for (let i = 0; i < 5; i++) {
+      const date = new Date(now.getTime() - (i + 1) * 4 * 60 * 60 * 1000); // 4 hours apart
+      history.push({
+        direction: Math.random() > 0.5 ? 'BULLISH' : 'BEARISH',
+        confidence: Math.floor(Math.random() * 40) + 60,
+        accurate: Math.random() > 0.3, // 70% accuracy
+        created_at: date.toISOString()
+      });
+    }
+
+    return history;
+  }
+
+  function calculateAccuracy(history) {
+    if (!history.length) return 0;
+    const accurate = history.filter(item => item.accurate).length;
+    return (accurate / history.length) * 100;
+  }
+
+  function updateStatus(message) {
+    const statusElement = document.getElementById('prediction-status');
+    if (statusElement) {
+      statusElement.textContent = message;
+    }
+  }
+
+  function showError(message) {
+    const loadingElement = document.getElementById('prediction-loading');
+    const contentElement = document.getElementById('prediction-content');
+    const errorElement = document.getElementById('prediction-error');
+    const errorMessage = document.getElementById('error-message');
+
+    if (loadingElement) loadingElement.classList.add('hidden');
+    if (contentElement) contentElement.classList.add('hidden');
+    if (errorElement) errorElement.classList.remove('hidden');
+    if (errorMessage) errorMessage.textContent = message;
+  }
+
+  // Utility functions
+  function updateElement(id, content) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = content;
+    }
+  }
+
+  function formatCurrency(value, decimals = 2) {
+    if (value === null || value === undefined) return '$0.00';
+    return '$' + parseFloat(value).toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+
+  function formatTimeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (diffHours > 0) {
+      return `${diffHours}h ago`;
+    } else {
+      return `${diffMins}m ago`;
+    }
+  }
+
+  // Cleanup
+  window.addEventListener('beforeunload', () => {
+    if (predictionTimer) {
+      clearInterval(predictionTimer);
+    }
+  });
+
+  // Export functions for external use
+  window.AIPrediction = {
+    refresh: loadPrediction,
+    setSymbol: (symbol) => {
+      currentSymbol = symbol;
+      loadPrediction();
+      loadHistory();
+    }
+  };
+</script>
+
+<style>
+  .ai-prediction-container {
+    @apply bg-dark-surface/80 backdrop-blur-sm rounded-lg border border-neon-purple/30 shadow-xl;
+  }
+
+  .ai-prediction-container.compact {
+    @apply text-sm;
+  }
+
+  .ai-prediction-container.compact .prediction-header h3 {
+    @apply text-base;
+  }
+
+  .ai-prediction-container.compact .prediction-card {
+    @apply p-4;
+  }
+
+  .prediction-glow {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+  }
+
+  .prediction-signal {
+    animation: signal-pulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.5));
+  }
+
+  @keyframes signal-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .confidence-fill {
+    box-shadow: 0 0 10px rgba(157, 78, 221, 0.4);
+  }
+
+  .signal-item {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .signal-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(157, 78, 221, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .signal-item:hover::before {
+    left: 100%;
+  }
+
+  .signal-item:hover {
+    transform: translateY(-2px);
+  }
+
+  .history-item {
+    transition: all 0.3s ease;
+  }
+
+  .history-item:hover {
+    background: rgba(157, 78, 221, 0.1);
+    border-color: rgba(157, 78, 221, 0.5);
+    transform: translateX(4px);
+  }
+
+  .load-more-btn:hover {
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.3);
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .prediction-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .current-prediction .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .key-signals {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .performance-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .key-signals {
+      grid-template-columns: 1fr;
+    }
+
+    .performance-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
