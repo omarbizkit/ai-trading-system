@@ -85,13 +85,13 @@
 - [x] **T031** [P] AIPrediction model and types in `src/lib/types/ai-prediction.ts`
 
 ### Services Layer
-- [ ] **T032** [P] Supabase client configuration in `src/lib/supabase.ts`
-- [ ] **T033** [P] TradingUserService CRUD operations in `src/lib/services/trading-user.service.ts`
-- [ ] **T034** [P] TradingRunService CRUD operations in `src/lib/services/trading-run.service.ts`
-- [ ] **T035** [P] TradeService CRUD operations in `src/lib/services/trade.service.ts`
-- [ ] **T036** [P] MarketDataService with CoinGecko integration in `src/lib/services/market-data.service.ts`
-- [ ] **T037** [P] AIPredictionService with TensorFlow.js in `src/lib/services/ai-prediction.service.ts`
-- [ ] **T038** [P] BacktestingService with Web Worker in `src/lib/services/backtesting.service.ts`
+- [x] **T032** [P] Supabase client configuration in `src/lib/supabase.ts`
+- [x] **T033** [P] TradingUserService CRUD operations in `src/lib/services/trading-user.service.ts`
+- [x] **T034** [P] TradingRunService CRUD operations in `src/lib/services/trading-run.service.ts`
+- [x] **T035** [P] TradeService CRUD operations in `src/lib/services/trade.service.ts`
+- [x] **T036** [P] MarketDataService with CoinGecko integration in `src/lib/services/market-data.service.ts`
+- [x] **T037** [P] AIPredictionService with TensorFlow.js in `src/lib/services/ai-prediction.service.ts`
+- [x] **T038** [P] BacktestingService with Web Worker in `src/lib/services/backtesting.service.ts`
 
 ### API Endpoints (Astro API Routes)
 - [ ] **T039** GET /api/user/profile endpoint in `src/pages/api/user/profile.ts`
