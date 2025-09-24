@@ -94,18 +94,18 @@
 - [x] **T038** [P] BacktestingService with Web Worker in `src/lib/services/backtesting.service.ts`
 
 ### API Endpoints (Astro API Routes)
-- [ ] **T039** GET /api/user/profile endpoint in `src/pages/api/user/profile.ts`
-- [ ] **T040** PUT /api/user/profile endpoint in `src/pages/api/user/profile.ts`
-- [ ] **T041** GET /api/runs endpoint in `src/pages/api/runs.ts`
-- [ ] **T042** POST /api/runs endpoint in `src/pages/api/runs.ts`
-- [ ] **T043** GET /api/runs/[runId].ts endpoint for run details
-- [ ] **T044** PATCH /api/runs/[runId].ts endpoint for run updates
-- [ ] **T045** GET /api/runs/[runId]/trades.ts endpoint for trades list
-- [ ] **T046** POST /api/runs/[runId]/trades.ts endpoint for trade execution
-- [ ] **T047** GET /api/market/[coinSymbol].ts endpoint for current market data
-- [ ] **T048** GET /api/market/[coinSymbol]/history.ts endpoint for historical data
-- [ ] **T049** GET /api/predictions/[coinSymbol].ts endpoint for AI predictions
-- [ ] **T050** POST /api/backtest.ts endpoint for backtesting
+- [x] **T039** GET /api/user/profile endpoint in `src/pages/api/user/profile.ts`
+- [x] **T040** PUT /api/user/profile endpoint in `src/pages/api/user/profile.ts`
+- [x] **T041** GET /api/runs endpoint in `src/pages/api/runs.ts`
+- [x] **T042** POST /api/runs endpoint in `src/pages/api/runs.ts`
+- [x] **T043** GET /api/runs/[runId].ts endpoint for run details
+- [x] **T044** PATCH /api/runs/[runId].ts endpoint for run updates
+- [x] **T045** GET /api/runs/[runId]/trades.ts endpoint for trades list
+- [x] **T046** POST /api/runs/[runId]/trades.ts endpoint for trade execution
+- [x] **T047** GET /api/market/[coinSymbol].ts endpoint for current market data
+- [x] **T048** GET /api/market/[coinSymbol]/history.ts endpoint for historical data
+- [x] **T049** GET /api/predictions/[coinSymbol].ts endpoint for AI predictions
+- [x] **T050** POST /api/backtest.ts endpoint for backtesting
 
 ### Core Components
 - [ ] **T051** [P] Layout component with cyberpunk theme in `src/layouts/Layout.astro`
