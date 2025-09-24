@@ -54,58 +54,58 @@
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
 
 ### Contract Tests (API Endpoints)
-- [ ] **T009** [P] Contract test GET /api/user/profile in `tests/contract/user-profile-get.test.ts`
-- [ ] **T010** [P] Contract test PUT /api/user/profile in `tests/contract/user-profile-put.test.ts`
-- [ ] **T011** [P] Contract test GET /api/runs in `tests/contract/runs-get.test.ts`
-- [ ] **T012** [P] Contract test POST /api/runs in `tests/contract/runs-post.test.ts`
-- [ ] **T013** [P] Contract test GET /api/runs/{runId} in `tests/contract/runs-get-id.test.ts`
-- [ ] **T014** [P] Contract test PATCH /api/runs/{runId} in `tests/contract/runs-patch.test.ts`
-- [ ] **T015** [P] Contract test GET /api/runs/{runId}/trades in `tests/contract/trades-get.test.ts`
-- [ ] **T016** [P] Contract test POST /api/runs/{runId}/trades in `tests/contract/trades-post.test.ts`
-- [ ] **T017** [P] Contract test GET /api/market/{coinSymbol} in `tests/contract/market-get.test.ts`
-- [ ] **T018** [P] Contract test GET /api/market/{coinSymbol}/history in `tests/contract/market-history.test.ts`
-- [ ] **T019** [P] Contract test GET /api/predictions/{coinSymbol} in `tests/contract/predictions-get.test.ts`
-- [ ] **T020** [P] Contract test POST /api/backtest in `tests/contract/backtest-post.test.ts`
+- [x] **T009** [P] Contract test GET /api/user/profile in `tests/contract/user-profile-get.test.ts`
+- [x] **T010** [P] Contract test PUT /api/user/profile in `tests/contract/user-profile-put.test.ts`
+- [x] **T011** [P] Contract test GET /api/runs in `tests/contract/runs-get.test.ts`
+- [x] **T012** [P] Contract test POST /api/runs in `tests/contract/runs-post.test.ts`
+- [x] **T013** [P] Contract test GET /api/runs/{runId} in `tests/contract/runs-get-id.test.ts`
+- [x] **T014** [P] Contract test PATCH /api/runs/{runId} in `tests/contract/runs-patch.test.ts`
+- [x] **T015** [P] Contract test GET /api/runs/{runId}/trades in `tests/contract/trades-get.test.ts`
+- [x] **T016** [P] Contract test POST /api/runs/{runId}/trades in `tests/contract/trades-post.test.ts`
+- [x] **T017** [P] Contract test GET /api/market/{coinSymbol} in `tests/contract/market-get.test.ts`
+- [x] **T018** [P] Contract test GET /api/market/{coinSymbol}/history in `tests/contract/market-history.test.ts`
+- [x] **T019** [P] Contract test GET /api/predictions/{coinSymbol} in `tests/contract/predictions-get.test.ts`
+- [x] **T020** [P] Contract test POST /api/backtest in `tests/contract/backtest-post.test.ts`
 
 ### Integration Tests (User Scenarios)
-- [ ] **T021** [P] Integration test guest user simulation flow in `tests/integration/guest-simulation.test.ts`
-- [ ] **T022** [P] Integration test authenticated backtesting flow in `tests/integration/auth-backtest.test.ts`
-- [ ] **T023** [P] Integration test real-time simulation dashboard in `tests/integration/realtime-dashboard.test.ts`
-- [ ] **T024** [P] Integration test risk management protocols in `tests/integration/risk-management.test.ts`
-- [ ] **T025** [P] Integration test cross-domain SSO navigation in `tests/integration/cross-domain-sso.test.ts`
-- [ ] **T026** [P] Integration test mobile responsiveness in `tests/integration/mobile-responsive.test.ts`
+- [x] **T021** [P] Integration test guest user simulation flow in `tests/integration/guest-simulation.test.ts`
+- [x] **T022** [P] Integration test authenticated backtesting flow in `tests/integration/auth-backtest.test.ts`
+- [x] **T023** [P] Integration test real-time simulation dashboard in `tests/integration/realtime-dashboard.test.ts`
+- [x] **T024** [P] Integration test risk management protocols in `tests/integration/risk-management.test.ts`
+- [x] **T025** [P] Integration test cross-domain SSO navigation in `tests/integration/cross-domain-sso.test.ts`
+- [x] **T026** [P] Integration test mobile responsiveness in `tests/integration/mobile-responsive.test.ts`
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
 
 ### Database Models & Types
-- [ ] **T027** [P] TradingUser model and types in `src/lib/types/trading-user.ts`
-- [ ] **T028** [P] TradingRun model and types in `src/lib/types/trading-run.ts`
-- [ ] **T029** [P] Trade model and types in `src/lib/types/trade.ts`
-- [ ] **T030** [P] MarketData model and types in `src/lib/types/market-data.ts`
-- [ ] **T031** [P] AIPrediction model and types in `src/lib/types/ai-prediction.ts`
+- [x] **T027** [P] TradingUser model and types in `src/lib/types/trading-user.ts`
+- [x] **T028** [P] TradingRun model and types in `src/lib/types/trading-run.ts`
+- [x] **T029** [P] Trade model and types in `src/lib/types/trade.ts`
+- [x] **T030** [P] MarketData model and types in `src/lib/types/market-data.ts`
+- [x] **T031** [P] AIPrediction model and types in `src/lib/types/ai-prediction.ts`
 
 ### Services Layer
-- [ ] **T032** [P] Supabase client configuration in `src/lib/supabase.ts`
-- [ ] **T033** [P] TradingUserService CRUD operations in `src/lib/services/trading-user.service.ts`
-- [ ] **T034** [P] TradingRunService CRUD operations in `src/lib/services/trading-run.service.ts`
-- [ ] **T035** [P] TradeService CRUD operations in `src/lib/services/trade.service.ts`
-- [ ] **T036** [P] MarketDataService with CoinGecko integration in `src/lib/services/market-data.service.ts`
-- [ ] **T037** [P] AIPredictionService with TensorFlow.js in `src/lib/services/ai-prediction.service.ts`
-- [ ] **T038** [P] BacktestingService with Web Worker in `src/lib/services/backtesting.service.ts`
+- [x] **T032** [P] Supabase client configuration in `src/lib/supabase.ts`
+- [x] **T033** [P] TradingUserService CRUD operations in `src/lib/services/trading-user.service.ts`
+- [x] **T034** [P] TradingRunService CRUD operations in `src/lib/services/trading-run.service.ts`
+- [x] **T035** [P] TradeService CRUD operations in `src/lib/services/trade.service.ts`
+- [x] **T036** [P] MarketDataService with CoinGecko integration in `src/lib/services/market-data.service.ts`
+- [x] **T037** [P] AIPredictionService with TensorFlow.js in `src/lib/services/ai-prediction.service.ts`
+- [x] **T038** [P] BacktestingService with Web Worker in `src/lib/services/backtesting.service.ts`
 
 ### API Endpoints (Astro API Routes)
-- [ ] **T039** GET /api/user/profile endpoint in `src/pages/api/user/profile.ts`
-- [ ] **T040** PUT /api/user/profile endpoint in `src/pages/api/user/profile.ts`
-- [ ] **T041** GET /api/runs endpoint in `src/pages/api/runs.ts`
-- [ ] **T042** POST /api/runs endpoint in `src/pages/api/runs.ts`
-- [ ] **T043** GET /api/runs/[runId].ts endpoint for run details
-- [ ] **T044** PATCH /api/runs/[runId].ts endpoint for run updates
-- [ ] **T045** GET /api/runs/[runId]/trades.ts endpoint for trades list
-- [ ] **T046** POST /api/runs/[runId]/trades.ts endpoint for trade execution
-- [ ] **T047** GET /api/market/[coinSymbol].ts endpoint for current market data
-- [ ] **T048** GET /api/market/[coinSymbol]/history.ts endpoint for historical data
-- [ ] **T049** GET /api/predictions/[coinSymbol].ts endpoint for AI predictions
-- [ ] **T050** POST /api/backtest.ts endpoint for backtesting
+- [x] **T039** GET /api/user/profile endpoint in `src/pages/api/user/profile.ts`
+- [x] **T040** PUT /api/user/profile endpoint in `src/pages/api/user/profile.ts`
+- [x] **T041** GET /api/runs endpoint in `src/pages/api/runs.ts`
+- [x] **T042** POST /api/runs endpoint in `src/pages/api/runs.ts`
+- [x] **T043** GET /api/runs/[runId].ts endpoint for run details
+- [x] **T044** PATCH /api/runs/[runId].ts endpoint for run updates
+- [x] **T045** GET /api/runs/[runId]/trades.ts endpoint for trades list
+- [x] **T046** POST /api/runs/[runId]/trades.ts endpoint for trade execution
+- [x] **T047** GET /api/market/[coinSymbol].ts endpoint for current market data
+- [x] **T048** GET /api/market/[coinSymbol]/history.ts endpoint for historical data
+- [x] **T049** GET /api/predictions/[coinSymbol].ts endpoint for AI predictions
+- [x] **T050** POST /api/backtest.ts endpoint for backtesting
 
 ### Core Components
 - [ ] **T051** [P] Layout component with cyberpunk theme in `src/layouts/Layout.astro`
