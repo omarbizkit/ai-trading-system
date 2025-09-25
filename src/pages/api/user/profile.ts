@@ -4,6 +4,8 @@
  * PUT /api/user/profile - Update user profile
  */
 
+export const prerender = false;
+
 import type { APIRoute } from "astro";
 import { supabase } from "../../../lib/supabase.js";
 import { tradingUserService } from "../../../lib/services/trading-user.service.js";

@@ -191,7 +191,7 @@ function isActive(href: string, current: string): boolean {
         mobileMenu.classList.toggle('hidden');
         
         // Animate hamburger icon
-        const svg = mobileMenuButton.querySelector('svg');
+        const svg = mobileMenuButton.querySelector('svg') as SVGElement;
         if (svg) {
           svg.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(90deg)';
         }
@@ -202,34 +202,38 @@ function isActive(href: string, current: string): boolean {
     const progressBar = document.getElementById('nav-progress');
     
     // Show progress on navigation
-    document.addEventListener('click', function(e) {
-      const link = e.target.closest('a[href^="/"]');
+    document.addEventListener('click', function(e: Event) {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a[href^="/"]');
       if (link && progressBar) {
-        progressBar.style.opacity = '1';
-        progressBar.style.animation = 'loading-pulse 1s ease-in-out infinite';
+        const progressBarElement = progressBar as HTMLElement;
+        progressBarElement.style.opacity = '1';
+        progressBarElement.style.animation = 'loading-pulse 1s ease-in-out infinite';
       }
     });
     
     // Hide progress when page loads
     window.addEventListener('load', function() {
       if (progressBar) {
-        progressBar.style.opacity = '0';
-        progressBar.style.animation = 'none';
+        const progressBarElement = progressBar as HTMLElement;
+        progressBarElement.style.opacity = '0';
+        progressBarElement.style.animation = 'none';
       }
     });
     
     // Close mobile menu when clicking outside
-    document.addEventListener('click', function(e) {
-      if (mobileMenu && !mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+    document.addEventListener('click', function(e: Event) {
+      const target = e.target as HTMLElement;
+      if (mobileMenu && mobileMenuButton && !mobileMenu.contains(target) && !mobileMenuButton.contains(target)) {
         mobileMenu.classList.add('hidden');
         mobileMenuButton.setAttribute('aria-expanded', 'false');
       }
     });
     
     // Add glow effect to active nav items
-    const activeNavItem = document.querySelector('.nav-link[aria-current="page"]');
-    if (activeNavItem && window.cyberpunk) {
-      window.cyberpunk.glow(activeNavItem, '#00ffff');
+    const activeNavItem = document.querySelector('.nav-link[aria-current="page"]') as HTMLElement;
+    if (activeNavItem && (window as any).cyberpunk) {
+      (window as any).cyberpunk.glow(activeNavItem, '#00ffff');
     }
   });
 </script>

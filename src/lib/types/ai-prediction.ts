@@ -415,14 +415,12 @@ export function formatPredictionForDisplay(prediction: AIPrediction): {
 
 export function isHighConfidencePrediction(
   prediction: AIPrediction,
-  threshold: number = DEFAULT_MODEL_CONFIG.confidence_threshold
+  threshold: number = 0.6
 ): boolean {
   return prediction.confidence_score >= threshold;
 }
 
-export function shouldTradeBased
-
-OnPrediction(
+export function shouldTradeBasedOnPrediction(
   prediction: AIPrediction,
   minConfidence: number = 0.7,
   allowedDirections: PredictedDirection[] = ["up", "down"]

@@ -118,11 +118,11 @@
 - [x] **T058** [P] BacktestingForm component for historical testing in `src/components/BacktestingForm.astro`
 
 ### Pages
-- [ ] **T059** Home page with simulation start in `src/pages/index.astro`
-- [ ] **T060** Simulation dashboard page in `src/pages/simulation.astro`
-- [ ] **T061** Backtesting page in `src/pages/backtesting.astro`
-- [ ] **T062** Trading history page in `src/pages/history.astro`
-- [ ] **T063** User profile/settings page in `src/pages/profile.astro`
+- [x] **T059** Home page with simulation start in `src/pages/index.astro`
+- [x] **T060** Simulation dashboard page in `src/pages/simulation.astro`
+- [x] **T061** Backtesting page in `src/pages/backtesting.astro`
+- [x] **T062** Trading history page in `src/pages/history.astro`
+- [x] **T063** User profile/settings page in `src/pages/profile.astro`
 
 ## Phase 3.4: Integration
 

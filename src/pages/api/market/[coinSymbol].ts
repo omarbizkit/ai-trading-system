@@ -3,6 +3,8 @@
  * GET /api/market/[coinSymbol] - Get current market data for a cryptocurrency
  */
 
+export const prerender = false;
+
 import type { APIRoute } from "astro";
 import { marketDataService } from "../../../lib/services/market-data.service.js";
 import type {

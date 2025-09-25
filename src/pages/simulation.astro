@@ -1,0 +1,361 @@
+---
+/**
+ * T060: Simulation dashboard page
+ * Live trading simulation interface with real-time charts and AI predictions
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import TradingChart from '../components/TradingChart.astro';
+import PortfolioMetrics from '../components/PortfolioMetrics.astro';
+import AIPrediction from '../components/AIPrediction.astro';
+import SimulationControls from '../components/SimulationControls.astro';
+import TradeLog from '../components/TradeLog.astro';
+
+const pageTitle = "Live Trading Simulation";
+const pageDescription = "Real-time cryptocurrency trading simulation powered by AI predictions and advanced market analysis.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Navigation currentPath="/simulation" />
+
+  <main class="min-h-screen bg-dark-bg">
+    <!-- Header Section -->
+    <div class="border-b border-neon-cyan/30 bg-dark-surface/50 backdrop-blur-sm">
+      <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <!-- Page Title -->
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-green rounded-xl flex items-center justify-center glow-border">
+              <span class="text-2xl">⚡</span>
+            </div>
+            <div>
+              <h1 class="text-3xl font-orbitron font-bold text-neon-cyan glow-text">
+                LIVE TRADING SIMULATION
+              </h1>
+              <p class="text-text-secondary mt-1">
+                Real-time AI-powered cryptocurrency trading
+              </p>
+            </div>
+          </div>
+
+          <!-- Status Indicators -->
+          <div class="flex items-center space-x-6">
+            <!-- Market Status -->
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-neon-green rounded-full animate-pulse"></div>
+              <div class="text-sm">
+                <div class="text-neon-green font-medium">MARKET OPEN</div>
+                <div class="text-text-muted">24/7 Trading</div>
+              </div>
+            </div>
+
+            <!-- AI Status -->
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-neon-purple rounded-full animate-pulse"></div>
+              <div class="text-sm">
+                <div class="text-neon-purple font-medium">AI ACTIVE</div>
+                <div class="text-text-muted">Neural Model v2.1</div>
+              </div>
+            </div>
+
+            <!-- Connection Status -->
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-neon-cyan rounded-full animate-pulse"></div>
+              <div class="text-sm">
+                <div class="text-neon-cyan font-medium">CONNECTED</div>
+                <div class="text-text-muted">Real-time Data</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="container mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+
+        <!-- Left Column: Portfolio & Controls -->
+        <div class="xl:col-span-1 space-y-6">
+          <!-- Portfolio Metrics -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30 glow-border p-6">
+            <PortfolioMetrics />
+          </div>
+
+          <!-- Simulation Controls -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-purple/30 p-6">
+            <SimulationControls />
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-green/30 p-6">
+            <h3 class="text-lg font-orbitron font-bold text-neon-green mb-4 flex items-center">
+              <span class="mr-2">📊</span>
+              Session Stats
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-text-secondary text-sm">Trades Today</span>
+                <span class="text-white font-bold">12</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-text-secondary text-sm">Win Rate</span>
+                <span class="text-neon-green font-bold">68.3%</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-text-secondary text-sm">Best Trade</span>
+                <span class="text-neon-cyan font-bold">+$2,341</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-text-secondary text-sm">Active Pairs</span>
+                <span class="text-white font-bold">5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Column: Main Chart -->
+        <div class="xl:col-span-2 space-y-6">
+          <!-- Trading Chart -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30 glow-border">
+            <div class="p-4 border-b border-neon-cyan/20">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h2 class="text-xl font-orbitron font-bold text-neon-cyan flex items-center">
+                  <span class="mr-2">📈</span>
+                  BITCOIN/USDT
+                </h2>
+                <div class="flex items-center space-x-4">
+                  <!-- Timeframe Selector -->
+                  <div class="flex bg-dark-surface/50 rounded-lg border border-neon-cyan/30 overflow-hidden">
+                    <button class="px-3 py-1 text-xs font-medium bg-neon-cyan text-dark-bg">1H</button>
+                    <button class="px-3 py-1 text-xs font-medium text-text-secondary hover:text-neon-cyan transition-colors">4H</button>
+                    <button class="px-3 py-1 text-xs font-medium text-text-secondary hover:text-neon-cyan transition-colors">1D</button>
+                    <button class="px-3 py-1 text-xs font-medium text-text-secondary hover:text-neon-cyan transition-colors">1W</button>
+                  </div>
+
+                  <!-- Price Display -->
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-neon-green">$43,521.32</div>
+                    <div class="text-sm text-neon-green">+2.34% (+$995.12)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="h-96">
+              <TradingChart />
+            </div>
+          </div>
+
+          <!-- AI Prediction Panel -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-purple/30">
+            <AIPrediction />
+          </div>
+        </div>
+
+        <!-- Right Column: Trading Activity -->
+        <div class="xl:col-span-1 space-y-6">
+          <!-- Active Positions -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-pink/30 p-6">
+            <h3 class="text-lg font-orbitron font-bold text-neon-pink mb-4 flex items-center justify-between">
+              <span class="flex items-center">
+                <span class="mr-2">🎯</span>
+                Active Positions
+              </span>
+              <span class="text-xs text-text-muted bg-neon-pink/10 px-2 py-1 rounded">3</span>
+            </h3>
+
+            <div class="space-y-3">
+              <!-- Position 1 -->
+              <div class="bg-dark-surface/50 rounded-lg p-3 border border-neon-green/20">
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <div class="text-white font-medium">BTC/USDT</div>
+                    <div class="text-xs text-neon-green">LONG • 0.025 BTC</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-neon-green font-bold">+$1,234</div>
+                    <div class="text-xs text-neon-green">+2.84%</div>
+                  </div>
+                </div>
+                <div class="text-xs text-text-muted">
+                  Entry: $42,150 • Current: $43,521
+                </div>
+              </div>
+
+              <!-- Position 2 -->
+              <div class="bg-dark-surface/50 rounded-lg p-3 border border-neon-pink/20">
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <div class="text-white font-medium">ETH/USDT</div>
+                    <div class="text-xs text-neon-pink">SHORT • 2.5 ETH</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-neon-pink font-bold">-$156</div>
+                    <div class="text-xs text-neon-pink">-0.89%</div>
+                  </div>
+                </div>
+                <div class="text-xs text-text-muted">
+                  Entry: $2,890 • Current: $2,865
+                </div>
+              </div>
+
+              <!-- Position 3 -->
+              <div class="bg-dark-surface/50 rounded-lg p-3 border border-neon-green/20">
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <div class="text-white font-medium">ADA/USDT</div>
+                    <div class="text-xs text-neon-green">LONG • 1,000 ADA</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-neon-green font-bold">+$89</div>
+                    <div class="text-xs text-neon-green">+1.23%</div>
+                  </div>
+                </div>
+                <div class="text-xs text-text-muted">
+                  Entry: $0.452 • Current: $0.458
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trade Log -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30">
+            <TradeLog />
+          </div>
+
+          <!-- Market Alerts -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-purple/30 p-6">
+            <h3 class="text-lg font-orbitron font-bold text-neon-purple mb-4 flex items-center">
+              <span class="mr-2">🚨</span>
+              Market Alerts
+            </h3>
+
+            <div class="space-y-3">
+              <div class="bg-neon-green/10 border border-neon-green/30 rounded-lg p-3">
+                <div class="flex items-start space-x-3">
+                  <div class="w-2 h-2 bg-neon-green rounded-full mt-2"></div>
+                  <div class="flex-1">
+                    <div class="text-neon-green font-medium text-sm">Support Level Hit</div>
+                    <div class="text-text-muted text-xs mt-1">
+                      BTC touched major support at $43,000. Strong bounce expected.
+                    </div>
+                    <div class="text-text-muted text-xs mt-1">2 min ago</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-neon-purple/10 border border-neon-purple/30 rounded-lg p-3">
+                <div class="flex items-start space-x-3">
+                  <div class="w-2 h-2 bg-neon-purple rounded-full mt-2"></div>
+                  <div class="flex-1">
+                    <div class="text-neon-purple font-medium text-sm">AI Confidence High</div>
+                    <div class="text-text-muted text-xs mt-1">
+                      Neural network shows 89% bullish confidence for next 4H.
+                    </div>
+                    <div class="text-text-muted text-xs mt-1">5 min ago</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-neon-cyan/10 border border-neon-cyan/30 rounded-lg p-3">
+                <div class="flex items-start space-x-3">
+                  <div class="w-2 h-2 bg-neon-cyan rounded-full mt-2"></div>
+                  <div class="flex-1">
+                    <div class="text-neon-cyan font-medium text-sm">Volume Spike</div>
+                    <div class="text-text-muted text-xs mt-1">
+                      Unusual volume detected in ETH/USDT. Monitor closely.
+                    </div>
+                    <div class="text-text-muted text-xs mt-1">12 min ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-6 right-6 flex flex-col space-y-3 z-40">
+      <!-- New Trade Button -->
+      <button class="w-14 h-14 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-full flex items-center justify-center glow-border shadow-lg hover:scale-105 transition-transform group">
+        <span class="text-2xl group-hover:scale-110 transition-transform">⚡</span>
+      </button>
+
+      <!-- Settings Button -->
+      <button class="w-12 h-12 bg-dark-card/80 backdrop-blur-md rounded-full border border-neon-cyan/30 flex items-center justify-center hover:bg-neon-cyan/10 transition-colors">
+        <span class="text-lg">⚙️</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- Real-time Connection Script -->
+  <script>
+    // Simulate real-time updates for demo
+    document.addEventListener('DOMContentLoaded', function() {
+      // Update price every 2 seconds
+      setInterval(() => {
+        const priceElement = document.querySelector('.text-2xl.font-bold.text-neon-green');
+        if (priceElement) {
+          const basePrice = 43521.32;
+          const variation = (Math.random() - 0.5) * 100;
+          const newPrice = basePrice + variation;
+          priceElement.textContent = `$${newPrice.toFixed(2)}`;
+        }
+      }, 2000);
+
+      // Pulse active status indicators
+      const indicators = document.querySelectorAll('.animate-pulse');
+      indicators.forEach(indicator => {
+        setInterval(() => {
+          indicator.style.opacity = indicator.style.opacity === '0.5' ? '1' : '0.5';
+        }, 1000);
+      });
+    });
+  </script>
+
+  <style>
+    /* Cyberpunk card effects */
+    .cyberpunk-card {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .cyberpunk-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 255, 255, 0.15);
+    }
+
+    .cyberpunk-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 255, 0.05) 50%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .cyberpunk-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Scrollbar styling for panels */
+    .cyberpunk-card::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .cyberpunk-card::-webkit-scrollbar-track {
+      background: var(--dark-bg);
+    }
+
+    .cyberpunk-card::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+      border-radius: 2px;
+    }
+  </style>
+</Layout>

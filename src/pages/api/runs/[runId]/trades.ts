@@ -4,6 +4,8 @@
  * POST /api/runs/[runId]/trades - Execute new trade
  */
 
+export const prerender = false;
+
 import type { APIRoute } from "astro";
 import { supabase } from "../../../../lib/supabase.js";
 import { tradingRunService } from "../../../../lib/services/trading-run.service.js";

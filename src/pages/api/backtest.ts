@@ -3,6 +3,8 @@
  * POST /api/backtest - Start a new backtest or get backtest results
  */
 
+export const prerender = false;
+
 import type { APIRoute } from "astro";
 import { supabase } from "../../lib/supabase.js";
 import { backtestingService, type BacktestRequest } from "../../lib/services/backtesting.service.js";

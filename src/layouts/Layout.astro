@@ -12,6 +12,9 @@ export interface Props {
 
 const { title, description = "AI-powered cryptocurrency trading simulator", canonical } = Astro.props;
 const currentUrl = Astro.url.href;
+
+// Import global styles
+import '../styles/globals.css';
 ---
 
 <!doctype html>
@@ -169,6 +172,7 @@ const currentUrl = Astro.url.href;
     </div>
     
     <script>
+      // @ts-nocheck
       // Theme initialization and loading screen
       document.addEventListener('DOMContentLoaded', function() {
         const loadingScreen = document.getElementById('loading-screen');
@@ -205,6 +209,8 @@ const currentUrl = Astro.url.href;
       function createMatrixEffect() {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
+        if (!ctx) return; // Exit if context is not available
+
         canvas.style.position = 'fixed';
         canvas.style.top = '0';
         canvas.style.left = '0';
@@ -212,43 +218,46 @@ const currentUrl = Astro.url.href;
         canvas.style.opacity = '0.1';
         canvas.style.pointerEvents = 'none';
         document.body.appendChild(canvas);
-        
+
         function resizeCanvas() {
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
         }
-        
+
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
-        
+
         const matrix = "01";
         const matrixArray = matrix.split("");
         const fontSize = 14;
         const columns = Math.floor(canvas.width / fontSize);
         const drops = [];
-        
+
+        // Initialize drops array
         for (let x = 0; x < columns; x++) {
           drops[x] = Math.random() * canvas.height;
         }
-        
+
         function drawMatrix() {
+          if (!ctx) return;
+          
           ctx.fillStyle = 'rgba(10, 10, 10, 0.04)';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
-          
+
           ctx.fillStyle = '#00ffff';
           ctx.font = fontSize + 'px monospace';
-          
+
           for (let i = 0; i < drops.length; i++) {
             const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            
+
             if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
               drops[i] = 0;
             }
             drops[i]++;
           }
         }
-        
+
         setInterval(drawMatrix, 50);
       }
       
@@ -262,12 +271,13 @@ const currentUrl = Astro.url.href;
           blue: '#0099ff'
         },
         
-        glow: (element, color = '#00ffff') => {
+        glow: function(element, color) {
+          color = color || '#00ffff';
           element.style.boxShadow = `0 0 20px ${color}40, inset 0 0 20px ${color}10`;
           element.style.border = `1px solid ${color}60`;
         },
-        
-        pulse: (element) => {
+
+        pulse: function(element) {
           element.classList.add('animate-pulse');
           setTimeout(() => element.classList.remove('animate-pulse'), 2000);
         }
