@@ -4,8 +4,8 @@
  * Based on data-model.md specifications
  */
 
-import { supabase, handleDatabaseError, retryOperation } from "../supabase.js";
-import type { Database } from "../supabase.js";
+import { supabase, handleDatabaseError, retryOperation } from "../supabase";
+import type { Database } from "../supabase";
 import type {
   AIPrediction,
   PredictedDirection,
@@ -17,12 +17,12 @@ import type {
   ModelPerformance,
   PredictionValidation,
   ModelConfig
-} from "../types/ai-prediction.js";
+} from "../types/ai-prediction";
 import {
   DEFAULT_MODEL_CONFIG,
   AI_PREDICTION_CONSTRAINTS
-} from "../types/ai-prediction.js";
-import type { MarketData } from "../types/market-data.js";
+} from "../types/ai-prediction";
+import type { MarketData } from "../types/market-data";
 
 // TensorFlow.js types (will be imported when model is loaded)
 declare global {
