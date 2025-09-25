@@ -3,7 +3,7 @@
  * ML model service for cryptocurrency price prediction
  */
 
-import * as tf from '@tensorflow/tfjs';
+// TensorFlow.js import removed - using mock implementation
 
 export interface PredictionInput {
   price_data: number[];
@@ -30,7 +30,7 @@ export interface ModelConfig {
 }
 
 interface ModelCache {
-  model: tf.LayersModel | null;
+  model: any | null; // Mock model type
   version: string;
   loaded_at: number;
   config: ModelConfig;
@@ -38,7 +38,7 @@ interface ModelCache {
 
 class ModelLoader {
   private cache: Map<string, ModelCache> = new Map();
-  private loading: Map<string, Promise<tf.LayersModel>> = new Map();
+  private loading: Map<string, Promise<any>> = new Map();
   private isInitialized = false;
 
   constructor() {
@@ -46,47 +46,22 @@ class ModelLoader {
   }
 
   /**
-   * Initialize TensorFlow.js with optimal backend
+   * Initialize mock ML system (TensorFlow.js disabled)
    */
   private async initializeTensorFlow(): Promise<void> {
     try {
-      // Set backend preference (CPU for reliability on free hosting)
-      const backend = import.meta.env.TENSORFLOW_JS_BACKEND || 'cpu';
-
-      if (backend === 'webgl' && typeof window !== 'undefined') {
-        await tf.setBackend('webgl');
-      } else {
-        await tf.setBackend('cpu');
-      }
-
-      await tf.ready();
-
-      console.log('TensorFlow.js initialized:', {
-        backend: tf.getBackend(),
-        version: tf.version.tfjs,
-        memory: tf.memory()
-      });
-
+      console.log('Mock ML system initialized (TensorFlow.js disabled)');
       this.isInitialized = true;
     } catch (error) {
-      console.error('Failed to initialize TensorFlow.js:', error);
-      // Fallback to CPU backend
-      try {
-        await tf.setBackend('cpu');
-        await tf.ready();
-        this.isInitialized = true;
-        console.log('Fallback to CPU backend successful');
-      } catch (fallbackError) {
-        console.error('Failed to initialize TensorFlow.js with CPU backend:', fallbackError);
-        this.isInitialized = false;
-      }
+      console.error('Failed to initialize mock ML system:', error);
+      this.isInitialized = false;
     }
   }
 
   /**
    * Load ML model for cryptocurrency price prediction
    */
-  async loadModel(symbol: string): Promise<tf.LayersModel | null> {
+  async loadModel(symbol: string): Promise<any | null> {
     if (!this.isInitialized) {
       await this.initializeTensorFlow();
       if (!this.isInitialized) {
@@ -138,64 +113,23 @@ class ModelLoader {
   }
 
   /**
-   * Load model from source (URL or IndexedDB)
+   * Load model from source (mock implementation)
    */
-  private async loadModelFromSource(config: ModelConfig): Promise<tf.LayersModel> {
-    // Try to load from IndexedDB cache first
-    try {
-      const cachedModel = await this.loadFromIndexedDB(config.model_url);
-      if (cachedModel) {
-        console.log('Loaded model from IndexedDB cache');
-        return cachedModel;
-      }
-    } catch (error) {
-      console.warn('Failed to load from IndexedDB, loading from URL');
-    }
-
-    // Load from URL
-    try {
-      const model = await tf.loadLayersModel(config.model_url);
-
-      // Save to IndexedDB for next time
-      try {
-        await this.saveToIndexedDB(config.model_url, model);
-      } catch (cacheError) {
-        console.warn('Failed to cache model in IndexedDB:', cacheError);
-      }
-
-      return model;
-    } catch (error) {
-      console.error('Failed to load model from URL:', error);
-      // Return mock model for development
-      return this.createMockModel(config);
-    }
+  private async loadModelFromSource(config: ModelConfig): Promise<any> {
+    // Return mock model since TensorFlow.js is disabled
+    console.log('Loading mock model (TensorFlow.js disabled)');
+    return this.createMockModel(config);
   }
 
   /**
-   * Make price prediction using loaded model
+   * Make price prediction using loaded model (mock implementation)
    */
   async predict(input: PredictionInput): Promise<PredictionOutput | null> {
     try {
-      const model = await this.loadModel(input.symbol);
-      if (!model) {
-        return this.getMockPrediction(input);
-      }
+      // Always return mock prediction since TensorFlow.js is disabled
+      const result = this.getMockPrediction(input);
 
-      // Prepare input tensor
-      const inputTensor = this.prepareInput(input);
-
-      // Make prediction
-      const prediction = model.predict(inputTensor) as tf.Tensor;
-      const predictionData = await prediction.data();
-
-      // Clean up tensors
-      inputTensor.dispose();
-      prediction.dispose();
-
-      // Process prediction results
-      const result = this.processPrediction(predictionData, input);
-
-      console.log('Prediction made:', {
+      console.log('Mock prediction made:', {
         symbol: input.symbol,
         predicted_price: result.predicted_price,
         confidence: result.confidence,
@@ -255,25 +189,15 @@ class ModelLoader {
   }
 
   /**
-   * Prepare input data for model
+   * Prepare input data for model (mock implementation)
    */
-  private prepareInput(input: PredictionInput): tf.Tensor {
-    // Normalize price and volume data
-    const priceData = this.normalizeArray(input.price_data);
-    const volumeData = this.normalizeArray(input.volume_data);
-
-    // Create sequence tensor [batch_size, sequence_length, features]
-    const sequenceLength = Math.min(priceData.length, 60);
-    const features = 2; // price + volume
-
-    const tensorData = new Float32Array(sequenceLength * features);
-
-    for (let i = 0; i < sequenceLength; i++) {
-      tensorData[i * features] = priceData[i] || 0;
-      tensorData[i * features + 1] = volumeData[i] || 0;
-    }
-
-    return tf.tensor3d([tensorData], [1, sequenceLength, features]);
+  private prepareInput(input: PredictionInput): any {
+    // Mock input preparation - just return the input data
+    return {
+      price_data: input.price_data,
+      volume_data: input.volume_data,
+      symbol: input.symbol
+    };
   }
 
   /**
@@ -307,24 +231,22 @@ class ModelLoader {
   /**
    * Create mock model for development/fallback
    */
-  private createMockModel(config: ModelConfig): tf.LayersModel {
-    const model = tf.sequential({
-      layers: [
-        tf.layers.dense({
-          units: 50,
-          activation: 'relu',
-          inputShape: [config.sequence_length, config.features.length]
-        }),
-        tf.layers.dense({
-          units: 25,
-          activation: 'relu'
-        }),
-        tf.layers.dense({
-          units: 2, // [predicted_price, confidence]
-          activation: 'linear'
-        })
-      ]
-    });
+  private createMockModel(config: ModelConfig): any {
+    const model = {
+      predict: (input: any) => {
+        // Mock prediction logic
+        const currentPrice = input.price_data[input.price_data.length - 1] || 100;
+        const randomFactor = (Math.random() - 0.5) * 0.1; // ±5% random change
+        const predictedPrice = currentPrice * (1 + randomFactor);
+        const confidence = 0.5 + Math.random() * 0.3; // 0.5-0.8 confidence
+
+        return {
+          data: () => [predictedPrice, confidence],
+          dispose: () => {}
+        };
+      },
+      dispose: () => {}
+    };
 
     console.log('Created mock model for development');
     return model;
@@ -373,33 +295,19 @@ class ModelLoader {
   }
 
   /**
-   * Load model from IndexedDB cache
+   * Load model from IndexedDB cache (disabled)
    */
-  private async loadFromIndexedDB(modelUrl: string): Promise<tf.LayersModel | null> {
-    try {
-      if (typeof window === 'undefined') return null;
-
-      const modelKey = `tfjs_model_${btoa(modelUrl)}`;
-      const model = await tf.loadLayersModel(`indexeddb://${modelKey}`);
-      return model;
-    } catch (error) {
-      return null;
-    }
+  private async loadFromIndexedDB(modelUrl: string): Promise<any | null> {
+    // IndexedDB caching disabled since TensorFlow.js is not available
+    return null;
   }
 
   /**
-   * Save model to IndexedDB cache
+   * Save model to IndexedDB cache (disabled)
    */
-  private async saveToIndexedDB(modelUrl: string, model: tf.LayersModel): Promise<void> {
-    try {
-      if (typeof window === 'undefined') return;
-
-      const modelKey = `tfjs_model_${btoa(modelUrl)}`;
-      await model.save(`indexeddb://${modelKey}`);
-      console.log('Model cached in IndexedDB');
-    } catch (error) {
-      console.warn('Failed to cache model in IndexedDB:', error);
-    }
+  private async saveToIndexedDB(modelUrl: string, model: any): Promise<void> {
+    // IndexedDB caching disabled since TensorFlow.js is not available
+    console.log('Model caching disabled (TensorFlow.js not available)');
   }
 
   /**
@@ -407,7 +315,7 @@ class ModelLoader {
    */
   clearCache(): void {
     this.cache.forEach((cache, key) => {
-      if (cache.model) {
+      if (cache.model && cache.model.dispose) {
         cache.model.dispose();
       }
     });
@@ -415,11 +323,7 @@ class ModelLoader {
     this.cache.clear();
     this.loading.clear();
 
-    // Run TensorFlow.js garbage collection
-    if (this.isInitialized) {
-      tf.disposeVariables();
-      console.log('Model cache cleared, memory freed');
-    }
+    console.log('Mock model cache cleared');
   }
 
   /**
@@ -427,13 +331,13 @@ class ModelLoader {
    */
   getMemoryStats(): any {
     if (!this.isInitialized) {
-      return { error: 'TensorFlow.js not initialized' };
+      return { error: 'Mock ML system not initialized' };
     }
 
     return {
-      ...tf.memory(),
       cached_models: this.cache.size,
-      loading_models: this.loading.size
+      loading_models: this.loading.size,
+      status: 'mock_mode'
     };
   }
 }
