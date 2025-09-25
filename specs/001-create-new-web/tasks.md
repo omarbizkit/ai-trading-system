@@ -127,16 +127,16 @@
 ## Phase 3.4: Integration
 
 ### Authentication & State Management
-- [ ] **T064** Supabase Auth integration with SSO configuration in `src/lib/auth.ts`
-- [ ] **T065** Auth middleware for protected routes in `src/middleware.ts`
-- [ ] **T066** Client-side state management for trading session in `src/lib/stores/trading-store.ts`
-- [ ] **T067** Real-time price updates with polling mechanism in `src/lib/services/price-monitor.service.ts`
+- [x] **T064** Supabase Auth integration with SSO configuration in `src/lib/auth.ts`
+- [x] **T065** Auth middleware for protected routes in `src/middleware.ts`
+- [x] **T066** Client-side state management for trading session in `src/lib/stores/trading-store.ts`
+- [x] **T067** Real-time price updates with polling mechanism in `src/lib/services/price-monitor.service.ts`
 
 ### ML & External Services
-- [ ] **T068** TensorFlow.js model loading and inference in `src/lib/ml/model-loader.ts`
-- [ ] **T069** CoinGecko API rate limiting and caching in `src/lib/services/coingecko.service.ts`
-- [ ] **T070** Web Worker for backtesting computations in `src/workers/backtest-worker.ts`
-- [ ] **T071** Error handling and retry logic for external APIs in `src/lib/utils/error-handler.ts`
+- [x] **T068** TensorFlow.js model loading and inference in `src/lib/ml/model-loader.ts`
+- [x] **T069** CoinGecko API rate limiting and caching in `src/lib/services/coingecko.service.ts`
+- [x] **T070** Web Worker for backtesting computations in `src/workers/backtest-worker.ts`
+- [x] **T071** Error handling and retry logic for external APIs in `src/lib/utils/error-handler.ts`
 
 ### UI/UX Integration
 - [ ] **T072** Responsive design implementation across all components

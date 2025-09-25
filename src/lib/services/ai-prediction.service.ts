@@ -23,42 +23,14 @@ import {
   AI_PREDICTION_CONSTRAINTS
 } from "../types/ai-prediction";
 import type { MarketData } from "../types/market-data";
-
-// TensorFlow.js types (will be imported when model is loaded)
-declare global {
-  interface Window {
-    tf?: any;
-  }
-}
+import { modelLoader, createPredictionInput } from "../ml/model-loader";
+import type { PredictionInput, PredictionOutput } from "../ml/model-loader";
 
 export class AIPredictionService {
-  private model: any = null;
   private modelConfig: ModelConfig;
-  private isModelLoading = false;
-  private modelLoadPromise: Promise<void> | null = null;
 
   constructor(config: ModelConfig = DEFAULT_MODEL_CONFIG) {
     this.modelConfig = config;
-  }
-
-  /**
-   * Initialize and load the AI model
-   */
-  async initializeModel(modelUrl?: string): Promise<void> {
-    if (this.model) return;
-
-    if (this.isModelLoading && this.modelLoadPromise) {
-      return this.modelLoadPromise;
-    }
-
-    this.isModelLoading = true;
-    this.modelLoadPromise = this.loadModel(modelUrl);
-
-    try {
-      await this.modelLoadPromise;
-    } finally {
-      this.isModelLoading = false;
-    }
   }
 
   /**
@@ -70,8 +42,6 @@ export class AIPredictionService {
     horizon: number = AI_PREDICTION_CONSTRAINTS.PREDICTION_HORIZON.DEFAULT
   ): Promise<AIPrediction> {
     try {
-      await this.ensureModelLoaded();
-
       // Prepare input features
       const inputFeatures = await this.prepareInputFeatures(marketData);
 
@@ -80,13 +50,25 @@ export class AIPredictionService {
         throw new Error("Invalid input features for prediction");
       }
 
-      // Generate prediction using the model
-      const prediction = await this.predict(inputFeatures, horizon);
+      // Create prediction input for model loader
+      const priceData = marketData.historical_data.map(d => d.price);
+      const volumeData = marketData.historical_data.map(d => d.volume);
+      const predictionInput = createPredictionInput(priceData, volumeData, coinSymbol);
+
+      // Generate prediction using the model loader
+      const modelPrediction = await modelLoader.predict(predictionInput);
+
+      if (!modelPrediction) {
+        throw new Error("Failed to generate prediction from model");
+      }
+
+      // Map model prediction to our format
+      const prediction = this.mapModelPrediction(modelPrediction);
 
       // Create prediction object
       const aiPrediction: Omit<AIPrediction, "id"> = {
         coin_symbol: coinSymbol.toUpperCase(),
-        model_version: this.modelConfig.version,
+        model_version: modelPrediction.model_version,
         input_features: inputFeatures,
         predicted_price: prediction.price,
         predicted_direction: prediction.direction,
@@ -297,82 +279,42 @@ export class AIPredictionService {
   }
 
   /**
-   * Private: Load the TensorFlow.js model
+   * Private: Map model loader prediction to internal format
    */
-  private async loadModel(modelUrl?: string): Promise<void> {
-    try {
-      // Load TensorFlow.js if not already loaded
-      if (typeof window !== "undefined" && !window.tf) {
-        await this.loadTensorFlowJS();
-      }
-
-      // For now, create a mock model for development
-      // In production, this would load a real trained model
-      this.model = await this.createMockModel();
-
-      console.log(`AI model ${this.modelConfig.version} loaded successfully`);
-    } catch (error: any) {
-      console.error("Failed to load AI model:", error);
-      throw new Error(`Failed to load AI model: ${error.message}`);
+  private mapModelPrediction(
+    modelPrediction: PredictionOutput
+  ): {
+    price: number;
+    direction: PredictedDirection;
+    confidence: number;
+  } {
+    // Map direction from model to our enum
+    let direction: PredictedDirection;
+    switch (modelPrediction.direction) {
+      case 'up':
+        direction = 'up';
+        break;
+      case 'down':
+        direction = 'down';
+        break;
+      default:
+        direction = 'hold';
+        break;
     }
-  }
 
-  /**
-   * Private: Load TensorFlow.js library
-   */
-  private async loadTensorFlowJS(): Promise<void> {
-    if (typeof window === "undefined") {
-      // Server-side: use Node.js version
-      const tf = await import("@tensorflow/tfjs-node");
-      (global as any).tf = tf;
-    } else {
-      // Client-side: load browser version
-      const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js";
-
-      return new Promise((resolve, reject) => {
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error("Failed to load TensorFlow.js"));
-        document.head.appendChild(script);
-      });
-    }
-  }
-
-  /**
-   * Private: Create mock model for development
-   */
-  private async createMockModel(): Promise<any> {
-    // This is a placeholder mock model
-    // In production, this would be replaced with a real trained model
     return {
-      predict: (inputs: number[][]) => {
-        // Mock prediction logic
-        const input = inputs[0];
-        const currentPrice = input?.[0] || 0;
-
-        // Generate pseudo-random but deterministic predictions
-        const seed = input?.reduce((sum, val) => sum + val, 0) || 0;
-        const random = Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000);
-
-        const priceChange = (random - 0.5) * 0.1; // ±5% max change
-        const predictedPrice = currentPrice * (1 + priceChange);
-        const confidence = 0.6 + Math.abs(random) * 0.3; // 0.6-0.9 range
-
-        return {
-          dataSync: () => [predictedPrice, confidence]
-        };
-      },
-      dispose: () => {}
+      price: modelPrediction.predicted_price,
+      direction,
+      confidence: modelPrediction.confidence
     };
   }
 
   /**
-   * Private: Ensure model is loaded
+   * Clean up model resources
    */
-  private async ensureModelLoaded(): Promise<void> {
-    if (!this.model) {
-      await this.initializeModel();
-    }
+  clearModelCache(): void {
+    // Model cleanup is handled by the model loader singleton
+    modelLoader.clearCache();
   }
 
   /**
@@ -434,38 +376,10 @@ export class AIPredictionService {
   }
 
   /**
-   * Private: Make prediction using the model
+   * Get model memory statistics
    */
-  private async predict(inputFeatures: InputFeatures, horizon: number): Promise<{
-    price: number;
-    direction: PredictedDirection;
-    confidence: number;
-  }> {
-    const features = this.featuresToArray(inputFeatures);
-    const prediction = this.model.predict([features]);
-    const result = prediction.dataSync();
-
-    const predictedPrice = result[0];
-    const confidence = Math.min(0.99, Math.max(0.01, result[1]));
-
-    // Determine direction based on price change
-    const currentPrice = inputFeatures.current_price;
-    const priceChangePercent = ((predictedPrice - currentPrice) / currentPrice) * 100;
-
-    let direction: PredictedDirection;
-    if (priceChangePercent > 0.5) {
-      direction = "up";
-    } else if (priceChangePercent < -0.5) {
-      direction = "down";
-    } else {
-      direction = "hold";
-    }
-
-    return {
-      price: predictedPrice,
-      direction,
-      confidence
-    };
+  getModelMemoryStats(): any {
+    return modelLoader.getMemoryStats();
   }
 
   /**
