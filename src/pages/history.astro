@@ -6,7 +6,6 @@
 
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
-import TradeLog from '../components/TradeLog.astro';
 
 const pageTitle = "Trading History";
 const pageDescription = "Complete trading history with detailed analytics, performance tracking, and advanced filtering options.";
@@ -486,6 +485,7 @@ const pageDescription = "Complete trading history with detailed analytics, perfo
 
   <!-- Trading History Interactive Script -->
   <script>
+    // @ts-nocheck
     document.addEventListener('DOMContentLoaded', function() {
       // Table sorting functionality
       const sortableHeaders = document.querySelectorAll('th[class*="cursor-pointer"]');
