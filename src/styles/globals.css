@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom cyberpunk utilities */
+@layer utilities {
+  .bg-dark-bg { background-color: #0a0a0a; }
+  .bg-dark-surface { background-color: #1a1a2e; }
+  .bg-dark-card { background-color: #16213e; }
+
+  .text-neon-cyan { color: #00ffff; }
+  .text-neon-pink { color: #ff00ff; }
+  .text-neon-green { color: #00ff00; }
+  .text-neon-purple { color: #9d4edd; }
+  .text-neon-blue { color: #0099ff; }
+
+  .text-text-primary { color: #ffffff; }
+  .text-text-secondary { color: #b0b0b0; }
+  .text-text-muted { color: #666666; }
+
+  .border-neon-cyan { border-color: #00ffff; }
+  .border-neon-pink { border-color: #ff00ff; }
+  .border-neon-green { border-color: #00ff00; }
+  .border-neon-purple { border-color: #9d4edd; }
+  .border-neon-blue { border-color: #0099ff; }
+
+  .glow-text {
+    text-shadow: 0 0 10px currentColor;
+  }
+
+  .glow-border {
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(0, 255, 255, 0.1);
+  }
+}

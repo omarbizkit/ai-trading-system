@@ -229,18 +229,22 @@ export interface Database {
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl) {
+// For development, allow placeholder values
+const isDevMode = import.meta.env.NODE_ENV === 'development';
+const isPlaceholder = supabaseUrl?.includes('placeholder') || supabaseAnonKey?.includes('placeholder');
+
+if (!supabaseUrl && !isDevMode) {
   throw new Error("Missing PUBLIC_SUPABASE_URL environment variable");
 }
 
-if (!supabaseAnonKey) {
+if (!supabaseAnonKey && !isDevMode) {
   throw new Error("Missing PUBLIC_SUPABASE_ANON_KEY environment variable");
 }
 
 // Create and configure Supabase client
 export const supabase: SupabaseClient<Database> = createClient<Database>(
-  supabaseUrl,
-  supabaseAnonKey,
+  supabaseUrl || 'https://dev-placeholder.supabase.co',
+  supabaseAnonKey || 'dev-placeholder-key',
   {
     auth: {
       // Configure for .bizkit.dev domain SSO

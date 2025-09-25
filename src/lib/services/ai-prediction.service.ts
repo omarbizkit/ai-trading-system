@@ -16,7 +16,9 @@ import type {
   ExternalFactors,
   ModelPerformance,
   PredictionValidation,
-  ModelConfig,
+  ModelConfig
+} from "../types/ai-prediction.js";
+import {
   DEFAULT_MODEL_CONFIG,
   AI_PREDICTION_CONSTRAINTS
 } from "../types/ai-prediction.js";

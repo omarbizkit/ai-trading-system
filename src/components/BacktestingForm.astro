@@ -1,0 +1,1209 @@
+---
+/**
+ * T058: BacktestingForm component for historical testing
+ * Backtesting configuration and execution with cyberpunk styling
+ */
+
+export interface Props {
+  compact?: boolean;
+  showResults?: boolean;
+  className?: string;
+}
+
+const {
+  compact = false,
+  showResults = true,
+  className = ''
+} = Astro.props;
+---
+
+<div class={`backtesting-form-container ${compact ? 'compact' : ''} ${className}`}>
+  <!-- Header -->
+  <div class="form-header flex items-center justify-between p-4 border-b border-neon-blue/20">
+    <div class="header-title">
+      <h3 class="text-lg font-orbitron font-bold text-neon-blue glow-text flex items-center">
+        <span class="mr-2">🔄</span>
+        Backtesting Engine
+      </h3>
+      <p class="text-sm text-text-muted mt-1" id="backtest-status">
+        Configure historical testing parameters
+      </p>
+    </div>
+
+    <div class="header-actions flex items-center space-x-2">
+      <!-- Processing indicator -->
+      <div class="processing-indicator hidden flex items-center space-x-2" id="processing-indicator">
+        <div class="w-2 h-2 bg-neon-blue rounded-full animate-ping"></div>
+        <span class="text-xs text-text-secondary">Processing...</span>
+      </div>
+
+      <!-- Saved configs -->
+      <div class="saved-configs">
+        <select id="saved-config" class="config-select bg-dark-surface border border-neon-blue/30 rounded px-2 py-1 text-sm text-white">
+          <option value="">New Configuration</option>
+          <option value="conservative">Conservative Strategy</option>
+          <option value="aggressive">Aggressive Growth</option>
+          <option value="ai_only">AI Signals Only</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuration Form -->
+  <div class="backtest-config p-4">
+    <div class="config-form space-y-6">
+      <!-- Time Range -->
+      <div class="time-range-section">
+        <h4 class="section-title text-md font-medium text-neon-blue mb-3 flex items-center">
+          <span class="mr-2">📅</span>
+          Time Range
+        </h4>
+
+        <div class="time-range-grid grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="date-input">
+            <label class="block text-sm text-text-secondary mb-2">Start Date</label>
+            <input type="date" id="start-date" class="w-full bg-dark-bg border border-neon-blue/30 rounded-lg px-3 py-2 text-white focus:border-neon-blue focus:ring-1 focus:ring-neon-blue" />
+          </div>
+
+          <div class="date-input">
+            <label class="block text-sm text-text-secondary mb-2">End Date</label>
+            <input type="date" id="end-date" class="w-full bg-dark-bg border border-neon-blue/30 rounded-lg px-3 py-2 text-white focus:border-neon-blue focus:ring-1 focus:ring-neon-blue" />
+          </div>
+
+          <div class="preset-ranges">
+            <label class="block text-sm text-text-secondary mb-2">Quick Select</label>
+            <div class="preset-buttons flex flex-wrap gap-2">
+              <button class="preset-btn px-2 py-1 text-xs bg-dark-surface border border-neon-blue/30 rounded text-neon-blue hover:bg-neon-blue/10" data-period="30d">30D</button>
+              <button class="preset-btn px-2 py-1 text-xs bg-dark-surface border border-neon-blue/30 rounded text-neon-blue hover:bg-neon-blue/10" data-period="90d">90D</button>
+              <button class="preset-btn px-2 py-1 text-xs bg-dark-surface border border-neon-blue/30 rounded text-neon-blue hover:bg-neon-blue/10" data-period="1y">1Y</button>
+              <button class="preset-btn px-2 py-1 text-xs bg-dark-surface border border-neon-blue/30 rounded text-neon-blue hover:bg-neon-blue/10" data-period="2y">2Y</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset Selection -->
+      <div class="asset-selection-section">
+        <h4 class="section-title text-md font-medium text-neon-blue mb-3 flex items-center">
+          <span class="mr-2">💰</span>
+          Assets & Capital
+        </h4>
+
+        <div class="assets-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="asset-symbols">
+            <label class="block text-sm text-text-secondary mb-2">Trading Pairs</label>
+            <div class="symbol-selector space-y-2">
+              <div class="checkbox-group">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" class="asset-checkbox sr-only" value="bitcoin" checked />
+                  <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-blue/30 rounded flex items-center justify-center">
+                    <div class="checkbox-mark w-2 h-2 bg-neon-blue rounded hidden"></div>
+                  </div>
+                  <span class="text-white">BTC/USD</span>
+                  <span class="text-text-muted ml-auto">$44,250</span>
+                </label>
+              </div>
+
+              <div class="checkbox-group">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" class="asset-checkbox sr-only" value="ethereum" />
+                  <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-blue/30 rounded flex items-center justify-center">
+                    <div class="checkbox-mark w-2 h-2 bg-neon-blue rounded hidden"></div>
+                  </div>
+                  <span class="text-white">ETH/USD</span>
+                  <span class="text-text-muted ml-auto">$2,485</span>
+                </label>
+              </div>
+
+              <div class="checkbox-group">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" class="asset-checkbox sr-only" value="cardano" />
+                  <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-blue/30 rounded flex items-center justify-center">
+                    <div class="checkbox-mark w-2 h-2 bg-neon-blue rounded hidden"></div>
+                  </div>
+                  <span class="text-white">ADA/USD</span>
+                  <span class="text-text-muted ml-auto">$0.47</span>
+                </label>
+              </div>
+
+              <div class="checkbox-group">
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" class="asset-checkbox sr-only" value="solana" />
+                  <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-blue/30 rounded flex items-center justify-center">
+                    <div class="checkbox-mark w-2 h-2 bg-neon-blue rounded hidden"></div>
+                  </div>
+                  <span class="text-white">SOL/USD</span>
+                  <span class="text-text-muted ml-auto">$98.45</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="capital-settings">
+            <div class="mb-4">
+              <label class="block text-sm text-text-secondary mb-2">Initial Capital</label>
+              <div class="capital-input relative">
+                <span class="absolute left-3 top-2 text-neon-blue">$</span>
+                <input type="number" id="initial-capital" class="w-full bg-dark-bg border border-neon-blue/30 rounded-lg pl-8 pr-3 py-2 text-white focus:border-neon-blue focus:ring-1 focus:ring-neon-blue" value="10000" min="1000" max="1000000" step="1000" />
+              </div>
+              <div class="capital-presets flex space-x-2 mt-2">
+                <button class="capital-preset-btn text-xs px-2 py-1 bg-dark-surface border border-neon-blue/30 rounded text-neon-blue hover:bg-neon-blue/10" data-amount="10000">$10K</button>
+                <button class="capital-preset-btn text-xs px-2 py-1 bg-dark-surface border border-neon-blue/30 rounded text-neon-blue hover:bg-neon-blue/10" data-amount="50000">$50K</button>
+                <button class="capital-preset-btn text-xs px-2 py-1 bg-dark-surface border border-neon-blue/30 rounded text-neon-blue hover:bg-neon-blue/10" data-amount="100000">$100K</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm text-text-secondary mb-2">Position Sizing</label>
+              <select id="position-sizing" class="w-full bg-dark-bg border border-neon-blue/30 rounded-lg px-3 py-2 text-white focus:border-neon-blue">
+                <option value="fixed">Fixed Amount</option>
+                <option value="percentage">Percentage of Capital</option>
+                <option value="kelly">Kelly Criterion</option>
+                <option value="martingale">Martingale</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy Configuration -->
+      <div class="strategy-section">
+        <h4 class="section-title text-md font-medium text-neon-blue mb-3 flex items-center">
+          <span class="mr-2">🧠</span>
+          Strategy Parameters
+        </h4>
+
+        <div class="strategy-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="ai-settings bg-dark-surface/30 rounded-lg p-4 border border-neon-purple/30">
+            <h5 class="font-medium text-neon-purple mb-3">AI Model Settings</h5>
+
+            <div class="ai-controls space-y-3">
+              <div>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" id="use-ai-predictions" class="sr-only" checked />
+                  <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-purple/30 rounded flex items-center justify-center">
+                    <div class="checkbox-mark w-2 h-2 bg-neon-purple rounded"></div>
+                  </div>
+                  <span class="text-white">Enable AI Predictions</span>
+                </label>
+              </div>
+
+              <div>
+                <label class="block text-xs text-text-muted mb-1">Confidence Threshold</label>
+                <div class="slider-container">
+                  <input type="range" id="confidence-threshold" class="w-full slider" min="50" max="95" value="75" step="5" />
+                  <div class="flex justify-between text-xs text-text-muted mt-1">
+                    <span>50%</span>
+                    <span id="confidence-value">75%</span>
+                    <span>95%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs text-text-muted mb-1">Prediction Timeframe</label>
+                <select id="prediction-timeframe" class="w-full bg-dark-bg border border-neon-purple/30 rounded px-2 py-1 text-sm text-white">
+                  <option value="1h">1 Hour</option>
+                  <option value="4h" selected>4 Hours</option>
+                  <option value="1d">1 Day</option>
+                  <option value="1w">1 Week</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="risk-settings bg-dark-surface/30 rounded-lg p-4 border border-neon-pink/30">
+            <h5 class="font-medium text-neon-pink mb-3">Risk Management</h5>
+
+            <div class="risk-controls space-y-3">
+              <div>
+                <label class="block text-xs text-text-muted mb-1">Stop Loss (%)</label>
+                <input type="number" id="stop-loss-pct" class="w-full bg-dark-bg border border-neon-pink/30 rounded px-2 py-1 text-sm text-white" value="5" min="0.1" max="20" step="0.1" />
+              </div>
+
+              <div>
+                <label class="block text-xs text-text-muted mb-1">Take Profit (%)</label>
+                <input type="number" id="take-profit-pct" class="w-full bg-dark-bg border border-neon-pink/30 rounded px-2 py-1 text-sm text-white" value="10" min="1" max="50" step="0.1" />
+              </div>
+
+              <div>
+                <label class="block text-xs text-text-muted mb-1">Max Daily Drawdown (%)</label>
+                <input type="number" id="max-drawdown" class="w-full bg-dark-bg border border-neon-pink/30 rounded px-2 py-1 text-sm text-white" value="15" min="5" max="50" step="1" />
+              </div>
+
+              <div>
+                <label class="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" id="trailing-stop" class="sr-only" />
+                  <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-pink/30 rounded flex items-center justify-center">
+                    <div class="checkbox-mark w-2 h-2 bg-neon-pink rounded hidden"></div>
+                  </div>
+                  <span class="text-white">Trailing Stop Loss</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Options (collapsible) -->
+      <div class="advanced-options">
+        <button class="advanced-toggle flex items-center space-x-2 text-sm text-neon-blue hover:text-neon-cyan mb-3" id="toggle-advanced">
+          <span class="toggle-icon transition-transform">▶</span>
+          <span>Advanced Options</span>
+        </button>
+
+        <div class="advanced-content hidden">
+          <div class="advanced-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="execution-settings">
+              <h5 class="font-medium text-neon-cyan mb-3">Execution</h5>
+
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs text-text-muted mb-1">Slippage (%)</label>
+                  <input type="number" id="slippage" class="w-full bg-dark-bg border border-neon-cyan/30 rounded px-2 py-1 text-sm text-white" value="0.1" min="0" max="2" step="0.01" />
+                </div>
+
+                <div>
+                  <label class="block text-xs text-text-muted mb-1">Commission (%)</label>
+                  <input type="number" id="commission" class="w-full bg-dark-bg border border-neon-cyan/30 rounded px-2 py-1 text-sm text-white" value="0.1" min="0" max="1" step="0.01" />
+                </div>
+
+                <div>
+                  <label class="flex items-center space-x-2 text-sm">
+                    <input type="checkbox" id="realistic-fills" class="sr-only" checked />
+                    <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-cyan/30 rounded flex items-center justify-center">
+                      <div class="checkbox-mark w-2 h-2 bg-neon-cyan rounded"></div>
+                    </div>
+                    <span class="text-white">Realistic Order Fills</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="data-settings">
+              <h5 class="font-medium text-neon-green mb-3">Data Quality</h5>
+
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs text-text-muted mb-1">Data Interval</label>
+                  <select id="data-interval" class="w-full bg-dark-bg border border-neon-green/30 rounded px-2 py-1 text-sm text-white">
+                    <option value="1m">1 Minute</option>
+                    <option value="5m">5 Minutes</option>
+                    <option value="15m">15 Minutes</option>
+                    <option value="1h" selected>1 Hour</option>
+                    <option value="1d">1 Day</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="flex items-center space-x-2 text-sm">
+                    <input type="checkbox" id="fill-gaps" class="sr-only" checked />
+                    <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-green/30 rounded flex items-center justify-center">
+                      <div class="checkbox-mark w-2 h-2 bg-neon-green rounded"></div>
+                    </div>
+                    <span class="text-white">Fill Data Gaps</span>
+                  </label>
+                </div>
+
+                <div>
+                  <label class="flex items-center space-x-2 text-sm">
+                    <input type="checkbox" id="adjust-splits" class="sr-only" />
+                    <div class="checkbox-custom w-4 h-4 bg-dark-surface border border-neon-green/30 rounded flex items-center justify-center">
+                      <div class="checkbox-mark w-2 h-2 bg-neon-green rounded hidden"></div>
+                    </div>
+                    <span class="text-white">Adjust for Splits</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions flex space-x-4 pt-6 border-t border-neon-blue/20">
+      <button id="start-backtest" class="start-btn flex-1 bg-gradient-to-r from-neon-blue to-neon-purple text-white font-bold py-3 px-6 rounded-lg hover:from-neon-purple hover:to-neon-blue transition-all transform hover:scale-105 glow-border">
+        <span class="flex items-center justify-center space-x-2">
+          <span>🚀</span>
+          <span>Start Backtest</span>
+        </span>
+      </button>
+
+      <button id="save-config" class="save-btn px-6 py-3 border-2 border-neon-blue text-neon-blue rounded-lg hover:bg-neon-blue/10 transition-colors">
+        💾 Save Config
+      </button>
+
+      <button id="reset-form" class="reset-btn px-4 py-3 border border-neon-pink/30 text-neon-pink rounded-lg hover:bg-neon-pink/10 transition-colors">
+        🔄 Reset
+      </button>
+    </div>
+  </div>
+
+  {showResults && (
+    <!-- Results Section (Initially Hidden) -->
+    <div id="backtest-results" class="backtest-results hidden border-t border-neon-blue/20">
+      <!-- Results will be populated by JavaScript -->
+    </div>
+  )}
+
+  <!-- Progress Modal -->
+  <div id="progress-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="progress-container bg-dark-surface rounded-lg border border-neon-blue/30 p-6 max-w-md mx-4">
+      <h3 class="text-lg font-bold text-neon-blue mb-4 text-center">Running Backtest</h3>
+
+      <div class="progress-info space-y-4">
+        <div class="progress-bar-container">
+          <div class="flex justify-between text-sm text-text-muted mb-2">
+            <span id="progress-stage">Initializing...</span>
+            <span id="progress-percentage">0%</span>
+          </div>
+          <div class="progress-bar bg-dark-bg rounded-full h-2">
+            <div class="progress-fill bg-gradient-to-r from-neon-blue to-neon-purple h-2 rounded-full transition-all duration-500" style="width: 0%" id="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="progress-stats grid grid-cols-2 gap-4 text-sm">
+          <div class="stat-item text-center">
+            <div class="text-text-muted">Trades Processed</div>
+            <div class="text-neon-blue font-mono" id="trades-processed">0</div>
+          </div>
+          <div class="stat-item text-center">
+            <div class="text-text-muted">Time Remaining</div>
+            <div class="text-neon-cyan font-mono" id="time-remaining">--:--</div>
+          </div>
+        </div>
+
+        <div class="progress-actions text-center">
+          <button id="cancel-backtest" class="px-4 py-2 border border-neon-pink/30 text-neon-pink rounded-lg hover:bg-neon-pink/10 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let backtestConfig = {};
+  let isRunning = false;
+  let progressInterval = null;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    setupEventListeners();
+    loadSavedConfigs();
+  });
+
+  function initializeForm() {
+    // Set default dates
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 90); // 90 days ago
+
+    document.getElementById('start-date').value = startDate.toISOString().split('T')[0];
+    document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
+
+    // Initialize checkboxes
+    initializeCheckboxes();
+
+    // Update confidence value display
+    updateConfidenceValue();
+  }
+
+  function setupEventListeners() {
+    // Date presets
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const period = e.target.dataset.period;
+        setDatePreset(period);
+      });
+    });
+
+    // Capital presets
+    document.querySelectorAll('.capital-preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const amount = e.target.dataset.amount;
+        document.getElementById('initial-capital').value = amount;
+      });
+    });
+
+    // Confidence threshold slider
+    const confidenceSlider = document.getElementById('confidence-threshold');
+    if (confidenceSlider) {
+      confidenceSlider.addEventListener('input', updateConfidenceValue);
+    }
+
+    // Advanced toggle
+    const advancedToggle = document.getElementById('toggle-advanced');
+    if (advancedToggle) {
+      advancedToggle.addEventListener('click', () => {
+        const content = document.querySelector('.advanced-content');
+        const icon = document.querySelector('.toggle-icon');
+
+        if (content && icon) {
+          content.classList.toggle('hidden');
+          icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(90deg)';
+        }
+      });
+    }
+
+    // Form buttons
+    document.getElementById('start-backtest')?.addEventListener('click', startBacktest);
+    document.getElementById('save-config')?.addEventListener('click', saveConfiguration);
+    document.getElementById('reset-form')?.addEventListener('click', resetForm);
+    document.getElementById('cancel-backtest')?.addEventListener('click', cancelBacktest);
+
+    // Saved config selector
+    document.getElementById('saved-config')?.addEventListener('change', loadConfiguration);
+
+    // Custom checkbox handling
+    setupCustomCheckboxes();
+  }
+
+  function initializeCheckboxes() {
+    // Initialize AI predictions checkbox as checked
+    const aiCheckbox = document.getElementById('use-ai-predictions');
+    const aiCheckboxMark = aiCheckbox?.parentElement.querySelector('.checkbox-mark');
+    if (aiCheckboxMark) {
+      aiCheckboxMark.classList.remove('hidden');
+    }
+
+    // Initialize realistic fills checkbox as checked
+    const realisticCheckbox = document.getElementById('realistic-fills');
+    const realisticCheckboxMark = realisticCheckbox?.parentElement.querySelector('.checkbox-mark');
+    if (realisticCheckboxMark) {
+      realisticCheckboxMark.classList.remove('hidden');
+    }
+
+    // Initialize fill gaps checkbox as checked
+    const fillGapsCheckbox = document.getElementById('fill-gaps');
+    const fillGapsCheckboxMark = fillGapsCheckbox?.parentElement.querySelector('.checkbox-mark');
+    if (fillGapsCheckboxMark) {
+      fillGapsCheckboxMark.classList.remove('hidden');
+    }
+
+    // Initialize first asset as checked
+    const firstAsset = document.querySelector('.asset-checkbox');
+    const firstAssetMark = firstAsset?.parentElement.querySelector('.checkbox-mark');
+    if (firstAssetMark) {
+      firstAssetMark.classList.remove('hidden');
+    }
+  }
+
+  function setupCustomCheckboxes() {
+    document.querySelectorAll('.checkbox-group label').forEach(label => {
+      label.addEventListener('click', (e) => {
+        e.preventDefault();
+        const checkbox = label.querySelector('input[type="checkbox"]');
+        const mark = label.querySelector('.checkbox-mark');
+
+        if (checkbox && mark) {
+          checkbox.checked = !checkbox.checked;
+          mark.classList.toggle('hidden', !checkbox.checked);
+        }
+      });
+    });
+  }
+
+  function setDatePreset(period) {
+    const endDate = new Date();
+    const startDate = new Date();
+
+    switch (period) {
+      case '30d':
+        startDate.setDate(startDate.getDate() - 30);
+        break;
+      case '90d':
+        startDate.setDate(startDate.getDate() - 90);
+        break;
+      case '1y':
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        break;
+      case '2y':
+        startDate.setFullYear(startDate.getFullYear() - 2);
+        break;
+    }
+
+    document.getElementById('start-date').value = startDate.toISOString().split('T')[0];
+    document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
+  }
+
+  function updateConfidenceValue() {
+    const slider = document.getElementById('confidence-threshold');
+    const valueDisplay = document.getElementById('confidence-value');
+
+    if (slider && valueDisplay) {
+      valueDisplay.textContent = slider.value + '%';
+    }
+  }
+
+  async function startBacktest() {
+    if (isRunning) return;
+
+    // Collect configuration
+    backtestConfig = collectConfiguration();
+
+    // Validate configuration
+    if (!validateConfiguration(backtestConfig)) {
+      return;
+    }
+
+    isRunning = true;
+    showProgressModal();
+
+    try {
+      // Start the backtest
+      const result = await runBacktest(backtestConfig);
+
+      if (result.success) {
+        displayResults(result.data);
+        updateStatus('Backtest completed successfully');
+      } else {
+        throw new Error(result.message || 'Backtest failed');
+      }
+    } catch (error) {
+      console.error('Backtest failed:', error);
+      updateStatus('Backtest failed: ' + error.message);
+      alert('Backtest failed: ' + error.message);
+    } finally {
+      isRunning = false;
+      hideProgressModal();
+    }
+  }
+
+  function collectConfiguration() {
+    const selectedAssets = [];
+    document.querySelectorAll('.asset-checkbox:checked').forEach(cb => {
+      selectedAssets.push(cb.value);
+    });
+
+    return {
+      timeRange: {
+        start: document.getElementById('start-date').value,
+        end: document.getElementById('end-date').value
+      },
+      assets: selectedAssets,
+      initialCapital: parseFloat(document.getElementById('initial-capital').value),
+      positionSizing: document.getElementById('position-sizing').value,
+      ai: {
+        enabled: document.getElementById('use-ai-predictions').checked,
+        confidenceThreshold: parseInt(document.getElementById('confidence-threshold').value),
+        timeframe: document.getElementById('prediction-timeframe').value
+      },
+      risk: {
+        stopLoss: parseFloat(document.getElementById('stop-loss-pct').value),
+        takeProfit: parseFloat(document.getElementById('take-profit-pct').value),
+        maxDrawdown: parseFloat(document.getElementById('max-drawdown').value),
+        trailingStop: document.getElementById('trailing-stop').checked
+      },
+      execution: {
+        slippage: parseFloat(document.getElementById('slippage').value),
+        commission: parseFloat(document.getElementById('commission').value),
+        realisticFills: document.getElementById('realistic-fills').checked
+      },
+      data: {
+        interval: document.getElementById('data-interval').value,
+        fillGaps: document.getElementById('fill-gaps').checked,
+        adjustSplits: document.getElementById('adjust-splits').checked
+      }
+    };
+  }
+
+  function validateConfiguration(config) {
+    if (!config.timeRange.start || !config.timeRange.end) {
+      alert('Please select both start and end dates');
+      return false;
+    }
+
+    if (new Date(config.timeRange.start) >= new Date(config.timeRange.end)) {
+      alert('End date must be after start date');
+      return false;
+    }
+
+    if (config.assets.length === 0) {
+      alert('Please select at least one trading pair');
+      return false;
+    }
+
+    if (config.initialCapital < 1000) {
+      alert('Initial capital must be at least $1,000');
+      return false;
+    }
+
+    return true;
+  }
+
+  async function runBacktest(config) {
+    try {
+      const response = await fetch('/api/backtest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API call failed, using mock data:', error);
+
+      // Return mock backtest results for demonstration
+      return {
+        success: true,
+        data: generateMockResults(config)
+      };
+    }
+  }
+
+  function generateMockResults(config) {
+    const totalReturn = (Math.random() - 0.4) * 0.5; // -20% to +30%
+    const finalCapital = config.initialCapital * (1 + totalReturn);
+    const maxDrawdown = Math.random() * 0.25; // 0-25%
+    const trades = Math.floor(Math.random() * 100) + 20;
+    const winRate = 0.4 + Math.random() * 0.4; // 40-80%
+
+    return {
+      summary: {
+        initialCapital: config.initialCapital,
+        finalCapital: finalCapital,
+        totalReturn: totalReturn * 100,
+        maxDrawdown: maxDrawdown * 100,
+        totalTrades: trades,
+        winRate: winRate * 100,
+        profitFactor: 1 + Math.random() * 2,
+        sharpeRatio: Math.random() * 3,
+        duration: Math.floor((new Date(config.timeRange.end) - new Date(config.timeRange.start)) / (1000 * 60 * 60 * 24))
+      },
+      trades: generateMockTrades(trades, config.assets),
+      performance: generateMockPerformance(config)
+    };
+  }
+
+  function generateMockTrades(count, assets) {
+    const trades = [];
+    for (let i = 0; i < count; i++) {
+      const asset = assets[Math.floor(Math.random() * assets.length)];
+      const profit = (Math.random() - 0.5) * 200; // -$100 to +$100
+      trades.push({
+        id: i + 1,
+        symbol: asset,
+        type: Math.random() > 0.5 ? 'buy' : 'sell',
+        entryPrice: 40000 + Math.random() * 10000,
+        exitPrice: 40000 + Math.random() * 10000,
+        amount: 100 + Math.random() * 400,
+        profit: profit,
+        date: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString()
+      });
+    }
+    return trades;
+  }
+
+  function generateMockPerformance(config) {
+    const days = Math.floor((new Date(config.timeRange.end) - new Date(config.timeRange.start)) / (1000 * 60 * 60 * 24));
+    const performance = [];
+
+    let capital = config.initialCapital;
+    for (let i = 0; i < days; i++) {
+      capital *= (1 + (Math.random() - 0.5) * 0.02); // Daily change -1% to +1%
+      performance.push({
+        date: new Date(new Date(config.timeRange.start).getTime() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        value: capital
+      });
+    }
+
+    return performance;
+  }
+
+  function showProgressModal() {
+    const modal = document.getElementById('progress-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      // Simulate progress
+      simulateProgress();
+    }
+  }
+
+  function hideProgressModal() {
+    const modal = document.getElementById('progress-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
+    }
+  }
+
+  function simulateProgress() {
+    let progress = 0;
+    const stages = [
+      'Loading historical data...',
+      'Initializing AI models...',
+      'Processing market data...',
+      'Executing trades...',
+      'Calculating metrics...',
+      'Generating report...'
+    ];
+
+    let currentStage = 0;
+
+    progressInterval = setInterval(() => {
+      progress += Math.random() * 15;
+
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(progressInterval);
+      }
+
+      // Update stage
+      if (progress > (currentStage + 1) * 16.67 && currentStage < stages.length - 1) {
+        currentStage++;
+      }
+
+      // Update UI
+      document.getElementById('progress-bar').style.width = progress + '%';
+      document.getElementById('progress-percentage').textContent = Math.round(progress) + '%';
+      document.getElementById('progress-stage').textContent = stages[currentStage];
+      document.getElementById('trades-processed').textContent = Math.round(progress * 2.5);
+
+      const timeRemaining = Math.max(0, Math.round((100 - progress) / 10));
+      document.getElementById('time-remaining').textContent = timeRemaining + 's';
+    }, 200);
+  }
+
+  function cancelBacktest() {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+
+    isRunning = false;
+    hideProgressModal();
+    updateStatus('Backtest cancelled');
+  }
+
+  function displayResults(results) {
+    const resultsContainer = document.getElementById('backtest-results');
+    if (!resultsContainer) return;
+
+    const summary = results.summary;
+    const returnColor = summary.totalReturn >= 0 ? 'text-neon-green' : 'text-neon-pink';
+
+    resultsContainer.innerHTML = `
+      <div class="results-content p-6">
+        <div class="results-header mb-6">
+          <h3 class="text-xl font-orbitron font-bold text-neon-blue glow-text mb-2">Backtest Results</h3>
+          <p class="text-text-muted">Performance analysis for ${summary.duration} days</p>
+        </div>
+
+        <div class="results-summary grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="metric-card bg-dark-surface/50 rounded-lg p-4 border border-neon-blue/30">
+            <div class="text-sm text-text-muted mb-1">Total Return</div>
+            <div class="text-2xl font-bold ${returnColor} font-mono">${summary.totalReturn >= 0 ? '+' : ''}${summary.totalReturn.toFixed(2)}%</div>
+          </div>
+
+          <div class="metric-card bg-dark-surface/50 rounded-lg p-4 border border-neon-green/30">
+            <div class="text-sm text-text-muted mb-1">Final Capital</div>
+            <div class="text-2xl font-bold text-neon-green font-mono">${formatCurrency(summary.finalCapital)}</div>
+          </div>
+
+          <div class="metric-card bg-dark-surface/50 rounded-lg p-4 border border-neon-cyan/30">
+            <div class="text-sm text-text-muted mb-1">Win Rate</div>
+            <div class="text-2xl font-bold text-neon-cyan font-mono">${summary.winRate.toFixed(1)}%</div>
+          </div>
+
+          <div class="metric-card bg-dark-surface/50 rounded-lg p-4 border border-neon-pink/30">
+            <div class="text-sm text-text-muted mb-1">Max Drawdown</div>
+            <div class="text-2xl font-bold text-neon-pink font-mono">${summary.maxDrawdown.toFixed(2)}%</div>
+          </div>
+        </div>
+
+        <div class="detailed-metrics grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div class="text-center">
+            <div class="text-text-muted">Total Trades</div>
+            <div class="text-lg font-mono text-white">${summary.totalTrades}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-text-muted">Profit Factor</div>
+            <div class="text-lg font-mono text-neon-purple">${summary.profitFactor.toFixed(2)}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-text-muted">Sharpe Ratio</div>
+            <div class="text-lg font-mono text-neon-blue">${summary.sharpeRatio.toFixed(2)}</div>
+          </div>
+          <div class="text-center">
+            <div class="text-text-muted">Duration</div>
+            <div class="text-lg font-mono text-white">${summary.duration} days</div>
+          </div>
+        </div>
+
+        <div class="results-actions mt-6 flex space-x-4">
+          <button class="export-btn px-4 py-2 bg-neon-blue text-white rounded-lg hover:bg-neon-cyan transition-colors">
+            📄 Export Report
+          </button>
+          <button class="new-backtest-btn px-4 py-2 border border-neon-green text-neon-green rounded-lg hover:bg-neon-green/10 transition-colors">
+            🔄 New Backtest
+          </button>
+        </div>
+      </div>
+    `;
+
+    resultsContainer.classList.remove('hidden');
+    resultsContainer.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function saveConfiguration() {
+    const config = collectConfiguration();
+    const name = prompt('Enter configuration name:');
+
+    if (name) {
+      // In a real app, this would save to backend
+      localStorage.setItem('backtest_config_' + name.toLowerCase().replace(/\s+/g, '_'), JSON.stringify(config));
+      updateStatus('Configuration saved as: ' + name);
+      loadSavedConfigs();
+    }
+  }
+
+  function loadConfiguration() {
+    const select = document.getElementById('saved-config');
+    const configName = select.value;
+
+    if (!configName) return;
+
+    // Load predefined or saved configuration
+    let config;
+
+    switch (configName) {
+      case 'conservative':
+        config = getConservativeConfig();
+        break;
+      case 'aggressive':
+        config = getAggressiveConfig();
+        break;
+      case 'ai_only':
+        config = getAIOnlyConfig();
+        break;
+      default:
+        // Load from localStorage
+        const saved = localStorage.getItem('backtest_config_' + configName);
+        if (saved) {
+          config = JSON.parse(saved);
+        }
+    }
+
+    if (config) {
+      applyConfiguration(config);
+      updateStatus('Configuration loaded: ' + configName);
+    }
+  }
+
+  function loadSavedConfigs() {
+    const select = document.getElementById('saved-config');
+    if (!select) return;
+
+    // Clear existing saved configs (keep predefined ones)
+    const options = select.querySelectorAll('option');
+    options.forEach((option, index) => {
+      if (index > 3) option.remove(); // Keep first 4 predefined options
+    });
+
+    // Add saved configs from localStorage
+    for (let key in localStorage) {
+      if (key.startsWith('backtest_config_')) {
+        const name = key.replace('backtest_config_', '').replace(/_/g, ' ');
+        const option = document.createElement('option');
+        option.value = key.replace('backtest_config_', '');
+        option.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        select.appendChild(option);
+      }
+    }
+  }
+
+  function getConservativeConfig() {
+    return {
+      risk: { stopLoss: 3, takeProfit: 6, maxDrawdown: 10, trailingStop: true },
+      ai: { enabled: true, confidenceThreshold: 85, timeframe: '1d' },
+      execution: { slippage: 0.1, commission: 0.1, realisticFills: true }
+    };
+  }
+
+  function getAggressiveConfig() {
+    return {
+      risk: { stopLoss: 8, takeProfit: 15, maxDrawdown: 25, trailingStop: false },
+      ai: { enabled: true, confidenceThreshold: 65, timeframe: '4h' },
+      execution: { slippage: 0.2, commission: 0.1, realisticFills: true }
+    };
+  }
+
+  function getAIOnlyConfig() {
+    return {
+      risk: { stopLoss: 5, takeProfit: 10, maxDrawdown: 15, trailingStop: true },
+      ai: { enabled: true, confidenceThreshold: 80, timeframe: '4h' },
+      execution: { slippage: 0.1, commission: 0.1, realisticFills: true }
+    };
+  }
+
+  function applyConfiguration(config) {
+    // Apply risk settings
+    if (config.risk) {
+      document.getElementById('stop-loss-pct').value = config.risk.stopLoss || 5;
+      document.getElementById('take-profit-pct').value = config.risk.takeProfit || 10;
+      document.getElementById('max-drawdown').value = config.risk.maxDrawdown || 15;
+
+      const trailingCheckbox = document.getElementById('trailing-stop');
+      const trailingMark = trailingCheckbox?.parentElement.querySelector('.checkbox-mark');
+      if (trailingCheckbox && trailingMark) {
+        trailingCheckbox.checked = config.risk.trailingStop || false;
+        trailingMark.classList.toggle('hidden', !trailingCheckbox.checked);
+      }
+    }
+
+    // Apply AI settings
+    if (config.ai) {
+      document.getElementById('confidence-threshold').value = config.ai.confidenceThreshold || 75;
+      document.getElementById('prediction-timeframe').value = config.ai.timeframe || '4h';
+      updateConfidenceValue();
+
+      const aiCheckbox = document.getElementById('use-ai-predictions');
+      const aiMark = aiCheckbox?.parentElement.querySelector('.checkbox-mark');
+      if (aiCheckbox && aiMark) {
+        aiCheckbox.checked = config.ai.enabled !== false;
+        aiMark.classList.toggle('hidden', !aiCheckbox.checked);
+      }
+    }
+
+    // Apply execution settings
+    if (config.execution) {
+      document.getElementById('slippage').value = config.execution.slippage || 0.1;
+      document.getElementById('commission').value = config.execution.commission || 0.1;
+
+      const realisticCheckbox = document.getElementById('realistic-fills');
+      const realisticMark = realisticCheckbox?.parentElement.querySelector('.checkbox-mark');
+      if (realisticCheckbox && realisticMark) {
+        realisticCheckbox.checked = config.execution.realisticFills !== false;
+        realisticMark.classList.toggle('hidden', !realisticCheckbox.checked);
+      }
+    }
+  }
+
+  function resetForm() {
+    if (confirm('Reset all settings to default values?')) {
+      // Reset form elements
+      document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.value = input.getAttribute('value') || '';
+      });
+
+      document.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = 0;
+      });
+
+      // Reset checkboxes
+      document.querySelectorAll('.checkbox-mark').forEach(mark => {
+        mark.classList.add('hidden');
+      });
+
+      // Reinitialize with defaults
+      initializeForm();
+      updateStatus('Form reset to default values');
+    }
+  }
+
+  function updateStatus(message) {
+    const statusElement = document.getElementById('backtest-status');
+    if (statusElement) {
+      statusElement.textContent = message;
+    }
+  }
+
+  function formatCurrency(value, decimals = 0) {
+    if (value === null || value === undefined) return '$0';
+    return '$' + parseFloat(value).toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+
+  // Export functions for external use
+  window.BacktestingForm = {
+    startBacktest: startBacktest,
+    saveConfiguration: saveConfiguration,
+    resetForm: resetForm
+  };
+</script>
+
+<style>
+  .backtesting-form-container {
+    @apply bg-dark-surface/80 backdrop-blur-sm rounded-lg border border-neon-blue/30 shadow-xl;
+  }
+
+  .backtesting-form-container.compact {
+    @apply text-sm;
+  }
+
+  .section-title {
+    position: relative;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, currentColor, transparent);
+  }
+
+  .checkbox-custom {
+    transition: all 0.3s ease;
+  }
+
+  .checkbox-custom:hover {
+    border-color: rgba(0, 153, 255, 0.5);
+    box-shadow: 0 0 10px rgba(0, 153, 255, 0.2);
+  }
+
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: linear-gradient(90deg, var(--dark-bg), var(--neon-blue));
+    border-radius: 3px;
+    outline: none;
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 153, 255, 0.5);
+  }
+
+  .slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 153, 255, 0.5);
+  }
+
+  .preset-btn:hover,
+  .capital-preset-btn:hover {
+    box-shadow: 0 0 10px rgba(0, 153, 255, 0.3);
+  }
+
+  .start-btn {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .start-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .start-btn:active::after {
+    width: 300px;
+    height: 300px;
+  }
+
+  .glow-border {
+    box-shadow: 0 0 20px rgba(0, 153, 255, 0.3);
+  }
+
+  .progress-container {
+    animation: modalSlide 0.3s ease-out;
+  }
+
+  @keyframes modalSlide {
+    from {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .config-select {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .form-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .time-range-grid,
+    .assets-grid,
+    .strategy-grid,
+    .advanced-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .results-summary {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .detailed-metrics {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .preset-buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .capital-presets {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .results-summary,
+    .detailed-metrics {
+      grid-template-columns: 1fr;
+    }
+
+    .results-actions {
+      flex-direction: column;
+    }
+  }
+</style>

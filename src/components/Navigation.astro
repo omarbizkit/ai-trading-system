@@ -1,0 +1,317 @@
+---
+/**
+ * T052: Navigation component with portfolio link
+ * Main navigation bar with cyberpunk styling and bizkit.dev integration
+ */
+
+export interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = Astro.url.pathname } = Astro.props;
+
+// Navigation items
+const navItems = [
+  { href: '/', label: 'Dashboard', icon: '📊' },
+  { href: '/simulation', label: 'Live Trading', icon: '⚡' },
+  { href: '/backtesting', label: 'Backtesting', icon: '🔄' },
+  { href: '/history', label: 'History', icon: '📈' },
+  { href: '/profile', label: 'Settings', icon: '⚙️' }
+];
+
+// Check if current path matches nav item
+function isActive(href: string, current: string): boolean {
+  if (href === '/' && current === '/') return true;
+  if (href !== '/' && current.startsWith(href)) return true;
+  return false;
+}
+---
+
+<nav class="cyberpunk-nav border-b border-neon-cyan/30 bg-dark-surface/80 backdrop-blur-md sticky top-0 z-50">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <!-- Logo / Brand -->
+      <div class="flex items-center space-x-4">
+        <a 
+          href="/" 
+          class="flex items-center space-x-3 text-neon-cyan hover:text-neon-pink transition-colors duration-300"
+          aria-label="AI Trading System Home"
+        >
+          <div class="w-8 h-8 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-lg flex items-center justify-center glow-border">
+            <span class="text-lg font-bold font-orbitron">AI</span>
+          </div>
+          <div class="hidden sm:block">
+            <h1 class="text-xl font-orbitron font-bold glow-text">TRADING SYSTEM</h1>
+            <p class="text-xs text-text-muted">Neural Network Powered</p>
+          </div>
+        </a>
+        
+        <!-- Back to Portfolio Link -->
+        <a 
+          href="https://bizkit.dev" 
+          class="hidden md:flex items-center space-x-1 text-text-secondary hover:text-neon-green transition-colors duration-300 text-sm"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>←</span>
+          <span>Back to Portfolio</span>
+        </a>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-1">
+        {navItems.map((item) => (
+          <a
+            href={item.href}
+            class={`
+              nav-link px-4 py-2 rounded-lg text-sm font-medium font-rajdhani transition-all duration-300
+              ${isActive(item.href, currentPath) 
+                ? 'text-neon-cyan bg-neon-cyan/10 border border-neon-cyan/30 glow-border shadow-neon-cyan/20' 
+                : 'text-text-secondary hover:text-neon-cyan hover:bg-neon-cyan/5'
+              }
+            `}
+            aria-current={isActive(item.href, currentPath) ? 'page' : undefined}
+          >
+            <span class="mr-2">{item.icon}</span>
+            {item.label}
+          </a>
+        ))}
+      </div>
+      
+      <!-- User Actions -->
+      <div class="flex items-center space-x-3">
+        <!-- Connection Status -->
+        <div class="hidden sm:flex items-center space-x-2 text-xs">
+          <div class="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
+          <span class="text-text-secondary">CONNECTED</span>
+        </div>
+        
+        <!-- User Profile -->
+        <div class="relative group">
+          <button 
+            class="flex items-center space-x-2 text-text-secondary hover:text-neon-cyan transition-colors duration-300 p-2 rounded-lg hover:bg-neon-cyan/5"
+            aria-label="User Menu"
+            id="user-menu-button"
+            aria-expanded="false"
+            aria-haspopup="true"
+          >
+            <div class="w-8 h-8 bg-gradient-to-br from-neon-purple to-neon-pink rounded-full flex items-center justify-center glow-border">
+              <span class="text-sm font-bold">U</span>
+            </div>
+            <span class="hidden sm:block text-sm font-medium">Trader</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <!-- Dropdown Menu -->
+          <div class="user-menu absolute right-0 mt-2 w-48 bg-dark-card/90 backdrop-blur-md rounded-lg border border-neon-cyan/30 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+            <div class="p-2">
+              <a href="/profile" class="block px-3 py-2 text-sm text-text-secondary hover:text-neon-cyan hover:bg-neon-cyan/10 rounded-md transition-colors">
+                <span class="mr-2">👤</span> Profile Settings
+              </a>
+              <a href="/history" class="block px-3 py-2 text-sm text-text-secondary hover:text-neon-cyan hover:bg-neon-cyan/10 rounded-md transition-colors">
+                <span class="mr-2">📊</span> Trading History
+              </a>
+              <hr class="my-2 border-neon-cyan/20" />
+              <button class="w-full text-left px-3 py-2 text-sm text-text-secondary hover:text-neon-pink hover:bg-neon-pink/10 rounded-md transition-colors">
+                <span class="mr-2">🚪</span> Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Mobile Menu Button -->
+        <button 
+          class="md:hidden p-2 rounded-lg text-text-secondary hover:text-neon-cyan hover:bg-neon-cyan/5 transition-colors duration-300"
+          aria-label="Toggle Mobile Menu"
+          id="mobile-menu-button"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Navigation Menu -->
+    <div class="mobile-menu md:hidden border-t border-neon-cyan/20 hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1">
+        {navItems.map((item) => (
+          <a
+            href={item.href}
+            class={`
+              block px-3 py-2 rounded-md text-base font-medium font-rajdhani transition-all duration-300
+              ${isActive(item.href, currentPath)
+                ? 'text-neon-cyan bg-neon-cyan/10 border border-neon-cyan/30'
+                : 'text-text-secondary hover:text-neon-cyan hover:bg-neon-cyan/5'
+              }
+            `}
+            aria-current={isActive(item.href, currentPath) ? 'page' : undefined}
+          >
+            <span class="mr-3">{item.icon}</span>
+            {item.label}
+          </a>
+        ))}
+        
+        <!-- Mobile-only Links -->
+        <div class="border-t border-neon-cyan/20 pt-3 mt-3">
+          <a 
+            href="https://bizkit.dev" 
+            class="block px-3 py-2 rounded-md text-base font-medium text-text-secondary hover:text-neon-green hover:bg-neon-green/5 transition-colors duration-300"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="mr-3">🔗</span>
+            Back to Portfolio
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Progress Bar for Loading States -->
+  <div class="loading-bar absolute bottom-0 left-0 h-0.5 bg-neon-cyan opacity-0 transition-opacity duration-300" id="nav-progress"></div>
+</nav>
+
+<script>
+  // Mobile menu toggle functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener('click', function() {
+        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+        
+        mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded));
+        mobileMenu.classList.toggle('hidden');
+        
+        // Animate hamburger icon
+        const svg = mobileMenuButton.querySelector('svg') as SVGElement;
+        if (svg) {
+          svg.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(90deg)';
+        }
+      });
+    }
+    
+    // Progress bar for navigation
+    const progressBar = document.getElementById('nav-progress');
+    
+    // Show progress on navigation
+    document.addEventListener('click', function(e: Event) {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a[href^="/"]');
+      if (link && progressBar) {
+        const progressBarElement = progressBar as HTMLElement;
+        progressBarElement.style.opacity = '1';
+        progressBarElement.style.animation = 'loading-pulse 1s ease-in-out infinite';
+      }
+    });
+    
+    // Hide progress when page loads
+    window.addEventListener('load', function() {
+      if (progressBar) {
+        const progressBarElement = progressBar as HTMLElement;
+        progressBarElement.style.opacity = '0';
+        progressBarElement.style.animation = 'none';
+      }
+    });
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e: Event) {
+      const target = e.target as HTMLElement;
+      if (mobileMenu && mobileMenuButton && !mobileMenu.contains(target) && !mobileMenuButton.contains(target)) {
+        mobileMenu.classList.add('hidden');
+        mobileMenuButton.setAttribute('aria-expanded', 'false');
+      }
+    });
+    
+    // Add glow effect to active nav items
+    const activeNavItem = document.querySelector('.nav-link[aria-current="page"]') as HTMLElement;
+    if (activeNavItem && (window as any).cyberpunk) {
+      (window as any).cyberpunk.glow(activeNavItem, '#00ffff');
+    }
+  });
+</script>
+
+<style>
+  /* Navigation specific styles */
+  .cyberpunk-nav {
+    background: linear-gradient(135deg, 
+      rgba(26, 26, 46, 0.9) 0%, 
+      rgba(22, 33, 62, 0.9) 100%
+    );
+  }
+  
+  .nav-link {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .nav-link:hover::before {
+    left: 100%;
+  }
+  
+  .user-menu {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes loading-pulse {
+    0%, 100% { width: 0%; }
+    50% { width: 100%; }
+  }
+  
+  .loading-bar {
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  }
+  
+  /* Mobile menu animations */
+  .mobile-menu {
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .cyberpunk-nav .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+</style>

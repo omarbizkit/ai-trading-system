@@ -1,0 +1,640 @@
+---
+/**
+ * T062: Trading history page
+ * Comprehensive trading history with advanced filtering and analytics
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import TradeLog from '../components/TradeLog.astro';
+
+const pageTitle = "Trading History";
+const pageDescription = "Complete trading history with detailed analytics, performance tracking, and advanced filtering options.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Navigation currentPath="/history" />
+
+  <main class="min-h-screen bg-dark-bg">
+    <!-- Header Section -->
+    <div class="border-b border-neon-cyan/30 bg-dark-surface/50 backdrop-blur-sm">
+      <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <!-- Page Title -->
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-neon-green to-neon-cyan rounded-xl flex items-center justify-center glow-border">
+              <span class="text-2xl">📈</span>
+            </div>
+            <div>
+              <h1 class="text-3xl font-orbitron font-bold text-neon-green glow-text">
+                TRADING HISTORY
+              </h1>
+              <p class="text-text-secondary mt-1">
+                Complete record of all trading activities and performance
+              </p>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="flex items-center space-x-4">
+            <button class="bg-neon-green/20 hover:bg-neon-green/30 border border-neon-green/50 text-neon-green px-4 py-2 rounded-lg font-medium transition-colors duration-300">
+              <span class="mr-2">📊</span>
+              Export Report
+            </button>
+            <button class="bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 text-neon-cyan px-4 py-2 rounded-lg font-medium transition-colors duration-300">
+              <span class="mr-2">📥</span>
+              Import Data
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Overview -->
+    <div class="container mx-auto px-4 py-8">
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total P&L -->
+        <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-green/30 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-text-secondary">Total P&L</div>
+            <div class="text-2xl">💰</div>
+          </div>
+          <div class="text-3xl font-bold text-neon-green">+$15,247</div>
+          <div class="text-sm text-neon-green mt-1">+18.4% ROI</div>
+          <div class="text-xs text-text-muted mt-2">Since Jan 2024</div>
+        </div>
+
+        <!-- Total Trades -->
+        <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-text-secondary">Total Trades</div>
+            <div class="text-2xl">🔄</div>
+          </div>
+          <div class="text-3xl font-bold text-neon-cyan">2,847</div>
+          <div class="text-sm text-neon-cyan mt-1">~8.2 per day</div>
+          <div class="text-xs text-text-muted mt-2">348 trading days</div>
+        </div>
+
+        <!-- Win Rate -->
+        <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-purple/30 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-text-secondary">Win Rate</div>
+            <div class="text-2xl">🎯</div>
+          </div>
+          <div class="text-3xl font-bold text-neon-purple">67.3%</div>
+          <div class="text-sm text-neon-purple mt-1">1,916 wins</div>
+          <div class="text-xs text-text-muted mt-2">931 losses</div>
+        </div>
+
+        <!-- Best Streak -->
+        <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-pink/30 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-text-secondary">Best Streak</div>
+            <div class="text-2xl">🚀</div>
+          </div>
+          <div class="text-3xl font-bold text-neon-pink">23</div>
+          <div class="text-sm text-neon-pink mt-1">consecutive wins</div>
+          <div class="text-xs text-text-muted mt-2">Nov 15-18, 2024</div>
+        </div>
+      </div>
+
+      <!-- Filters and Search -->
+      <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30 p-6 mb-8">
+        <h3 class="text-lg font-orbitron font-bold text-neon-cyan mb-4 flex items-center">
+          <span class="mr-2">🔍</span>
+          Filters & Search
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Date Range -->
+          <div>
+            <label class="block text-sm text-text-secondary mb-2">Date Range</label>
+            <select class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neon-cyan">
+              <option>All Time</option>
+              <option>Today</option>
+              <option>This Week</option>
+              <option>This Month</option>
+              <option>Last 30 Days</option>
+              <option>Last 3 Months</option>
+              <option>Last 6 Months</option>
+              <option>This Year</option>
+              <option>Custom Range</option>
+            </select>
+          </div>
+
+          <!-- Trading Pair -->
+          <div>
+            <label class="block text-sm text-text-secondary mb-2">Trading Pair</label>
+            <select class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neon-cyan">
+              <option>All Pairs</option>
+              <option>BTC/USDT</option>
+              <option>ETH/USDT</option>
+              <option>ADA/USDT</option>
+              <option>SOL/USDT</option>
+              <option>DOT/USDT</option>
+              <option>MATIC/USDT</option>
+            </select>
+          </div>
+
+          <!-- Trade Type -->
+          <div>
+            <label class="block text-sm text-text-secondary mb-2">Trade Type</label>
+            <select class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neon-cyan">
+              <option>All Types</option>
+              <option>Long Only</option>
+              <option>Short Only</option>
+              <option>AI Signals</option>
+              <option>Manual Trades</option>
+            </select>
+          </div>
+
+          <!-- Result -->
+          <div>
+            <label class="block text-sm text-text-secondary mb-2">Result</label>
+            <select class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neon-cyan">
+              <option>All Results</option>
+              <option>Profitable Only</option>
+              <option>Losses Only</option>
+              <option>Break Even</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 mt-4">
+          <!-- Search Bar -->
+          <div class="flex-1">
+            <input
+              type="text"
+              placeholder="Search by trade ID, pair, or notes..."
+              class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-2 text-sm placeholder-text-muted focus:outline-none focus:border-neon-cyan"
+            >
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex space-x-2">
+            <button class="bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 text-neon-cyan px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              Apply Filters
+            </button>
+            <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Analytics -->
+        <div class="lg:col-span-1 space-y-6">
+          <!-- Monthly Performance -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-green/30 p-6">
+            <h3 class="text-lg font-orbitron font-bold text-neon-green mb-4 flex items-center">
+              <span class="mr-2">📅</span>
+              Monthly Performance
+            </h3>
+
+            <div class="space-y-4">
+              <div class="flex justify-between items-center py-2 border-b border-neon-green/10">
+                <span class="text-text-secondary">December 2024</span>
+                <span class="text-neon-green font-bold">+$3,247</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-neon-green/10">
+                <span class="text-text-secondary">November 2024</span>
+                <span class="text-neon-green font-bold">+$4,521</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-neon-green/10">
+                <span class="text-text-secondary">October 2024</span>
+                <span class="text-neon-pink font-bold">-$892</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-neon-green/10">
+                <span class="text-text-secondary">September 2024</span>
+                <span class="text-neon-green font-bold">+$2,156</span>
+              </div>
+              <div class="flex justify-between items-center py-2">
+                <span class="text-text-secondary">August 2024</span>
+                <span class="text-neon-green font-bold">+$1,734</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Performing Pairs -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-purple/30 p-6">
+            <h3 class="text-lg font-orbitron font-bold text-neon-purple mb-4 flex items-center">
+              <span class="mr-2">🏆</span>
+              Top Pairs
+            </h3>
+
+            <div class="space-y-3">
+              <div class="flex justify-between items-center bg-dark-surface/30 rounded-lg p-3">
+                <div>
+                  <div class="text-white font-medium">BTC/USDT</div>
+                  <div class="text-xs text-text-muted">847 trades</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-neon-green font-bold">+$8,234</div>
+                  <div class="text-xs text-neon-green">69% win rate</div>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center bg-dark-surface/30 rounded-lg p-3">
+                <div>
+                  <div class="text-white font-medium">ETH/USDT</div>
+                  <div class="text-xs text-text-muted">623 trades</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-neon-green font-bold">+$4,521</div>
+                  <div class="text-xs text-neon-green">64% win rate</div>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center bg-dark-surface/30 rounded-lg p-3">
+                <div>
+                  <div class="text-white font-medium">SOL/USDT</div>
+                  <div class="text-xs text-text-muted">412 trades</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-neon-green font-bold">+$2,892</div>
+                  <div class="text-xs text-neon-green">72% win rate</div>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center bg-dark-surface/30 rounded-lg p-3">
+                <div>
+                  <div class="text-white font-medium">ADA/USDT</div>
+                  <div class="text-xs text-text-muted">389 trades</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-neon-pink font-bold">-$234</div>
+                  <div class="text-xs text-neon-pink">58% win rate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk Metrics -->
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30 p-6">
+            <h3 class="text-lg font-orbitron font-bold text-neon-cyan mb-4 flex items-center">
+              <span class="mr-2">⚡</span>
+              Risk Metrics
+            </h3>
+
+            <div class="space-y-4">
+              <!-- Sharpe Ratio -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-text-secondary text-sm">Sharpe Ratio</span>
+                  <span class="text-neon-green font-bold">2.14</span>
+                </div>
+                <div class="w-full bg-dark-surface/50 rounded-full h-2">
+                  <div class="bg-gradient-to-r from-neon-cyan to-neon-green h-2 rounded-full" style="width: 85%"></div>
+                </div>
+              </div>
+
+              <!-- Max Drawdown -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-text-secondary text-sm">Max Drawdown</span>
+                  <span class="text-neon-pink font-bold">-12.4%</span>
+                </div>
+                <div class="w-full bg-dark-surface/50 rounded-full h-2">
+                  <div class="bg-gradient-to-r from-neon-pink to-neon-purple h-2 rounded-full" style="width: 25%"></div>
+                </div>
+              </div>
+
+              <!-- Average Trade -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-text-secondary text-sm">Avg Trade</span>
+                  <span class="text-neon-cyan font-bold">+$5.36</span>
+                </div>
+                <div class="w-full bg-dark-surface/50 rounded-full h-2">
+                  <div class="bg-gradient-to-r from-neon-cyan to-neon-purple h-2 rounded-full" style="width: 68%"></div>
+                </div>
+              </div>
+
+              <!-- Volatility -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-text-secondary text-sm">Volatility</span>
+                  <span class="text-neon-purple font-bold">18.7%</span>
+                </div>
+                <div class="w-full bg-dark-surface/50 rounded-full h-2">
+                  <div class="bg-gradient-to-r from-neon-purple to-neon-pink h-2 rounded-full" style="width: 47%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Trade History Table -->
+        <div class="lg:col-span-2">
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30">
+            <div class="p-4 border-b border-neon-cyan/20">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h3 class="text-lg font-orbitron font-bold text-neon-cyan flex items-center">
+                  <span class="mr-2">📋</span>
+                  Trade History
+                </h3>
+                <div class="flex items-center space-x-4">
+                  <!-- Pagination Info -->
+                  <span class="text-sm text-text-secondary">
+                    Showing 1-20 of 2,847 trades
+                  </span>
+
+                  <!-- Entries per page -->
+                  <select class="bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-3 py-1 text-sm focus:outline-none focus:border-neon-cyan">
+                    <option>20 per page</option>
+                    <option>50 per page</option>
+                    <option>100 per page</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enhanced Trade Log Component -->
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-dark-surface/30">
+                  <tr class="text-left text-text-secondary text-sm">
+                    <th class="p-4 cursor-pointer hover:text-neon-cyan transition-colors">
+                      <div class="flex items-center">
+                        Date/Time
+                        <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5 8l5 5 5-5H5z"/>
+                        </svg>
+                      </div>
+                    </th>
+                    <th class="p-4 cursor-pointer hover:text-neon-cyan transition-colors">
+                      <div class="flex items-center">
+                        Pair
+                        <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5 8l5 5 5-5H5z"/>
+                        </svg>
+                      </div>
+                    </th>
+                    <th class="p-4">Type</th>
+                    <th class="p-4 cursor-pointer hover:text-neon-cyan transition-colors">
+                      <div class="flex items-center">
+                        Entry Price
+                        <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5 8l5 5 5-5H5z"/>
+                        </svg>
+                      </div>
+                    </th>
+                    <th class="p-4 cursor-pointer hover:text-neon-cyan transition-colors">
+                      <div class="flex items-center">
+                        Exit Price
+                        <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5 8l5 5 5-5H5z"/>
+                        </svg>
+                      </div>
+                    </th>
+                    <th class="p-4 cursor-pointer hover:text-neon-cyan transition-colors">
+                      <div class="flex items-center">
+                        P&L
+                        <svg class="w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M5 8l5 5 5-5H5z"/>
+                        </svg>
+                      </div>
+                    </th>
+                    <th class="p-4">Duration</th>
+                    <th class="p-4">Source</th>
+                  </tr>
+                </thead>
+                <tbody class="text-sm">
+                  <tr class="border-b border-neon-cyan/10 hover:bg-dark-surface/20 transition-colors cursor-pointer">
+                    <td class="p-4 text-text-muted">Dec 18, 14:32:15</td>
+                    <td class="p-4 text-white font-medium">BTC/USDT</td>
+                    <td class="p-4"><span class="text-neon-green bg-neon-green/10 px-2 py-1 rounded text-xs">LONG</span></td>
+                    <td class="p-4 text-white">$42,150.23</td>
+                    <td class="p-4 text-white">$43,521.87</td>
+                    <td class="p-4 text-neon-green font-bold">+$1,371.64</td>
+                    <td class="p-4 text-text-muted">2h 24m</td>
+                    <td class="p-4"><span class="text-neon-purple bg-neon-purple/10 px-2 py-1 rounded text-xs">AI</span></td>
+                  </tr>
+                  <tr class="border-b border-neon-cyan/10 hover:bg-dark-surface/20 transition-colors cursor-pointer">
+                    <td class="p-4 text-text-muted">Dec 18, 11:15:42</td>
+                    <td class="p-4 text-white font-medium">ETH/USDT</td>
+                    <td class="p-4"><span class="text-neon-pink bg-neon-pink/10 px-2 py-1 rounded text-xs">SHORT</span></td>
+                    <td class="p-4 text-white">$2,890.45</td>
+                    <td class="p-4 text-white">$2,834.12</td>
+                    <td class="p-4 text-neon-green font-bold">+$560.33</td>
+                    <td class="p-4 text-text-muted">1h 48m</td>
+                    <td class="p-4"><span class="text-neon-purple bg-neon-purple/10 px-2 py-1 rounded text-xs">AI</span></td>
+                  </tr>
+                  <tr class="border-b border-neon-cyan/10 hover:bg-dark-surface/20 transition-colors cursor-pointer">
+                    <td class="p-4 text-text-muted">Dec 18, 09:42:18</td>
+                    <td class="p-4 text-white font-medium">ADA/USDT</td>
+                    <td class="p-4"><span class="text-neon-green bg-neon-green/10 px-2 py-1 rounded text-xs">LONG</span></td>
+                    <td class="p-4 text-white">$0.4520</td>
+                    <td class="p-4 text-white">$0.4410</td>
+                    <td class="p-4 text-neon-pink font-bold">-$110.00</td>
+                    <td class="p-4 text-text-muted">4h 42m</td>
+                    <td class="p-4"><span class="text-text-secondary bg-text-secondary/10 px-2 py-1 rounded text-xs">MANUAL</span></td>
+                  </tr>
+                  <tr class="border-b border-neon-cyan/10 hover:bg-dark-surface/20 transition-colors cursor-pointer">
+                    <td class="p-4 text-text-muted">Dec 17, 16:28:56</td>
+                    <td class="p-4 text-white font-medium">SOL/USDT</td>
+                    <td class="p-4"><span class="text-neon-green bg-neon-green/10 px-2 py-1 rounded text-xs">LONG</span></td>
+                    <td class="p-4 text-white">$98.50</td>
+                    <td class="p-4 text-white">$102.34</td>
+                    <td class="p-4 text-neon-green font-bold">+$384.00</td>
+                    <td class="p-4 text-text-muted">6h 12m</td>
+                    <td class="p-4"><span class="text-neon-purple bg-neon-purple/10 px-2 py-1 rounded text-xs">AI</span></td>
+                  </tr>
+                  <tr class="border-b border-neon-cyan/10 hover:bg-dark-surface/20 transition-colors cursor-pointer">
+                    <td class="p-4 text-text-muted">Dec 17, 13:11:33</td>
+                    <td class="p-4 text-white font-medium">DOT/USDT</td>
+                    <td class="p-4"><span class="text-neon-pink bg-neon-pink/10 px-2 py-1 rounded text-xs">SHORT</span></td>
+                    <td class="p-4 text-white">$7.82</td>
+                    <td class="p-4 text-white">$7.65</td>
+                    <td class="p-4 text-neon-green font-bold">+$170.00</td>
+                    <td class="p-4 text-text-muted">3h 06m</td>
+                    <td class="p-4"><span class="text-neon-purple bg-neon-purple/10 px-2 py-1 rounded text-xs">AI</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-4 border-t border-neon-cyan/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div class="text-sm text-text-secondary">
+                Total: $15,247 profit from 2,847 trades
+              </div>
+              <div class="flex items-center space-x-2">
+                <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-3 py-1 rounded-lg text-sm transition-colors disabled:opacity-50" disabled>
+                  Previous
+                </button>
+                <div class="flex space-x-1">
+                  <button class="bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan px-3 py-1 rounded-lg text-sm font-medium">1</button>
+                  <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-3 py-1 rounded-lg text-sm transition-colors">2</button>
+                  <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-3 py-1 rounded-lg text-sm transition-colors">3</button>
+                  <span class="px-2 text-text-muted">...</span>
+                  <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-3 py-1 rounded-lg text-sm transition-colors">143</button>
+                </div>
+                <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-3 py-1 rounded-lg text-sm transition-colors">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Trading History Interactive Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Table sorting functionality
+      const sortableHeaders = document.querySelectorAll('th[class*="cursor-pointer"]');
+      let sortDirection = {};
+
+      sortableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+          const column = this.textContent.trim();
+          sortDirection[column] = sortDirection[column] === 'asc' ? 'desc' : 'asc';
+
+          // Visual feedback
+          sortableHeaders.forEach(h => {
+            const svg = h.querySelector('svg');
+            if (svg) {
+              svg.style.transform = h === this
+                ? (sortDirection[column] === 'asc' ? 'rotate(0deg)' : 'rotate(180deg)')
+                : 'rotate(0deg)';
+              svg.style.color = h === this ? '#00ffff' : 'inherit';
+            }
+          });
+
+          // In real app, would sort the data
+          console.log(`Sorting by ${column} in ${sortDirection[column]} order`);
+        });
+      });
+
+      // Row click for trade details
+      const tradeRows = document.querySelectorAll('tbody tr[class*="cursor-pointer"]');
+      tradeRows.forEach(row => {
+        row.addEventListener('click', function() {
+          // Remove active state from all rows
+          tradeRows.forEach(r => r.classList.remove('ring-2', 'ring-neon-cyan'));
+
+          // Add active state to clicked row
+          this.classList.add('ring-2', 'ring-neon-cyan');
+
+          // In real app, would show trade details modal
+          const pair = this.cells[1].textContent;
+          const pnl = this.cells[5].textContent;
+          console.log(`Selected trade: ${pair} - ${pnl}`);
+        });
+      });
+
+      // Filter form handling
+      const filterInputs = document.querySelectorAll('select, input[type="text"]');
+      filterInputs.forEach(input => {
+        input.addEventListener('change', function() {
+          // In real app, would filter the data
+          console.log(`Filter changed: ${this.name || 'search'} = ${this.value}`);
+        });
+      });
+
+      // Export functionality
+      const exportButton = document.querySelector('button[class*="neon-green"]');
+      if (exportButton) {
+        exportButton.addEventListener('click', function() {
+          // In real app, would generate and download CSV/PDF report
+          alert('Export functionality would generate a detailed trading report here.');
+        });
+      }
+
+      // Pagination
+      const paginationButtons = document.querySelectorAll('button[class*="px-3"]');
+      paginationButtons.forEach(button => {
+        if (!button.disabled && button.textContent.match(/^\d+$/)) {
+          button.addEventListener('click', function() {
+            // Update active page
+            paginationButtons.forEach(b => {
+              if (b.textContent.match(/^\d+$/)) {
+                b.className = b === this
+                  ? 'bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan px-3 py-1 rounded-lg text-sm font-medium'
+                  : 'bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-3 py-1 rounded-lg text-sm transition-colors';
+              }
+            });
+
+            // In real app, would load new page data
+            console.log(`Loading page ${this.textContent}`);
+          });
+        }
+      });
+    });
+  </script>
+
+  <style>
+    /* Cyberpunk card effects */
+    .cyberpunk-card {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .cyberpunk-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+    }
+
+    .cyberpunk-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 255, 0.03) 50%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .cyberpunk-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Table enhancements */
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    /* Sortable header animations */
+    th svg {
+      transition: all 0.3s ease;
+    }
+
+    /* Row selection effects */
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(0, 255, 255, 0.05) !important;
+      border-color: rgba(0, 255, 255, 0.3);
+    }
+
+    tbody tr.ring-2 {
+      background: rgba(0, 255, 255, 0.1) !important;
+    }
+
+    /* Custom scrollbar for table */
+    .overflow-x-auto::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-track {
+      background: var(--dark-bg);
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+      border-radius: 2px;
+    }
+  </style>
+</Layout>

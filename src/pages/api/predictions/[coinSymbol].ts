@@ -3,6 +3,8 @@
  * GET /api/predictions/[coinSymbol] - Get AI predictions for a cryptocurrency
  */
 
+export const prerender = false;
+
 import type { APIRoute } from "astro";
 import { aiPredictionService } from "../../../lib/services/ai-prediction.service.js";
 import { marketDataService } from "../../../lib/services/market-data.service.js";

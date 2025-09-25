@@ -1,44 +1,620 @@
 ---
-// Basic index page for AI Trading System
-const title = "AI Trading System";
+/**
+ * T059: Home page with simulation start
+ * Main landing page for the AI Trading System with simulation onboarding
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import PortfolioMetrics from '../components/PortfolioMetrics.astro';
+import AIPrediction from '../components/AIPrediction.astro';
+import SimulationControls from '../components/SimulationControls.astro';
+
+// Page metadata
+const title = 'AI Trading System - Cryptocurrency Trading Simulator';
+const description = 'Experience AI-powered cryptocurrency trading with real market data and zero risk. Advanced backtesting, ML predictions, and cyberpunk interface.';
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-  </head>
-  <body class="bg-dark-900 text-white min-h-screen">
-    <main class="container mx-auto px-4 py-8">
-      <h1 class="text-4xl font-bold text-neon-cyan mb-4">
-        {title}
-      </h1>
-      <p class="text-lg mb-8">
-        AI-powered cryptocurrency trading simulator - Coming Soon
-      </p>
-      <div class="bg-dark-800 p-6 rounded-lg border border-neon-cyan/20">
-        <h2 class="text-2xl font-semibold mb-4">Features</h2>
-        <ul class="space-y-2">
-          <li class="flex items-center">
-            <span class="text-neon-green mr-2">✓</span>
-            Real-time cryptocurrency price tracking
-          </li>
-          <li class="flex items-center">
-            <span class="text-neon-green mr-2">✓</span>
-            AI-powered trading signals
-          </li>
-          <li class="flex items-center">
-            <span class="text-neon-green mr-2">✓</span>
-            Backtesting with historical data
-          </li>
-          <li class="flex items-center">
-            <span class="text-neon-green mr-2">✓</span>
-            Risk management protocols
-          </li>
-        </ul>
+<Layout title={title} description={description}>
+  <Navigation />
+
+  <main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section relative overflow-hidden">
+      <!-- Background Effects -->
+      <div class="hero-background">
+        <div class="matrix-overlay absolute inset-0 opacity-10"></div>
+        <div class="gradient-overlay absolute inset-0 bg-gradient-to-br from-dark-bg via-transparent to-dark-card opacity-80"></div>
       </div>
-    </main>
-  </body>
-</html>
+
+      <div class="hero-content relative z-10 container mx-auto px-4 py-16 lg:py-24">
+        <div class="text-center mb-12">
+          <!-- Main Heading -->
+          <h1 class="hero-title text-4xl md:text-6xl lg:text-7xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-purple mb-6 glow-text-strong">
+            AI Trading System
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="hero-subtitle text-xl md:text-2xl text-text-muted mb-8 max-w-3xl mx-auto font-rajdhani">
+            Experience the future of cryptocurrency trading with
+            <span class="text-neon-cyan font-bold">AI-powered predictions</span>,
+            <span class="text-neon-green font-bold">real market data</span>, and
+            <span class="text-neon-pink font-bold">zero financial risk</span>
+          </p>
+
+          <!-- Feature Pills -->
+          <div class="feature-pills flex flex-wrap justify-center gap-3 mb-8">
+            <div class="pill bg-neon-cyan/20 border border-neon-cyan/40 text-neon-cyan px-4 py-2 rounded-full text-sm font-medium">
+              🤖 AI Predictions
+            </div>
+            <div class="pill bg-neon-green/20 border border-neon-green/40 text-neon-green px-4 py-2 rounded-full text-sm font-medium">
+              📊 Real-time Data
+            </div>
+            <div class="pill bg-neon-pink/20 border border-neon-pink/40 text-neon-pink px-4 py-2 rounded-full text-sm font-medium">
+              🛡️ Paper Trading
+            </div>
+            <div class="pill bg-neon-purple/20 border border-neon-purple/40 text-neon-purple px-4 py-2 rounded-full text-sm font-medium">
+              📈 Advanced Charts
+            </div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="cta-buttons flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="/simulation" class="cta-primary bg-gradient-to-r from-neon-cyan to-neon-blue hover:from-neon-blue hover:to-neon-purple text-dark-bg font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 glow-border-strong">
+              <span class="flex items-center space-x-2">
+                <span>🚀</span>
+                <span>Start Trading Simulation</span>
+              </span>
+            </a>
+
+            <a href="/backtesting" class="cta-secondary border-2 border-neon-purple text-neon-purple hover:bg-neon-purple hover:text-dark-bg font-bold py-4 px-8 rounded-lg text-lg transition-all">
+              <span class="flex items-center space-x-2">
+                <span>📊</span>
+                <span>Try Backtesting</span>
+              </span>
+            </a>
+          </div>
+
+          <!-- Trust Indicators -->
+          <div class="trust-indicators mt-8 text-sm text-text-muted">
+            <p class="mb-2">
+              <span class="text-neon-green">✓</span> No real money required
+              <span class="mx-4 text-neon-cyan">✓</span> Real market prices
+              <span class="text-neon-pink">✓</span> Professional tools
+            </p>
+            <p>
+              <span class="text-text-secondary">Part of </span>
+              <a href="https://bizkit.dev" class="text-neon-cyan hover:text-neon-pink transition-colors font-medium">bizkit.dev</a>
+              <span class="text-text-secondary"> portfolio showcase</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Overview -->
+    <section class="features-section py-16 bg-dark-surface/30">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-orbitron font-bold text-neon-cyan glow-text mb-4">
+            Advanced Trading Features
+          </h2>
+          <p class="text-lg text-text-muted max-w-2xl mx-auto">
+            Experience professional-grade trading tools with cutting-edge AI assistance and risk-free simulation
+          </p>
+        </div>
+
+        <div class="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- AI Predictions -->
+          <div class="feature-card bg-dark-card/50 backdrop-blur-sm border border-neon-purple/30 rounded-lg p-6 hover:border-neon-purple/50 transition-all transform hover:translate-y-1">
+            <div class="feature-icon text-4xl mb-4">🧠</div>
+            <h3 class="text-xl font-bold text-neon-purple mb-3">AI-Powered Predictions</h3>
+            <p class="text-text-muted mb-4">
+              Advanced machine learning models analyze market patterns to provide intelligent trading signals with confidence scores.
+            </p>
+            <div class="feature-stats text-sm">
+              <div class="stat-item flex justify-between mb-1">
+                <span class="text-text-secondary">Model Accuracy:</span>
+                <span class="text-neon-green">73.2%</span>
+              </div>
+              <div class="stat-item flex justify-between">
+                <span class="text-text-secondary">Predictions/Day:</span>
+                <span class="text-neon-cyan">144</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-time Charts -->
+          <div class="feature-card bg-dark-card/50 backdrop-blur-sm border border-neon-green/30 rounded-lg p-6 hover:border-neon-green/50 transition-all transform hover:translate-y-1">
+            <div class="feature-icon text-4xl mb-4">📈</div>
+            <h3 class="text-xl font-bold text-neon-green mb-3">Professional Charts</h3>
+            <p class="text-text-muted mb-4">
+              TradingView-powered charts with technical indicators, multiple timeframes, and real-time price data from CoinGecko.
+            </p>
+            <div class="feature-stats text-sm">
+              <div class="stat-item flex justify-between mb-1">
+                <span class="text-text-secondary">Indicators:</span>
+                <span class="text-neon-green">15+</span>
+              </div>
+              <div class="stat-item flex justify-between">
+                <span class="text-text-secondary">Update Rate:</span>
+                <span class="text-neon-cyan">30s</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Portfolio Analytics -->
+          <div class="feature-card bg-dark-card/50 backdrop-blur-sm border border-neon-cyan/30 rounded-lg p-6 hover:border-neon-cyan/50 transition-all transform hover:translate-y-1">
+            <div class="feature-icon text-4xl mb-4">💼</div>
+            <h3 class="text-xl font-bold text-neon-cyan mb-3">Portfolio Analytics</h3>
+            <p class="text-text-muted mb-4">
+              Comprehensive performance tracking with metrics like Sharpe ratio, maximum drawdown, and win rates.
+            </p>
+            <div class="feature-stats text-sm">
+              <div class="stat-item flex justify-between mb-1">
+                <span class="text-text-secondary">Metrics:</span>
+                <span class="text-neon-cyan">12+</span>
+              </div>
+              <div class="stat-item flex justify-between">
+                <span class="text-text-secondary">History:</span>
+                <span class="text-neon-green">Unlimited</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Backtesting Engine -->
+          <div class="feature-card bg-dark-card/50 backdrop-blur-sm border border-neon-blue/30 rounded-lg p-6 hover:border-neon-blue/50 transition-all transform hover:translate-y-1">
+            <div class="feature-icon text-4xl mb-4">🔄</div>
+            <h3 class="text-xl font-bold text-neon-blue mb-3">Backtesting Engine</h3>
+            <p class="text-text-muted mb-4">
+              Test your strategies against historical data with realistic execution simulation and comprehensive reporting.
+            </p>
+            <div class="feature-stats text-sm">
+              <div class="stat-item flex justify-between mb-1">
+                <span class="text-text-secondary">Historical Data:</span>
+                <span class="text-neon-blue">2+ Years</span>
+              </div>
+              <div class="stat-item flex justify-between">
+                <span class="text-text-secondary">Processing:</span>
+                <span class="text-neon-cyan">Web Workers</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk Management -->
+          <div class="feature-card bg-dark-card/50 backdrop-blur-sm border border-neon-pink/30 rounded-lg p-6 hover:border-neon-pink/50 transition-all transform hover:translate-y-1">
+            <div class="feature-icon text-4xl mb-4">🛡️</div>
+            <h3 class="text-xl font-bold text-neon-pink mb-3">Risk Management</h3>
+            <p class="text-text-muted mb-4">
+              Built-in stop-loss, take-profit, and position sizing tools to protect your virtual capital and learn proper risk control.
+            </p>
+            <div class="feature-stats text-sm">
+              <div class="stat-item flex justify-between mb-1">
+                <span class="text-text-secondary">Max Drawdown:</span>
+                <span class="text-neon-pink">Configurable</span>
+              </div>
+              <div class="stat-item flex justify-between">
+                <span class="text-text-secondary">Auto Stop-Loss:</span>
+                <span class="text-neon-green">✓ Available</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Responsive -->
+          <div class="feature-card bg-dark-card/50 backdrop-blur-sm border border-neon-yellow/30 rounded-lg p-6 hover:border-neon-yellow/50 transition-all transform hover:translate-y-1">
+            <div class="feature-icon text-4xl mb-4">📱</div>
+            <h3 class="text-xl font-bold text-neon-yellow mb-3">Mobile Optimized</h3>
+            <p class="text-text-muted mb-4">
+              Fully responsive cyberpunk interface that works seamlessly on desktop, tablet, and mobile devices.
+            </p>
+            <div class="feature-stats text-sm">
+              <div class="stat-item flex justify-between mb-1">
+                <span class="text-text-secondary">Breakpoints:</span>
+                <span class="text-neon-yellow">5</span>
+              </div>
+              <div class="stat-item flex justify-between">
+                <span class="text-text-secondary">Touch Support:</span>
+                <span class="text-neon-green">✓ Full</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Preview Section -->
+    <section class="preview-section py-16">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-orbitron font-bold text-neon-green glow-text mb-4">
+            Live Market Preview
+          </h2>
+          <p class="text-lg text-text-muted max-w-2xl mx-auto">
+            Get a taste of the trading experience with live market data and AI predictions
+          </p>
+        </div>
+
+        <div class="preview-grid grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- AI Prediction Preview -->
+          <div class="preview-card">
+            <div class="card-header mb-4">
+              <h3 class="text-xl font-bold text-neon-purple">AI Market Analysis</h3>
+              <p class="text-sm text-text-muted">Live predictions for Bitcoin</p>
+            </div>
+            <AIPrediction symbol="bitcoin" compact={true} showHistory={false} className="h-80" />
+          </div>
+
+          <!-- Portfolio Metrics Preview -->
+          <div class="preview-card">
+            <div class="card-header mb-4">
+              <h3 class="text-xl font-bold text-neon-cyan">Portfolio Performance</h3>
+              <p class="text-sm text-text-muted">Sample simulation results</p>
+            </div>
+            <PortfolioMetrics compact={true} showChart={false} className="h-80" />
+          </div>
+        </div>
+
+        <!-- Quick Start Controls -->
+        <div class="quick-start-section mt-12">
+          <div class="bg-dark-card/30 backdrop-blur-sm border border-neon-green/30 rounded-lg p-6">
+            <div class="text-center mb-6">
+              <h3 class="text-2xl font-bold text-neon-green mb-2">Ready to Start Trading?</h3>
+              <p class="text-text-muted">Launch your simulation with $10,000 virtual capital</p>
+            </div>
+            <SimulationControls compact={true} autoTrade={false} showAdvanced={false} className="max-w-2xl mx-auto" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Getting Started Guide -->
+    <section class="guide-section py-16 bg-dark-surface/20">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-orbitron font-bold text-neon-blue glow-text mb-4">
+            How to Get Started
+          </h2>
+          <p class="text-lg text-text-muted max-w-2xl mx-auto">
+            Follow these simple steps to begin your AI-assisted trading journey
+          </p>
+        </div>
+
+        <div class="steps-container max-w-4xl mx-auto">
+          <div class="steps-grid grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Step 1 -->
+            <div class="step-card text-center">
+              <div class="step-number bg-neon-cyan text-dark-bg w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">1</div>
+              <h3 class="text-xl font-bold text-neon-cyan mb-3">Choose Your Path</h3>
+              <p class="text-text-muted mb-4">
+                Start with live simulation for real-time trading or try backtesting to analyze historical performance.
+              </p>
+              <div class="step-actions space-y-2">
+                <a href="/simulation" class="block bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan py-2 px-4 rounded hover:bg-neon-cyan/20 transition-colors">Live Simulation</a>
+                <a href="/backtesting" class="block bg-neon-blue/10 border border-neon-blue/30 text-neon-blue py-2 px-4 rounded hover:bg-neon-blue/20 transition-colors">Backtesting</a>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card text-center">
+              <div class="step-number bg-neon-green text-dark-bg w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">2</div>
+              <h3 class="text-xl font-bold text-neon-green mb-3">Configure Settings</h3>
+              <p class="text-text-muted mb-4">
+                Set your risk parameters, enable AI assistance, and choose your preferred cryptocurrencies to trade.
+              </p>
+              <div class="step-features text-sm">
+                <div class="feature-item text-text-secondary mb-1">• Risk management rules</div>
+                <div class="feature-item text-text-secondary mb-1">• AI confidence thresholds</div>
+                <div class="feature-item text-text-secondary">• Asset selection</div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card text-center">
+              <div class="step-number bg-neon-pink text-dark-bg w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">3</div>
+              <h3 class="text-xl font-bold text-neon-pink mb-3">Start Trading</h3>
+              <p class="text-text-muted mb-4">
+                Execute trades with AI guidance, monitor your portfolio performance, and refine your strategy over time.
+              </p>
+              <div class="step-features text-sm">
+                <div class="feature-item text-text-secondary mb-1">• Real-time market data</div>
+                <div class="feature-item text-text-secondary mb-1">• AI trade suggestions</div>
+                <div class="feature-item text-text-secondary">• Performance analytics</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Resources -->
+        <div class="resources-section mt-12 text-center">
+          <h3 class="text-xl font-bold text-neon-purple mb-6">Need Help Getting Started?</h3>
+          <div class="resource-links flex flex-wrap justify-center gap-4">
+            <a href="/history" class="resource-link bg-dark-card border border-neon-purple/30 text-neon-purple py-2 px-4 rounded hover:bg-neon-purple/10 transition-colors">
+              📊 View Sample Results
+            </a>
+            <a href="https://bizkit.dev" class="resource-link bg-dark-card border border-neon-cyan/30 text-neon-cyan py-2 px-4 rounded hover:bg-neon-cyan/10 transition-colors" target="_blank">
+              👨‍💻 Developer Portfolio
+            </a>
+            <a href="#" class="resource-link bg-dark-card border border-neon-green/30 text-neon-green py-2 px-4 rounded hover:bg-neon-green/10 transition-colors" onclick="alert('Documentation coming soon!')">
+              📚 Documentation
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <section class="footer-cta py-16 bg-gradient-to-r from-dark-bg to-dark-card">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-5xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink mb-6 glow-text-strong">
+          Ready to Master AI Trading?
+        </h2>
+        <p class="text-xl text-text-muted mb-8 max-w-2xl mx-auto">
+          Join the future of cryptocurrency trading with zero risk and unlimited learning potential
+        </p>
+
+        <div class="cta-final flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a href="/simulation" class="cta-primary bg-gradient-to-r from-neon-cyan to-neon-pink hover:from-neon-pink hover:to-neon-purple text-dark-bg font-bold py-4 px-8 rounded-lg text-xl transition-all transform hover:scale-105 glow-border-strong">
+            <span class="flex items-center space-x-2">
+              <span>🚀</span>
+              <span>Launch Simulation Now</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="disclaimer mt-8 text-sm text-text-muted max-w-3xl mx-auto">
+          <p class="mb-2">
+            <strong class="text-neon-pink">⚠️ SIMULATION ONLY:</strong> This application operates exclusively with virtual capital for educational purposes. No real money transactions are processed.
+          </p>
+          <p>
+            Built with ❤️ by <a href="https://bizkit.dev" class="text-neon-cyan hover:text-neon-pink transition-colors">Omar Bizkit</a> •
+            Part of the <a href="https://bizkit.dev" class="text-neon-green hover:text-neon-cyan transition-colors">bizkit.dev</a> portfolio showcase
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animate feature cards on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const cardObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animation = 'slideInUp 0.6s ease-out forwards';
+        }
+      });
+    }, observerOptions);
+
+    // Observe feature cards
+    document.querySelectorAll('.feature-card, .step-card').forEach(card => {
+      const element = card as HTMLElement;
+      element.style.opacity = '0';
+      element.style.transform = 'translateY(30px)';
+      cardObserver.observe(card);
+    });
+
+    // Animate hero elements
+    const heroElements = document.querySelectorAll('.hero-title, .hero-subtitle, .feature-pills, .cta-buttons');
+    heroElements.forEach((el, index) => {
+      const element = el as HTMLElement;
+      element.style.animation = `fadeInUp 0.8s ease-out ${index * 0.2}s forwards`;
+    });
+
+    // Add dynamic glow effects
+    const pills = document.querySelectorAll('.pill');
+    pills.forEach(pill => {
+      const element = pill as HTMLElement;
+      pill.addEventListener('mouseenter', () => {
+        element.style.boxShadow = '0 0 20px currentColor';
+        element.style.transform = 'translateY(-2px)';
+      });
+
+      pill.addEventListener('mouseleave', () => {
+        element.style.boxShadow = '';
+        element.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e: Event) {
+        e.preventDefault();
+        const link = this as HTMLAnchorElement;
+        const href = link.getAttribute('href');
+        if (href) {
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        }
+      });
+    });
+
+    // Track CTA clicks for analytics
+    document.querySelectorAll('.cta-primary, .cta-secondary').forEach(button => {
+      button.addEventListener('click', (e: Event) => {
+        // Analytics tracking would go here
+        const target = e.target as HTMLElement;
+        if (target) {
+          console.log('CTA clicked:', target.textContent?.trim());
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Hero Section Styling */
+  .hero-section {
+    min-height: 80vh;
+    background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(135deg, rgba(157, 78, 221, 0.1) 0%, transparent 50%),
+                var(--dark-bg);
+  }
+
+  .matrix-overlay {
+    background-image:
+      linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: matrixMove 20s linear infinite;
+  }
+
+  @keyframes matrixMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
+
+  .glow-text-strong {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
+  }
+
+  .glow-border-strong {
+    box-shadow: 0 0 20px currentColor, inset 0 0 20px rgba(0, 255, 255, 0.1);
+  }
+
+  /* Feature Cards */
+  .feature-card {
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 40px currentColor;
+  }
+
+  .feature-icon {
+    filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.5));
+  }
+
+  /* Step Cards */
+  .step-card {
+    transition: all 0.3s ease;
+  }
+
+  .step-number {
+    box-shadow: 0 0 20px currentColor;
+  }
+
+  /* Pills Animation */
+  .pill {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Animations */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* CTA Buttons */
+  .cta-primary, .cta-secondary {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-primary::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .cta-primary:active::after {
+    width: 300px;
+    height: 300px;
+  }
+
+  /* Resource Links */
+  .resource-link {
+    transition: all 0.3s ease;
+  }
+
+  .resource-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Preview Cards */
+  .preview-card {
+    backdrop-filter: blur(10px);
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+    }
+
+    .feature-pills {
+      justify-content: center;
+    }
+
+    .steps-grid {
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-content {
+      padding: 2rem 0;
+    }
+
+    .feature-pills {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pill {
+      width: 200px;
+      text-align: center;
+    }
+  }
+</style>

@@ -1,0 +1,941 @@
+---
+/**
+ * T063: User profile/settings page
+ * Complete user profile management and system configuration
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+
+const pageTitle = "Profile & Settings";
+const pageDescription = "Manage your trading profile, preferences, and system configuration for optimal AI trading performance.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Navigation currentPath="/profile" />
+
+  <main class="min-h-screen bg-dark-bg">
+    <!-- Header Section -->
+    <div class="border-b border-neon-cyan/30 bg-dark-surface/50 backdrop-blur-sm">
+      <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <!-- Page Title -->
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-neon-cyan to-neon-purple rounded-xl flex items-center justify-center glow-border">
+              <span class="text-2xl">⚙️</span>
+            </div>
+            <div>
+              <h1 class="text-3xl font-orbitron font-bold text-neon-cyan glow-text">
+                PROFILE & SETTINGS
+              </h1>
+              <p class="text-text-secondary mt-1">
+                Customize your AI trading experience and account preferences
+              </p>
+            </div>
+          </div>
+
+          <!-- User Status -->
+          <div class="flex items-center space-x-6">
+            <!-- Account Type -->
+            <div class="text-right">
+              <div class="text-neon-purple font-bold">PRO TRADER</div>
+              <div class="text-xs text-text-muted">Active since Jan 2024</div>
+            </div>
+
+            <!-- Profile Avatar -->
+            <div class="w-16 h-16 bg-gradient-to-br from-neon-purple to-neon-pink rounded-full flex items-center justify-center glow-border text-2xl font-bold">
+              JD
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        <!-- Left Sidebar: Navigation -->
+        <div class="lg:col-span-1">
+          <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30 p-6 sticky top-24">
+            <h3 class="text-lg font-orbitron font-bold text-neon-cyan mb-4">Settings Menu</h3>
+
+            <nav class="space-y-2">
+              <button class="setting-tab w-full text-left p-3 rounded-lg bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan font-medium transition-all" data-tab="profile">
+                <span class="mr-3">👤</span>
+                Profile Information
+              </button>
+              <button class="setting-tab w-full text-left p-3 rounded-lg hover:bg-neon-cyan/5 text-text-secondary hover:text-neon-cyan transition-all" data-tab="trading">
+                <span class="mr-3">⚡</span>
+                Trading Preferences
+              </button>
+              <button class="setting-tab w-full text-left p-3 rounded-lg hover:bg-neon-cyan/5 text-text-secondary hover:text-neon-cyan transition-all" data-tab="ai">
+                <span class="mr-3">🧠</span>
+                AI Configuration
+              </button>
+              <button class="setting-tab w-full text-left p-3 rounded-lg hover:bg-neon-cyan/5 text-text-secondary hover:text-neon-cyan transition-all" data-tab="security">
+                <span class="mr-3">🔒</span>
+                Security & Privacy
+              </button>
+              <button class="setting-tab w-full text-left p-3 rounded-lg hover:bg-neon-cyan/5 text-text-secondary hover:text-neon-cyan transition-all" data-tab="notifications">
+                <span class="mr-3">🔔</span>
+                Notifications
+              </button>
+              <button class="setting-tab w-full text-left p-3 rounded-lg hover:bg-neon-cyan/5 text-text-secondary hover:text-neon-cyan transition-all" data-tab="subscription">
+                <span class="mr-3">💎</span>
+                Subscription
+              </button>
+            </nav>
+
+            <!-- Quick Stats -->
+            <div class="mt-8 p-4 bg-dark-surface/30 rounded-lg border border-neon-purple/20">
+              <h4 class="text-sm font-medium text-neon-purple mb-3">Account Overview</h4>
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between">
+                  <span class="text-text-secondary">Member Since</span>
+                  <span class="text-white">Jan 15, 2024</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-text-secondary">Total Trades</span>
+                  <span class="text-neon-green">2,847</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-text-secondary">AI Accuracy</span>
+                  <span class="text-neon-cyan">73.2%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-text-secondary">Profit This Month</span>
+                  <span class="text-neon-green">+$3,247</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Content: Settings Panels -->
+        <div class="lg:col-span-3">
+          <!-- Profile Information Tab -->
+          <div class="setting-panel active" data-panel="profile">
+            <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30 p-6 mb-6">
+              <h3 class="text-xl font-orbitron font-bold text-neon-cyan mb-6 flex items-center">
+                <span class="mr-3">👤</span>
+                Profile Information
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Profile Photo -->
+                <div class="md:col-span-2">
+                  <label class="block text-sm text-text-secondary mb-4">Profile Photo</label>
+                  <div class="flex items-center space-x-4">
+                    <div class="w-20 h-20 bg-gradient-to-br from-neon-purple to-neon-pink rounded-full flex items-center justify-center glow-border text-2xl font-bold">
+                      JD
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                      <button class="bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 text-neon-cyan px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Change Photo
+                      </button>
+                      <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-4 py-2 rounded-lg text-sm transition-colors">
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- First Name -->
+                <div>
+                  <label class="block text-sm text-text-secondary mb-2">First Name</label>
+                  <input
+                    type="text"
+                    value="John"
+                    class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-cyan transition-colors"
+                  >
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                  <label class="block text-sm text-text-secondary mb-2">Last Name</label>
+                  <input
+                    type="text"
+                    value="Doe"
+                    class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-cyan transition-colors"
+                  >
+                </div>
+
+                <!-- Email -->
+                <div>
+                  <label class="block text-sm text-text-secondary mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    value="john.doe@example.com"
+                    class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-cyan transition-colors"
+                  >
+                </div>
+
+                <!-- Phone -->
+                <div>
+                  <label class="block text-sm text-text-secondary mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    value="+1 (555) 123-4567"
+                    class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-cyan transition-colors"
+                  >
+                </div>
+
+                <!-- Timezone -->
+                <div>
+                  <label class="block text-sm text-text-secondary mb-2">Timezone</label>
+                  <select class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-cyan">
+                    <option>UTC-8 (Pacific Time)</option>
+                    <option>UTC-5 (Eastern Time)</option>
+                    <option>UTC+0 (GMT)</option>
+                    <option>UTC+1 (Central Europe)</option>
+                    <option>UTC+8 (Asia/Singapore)</option>
+                  </select>
+                </div>
+
+                <!-- Language -->
+                <div>
+                  <label class="block text-sm text-text-secondary mb-2">Language</label>
+                  <select class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-cyan">
+                    <option>English</option>
+                    <option>Spanish</option>
+                    <option>French</option>
+                    <option>German</option>
+                    <option>Japanese</option>
+                    <option>Chinese</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex justify-end mt-6 space-x-3">
+                <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-6 py-2 rounded-lg font-medium transition-colors">
+                  Cancel
+                </button>
+                <button class="bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 text-neon-cyan px-6 py-2 rounded-lg font-medium transition-colors">
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trading Preferences Tab -->
+          <div class="setting-panel" data-panel="trading">
+            <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-purple/30 p-6 mb-6">
+              <h3 class="text-xl font-orbitron font-bold text-neon-purple mb-6 flex items-center">
+                <span class="mr-3">⚡</span>
+                Trading Preferences
+              </h3>
+
+              <div class="space-y-6">
+                <!-- Risk Management -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Risk Management</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm text-text-secondary mb-2">Max Position Size (%)</label>
+                      <input
+                        type="range"
+                        min="1"
+                        max="25"
+                        value="10"
+                        class="w-full h-2 bg-dark-surface/50 rounded-lg appearance-none cursor-pointer slider"
+                      >
+                      <div class="flex justify-between text-xs text-text-muted mt-1">
+                        <span>1%</span>
+                        <span class="text-neon-purple font-bold">10%</span>
+                        <span>25%</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm text-text-secondary mb-2">Stop Loss (%)</label>
+                      <input
+                        type="range"
+                        min="1"
+                        max="20"
+                        value="5"
+                        class="w-full h-2 bg-dark-surface/50 rounded-lg appearance-none cursor-pointer slider"
+                      >
+                      <div class="flex justify-between text-xs text-text-muted mt-1">
+                        <span>1%</span>
+                        <span class="text-neon-purple font-bold">5%</span>
+                        <span>20%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Trading Strategy -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Default Strategy</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-green/20 cursor-pointer hover:border-neon-green/40 transition-colors strategy-option active">
+                      <div class="text-center">
+                        <div class="text-2xl mb-2">🛡️</div>
+                        <div class="text-white font-medium">Conservative</div>
+                        <div class="text-xs text-text-muted mt-1">Lower risk, steady gains</div>
+                      </div>
+                    </div>
+                    <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-purple/20 cursor-pointer hover:border-neon-purple/40 transition-colors strategy-option">
+                      <div class="text-center">
+                        <div class="text-2xl mb-2">⚖️</div>
+                        <div class="text-white font-medium">Balanced</div>
+                        <div class="text-xs text-text-muted mt-1">Moderate risk/reward</div>
+                      </div>
+                    </div>
+                    <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-pink/20 cursor-pointer hover:border-neon-pink/40 transition-colors strategy-option">
+                      <div class="text-center">
+                        <div class="text-2xl mb-2">🚀</div>
+                        <div class="text-white font-medium">Aggressive</div>
+                        <div class="text-xs text-text-muted mt-1">High risk, high reward</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Preferred Assets -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Preferred Assets</h4>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                      <input type="checkbox" checked class="sr-only peer">
+                      <div class="w-5 h-5 border-2 border-neon-cyan/30 rounded peer-checked:bg-neon-cyan peer-checked:border-neon-cyan transition-colors"></div>
+                      <span class="text-white">BTC/USDT</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                      <input type="checkbox" checked class="sr-only peer">
+                      <div class="w-5 h-5 border-2 border-neon-cyan/30 rounded peer-checked:bg-neon-cyan peer-checked:border-neon-cyan transition-colors"></div>
+                      <span class="text-white">ETH/USDT</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                      <input type="checkbox" class="sr-only peer">
+                      <div class="w-5 h-5 border-2 border-neon-cyan/30 rounded peer-checked:bg-neon-cyan peer-checked:border-neon-cyan transition-colors"></div>
+                      <span class="text-white">ADA/USDT</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                      <input type="checkbox" checked class="sr-only peer">
+                      <div class="w-5 h-5 border-2 border-neon-cyan/30 rounded peer-checked:bg-neon-cyan peer-checked:border-neon-cyan transition-colors"></div>
+                      <span class="text-white">SOL/USDT</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Auto Trading -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Automation Settings</h4>
+                  <div class="space-y-4">
+                    <label class="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-white font-medium">Enable Auto Trading</div>
+                        <div class="text-sm text-text-muted">Allow AI to execute trades automatically</div>
+                      </div>
+                      <div class="relative inline-block w-12 h-6">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div class="w-12 h-6 bg-dark-surface/50 rounded-full peer-checked:bg-neon-cyan/20 peer-checked:border-neon-cyan border border-neon-cyan/30 transition-colors"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-neon-cyan rounded-full transition-transform peer-checked:translate-x-6"></div>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-white font-medium">Trade During Market Hours Only</div>
+                        <div class="text-sm text-text-muted">Limit trading to your timezone's market hours</div>
+                      </div>
+                      <div class="relative inline-block w-12 h-6">
+                        <input type="checkbox" class="sr-only peer">
+                        <div class="w-12 h-6 bg-dark-surface/50 rounded-full peer-checked:bg-neon-cyan/20 peer-checked:border-neon-cyan border border-neon-cyan/30 transition-colors"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-gray-400 rounded-full transition-transform peer-checked:translate-x-6 peer-checked:bg-neon-cyan"></div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end mt-6 space-x-3">
+                <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-6 py-2 rounded-lg font-medium transition-colors">
+                  Reset to Defaults
+                </button>
+                <button class="bg-neon-purple/20 hover:bg-neon-purple/30 border border-neon-purple/50 text-neon-purple px-6 py-2 rounded-lg font-medium transition-colors">
+                  Save Preferences
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Configuration Tab -->
+          <div class="setting-panel" data-panel="ai">
+            <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-green/30 p-6 mb-6">
+              <h3 class="text-xl font-orbitron font-bold text-neon-green mb-6 flex items-center">
+                <span class="mr-3">🧠</span>
+                AI Configuration
+              </h3>
+
+              <div class="space-y-6">
+                <!-- AI Model Selection -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">AI Model</h4>
+                  <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-green/20">
+                    <div class="flex items-center justify-between mb-3">
+                      <div>
+                        <div class="text-white font-medium">Neural Trading Model v2.1</div>
+                        <div class="text-sm text-text-muted">Advanced deep learning for crypto prediction</div>
+                      </div>
+                      <div class="text-neon-green font-bold">ACTIVE</div>
+                    </div>
+                    <div class="text-xs text-text-secondary">
+                      Last updated: Dec 15, 2024 • Accuracy: 73.2% • Confidence: High
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Confidence Threshold -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Confidence Settings</h4>
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm text-text-secondary mb-2">Minimum Confidence for Trade Execution</label>
+                      <input
+                        type="range"
+                        min="50"
+                        max="95"
+                        value="75"
+                        class="w-full h-2 bg-dark-surface/50 rounded-lg appearance-none cursor-pointer slider"
+                      >
+                      <div class="flex justify-between text-xs text-text-muted mt-1">
+                        <span>50%</span>
+                        <span class="text-neon-green font-bold">75%</span>
+                        <span>95%</span>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      <div class="bg-dark-surface/30 p-3 rounded-lg text-center">
+                        <div class="text-neon-green text-sm font-bold">HIGH CONFIDENCE</div>
+                        <div class="text-2xl font-bold text-white mt-1">89%</div>
+                        <div class="text-xs text-text-muted">142 trades this month</div>
+                      </div>
+                      <div class="bg-dark-surface/30 p-3 rounded-lg text-center">
+                        <div class="text-neon-cyan text-sm font-bold">MEDIUM CONFIDENCE</div>
+                        <div class="text-2xl font-bold text-white mt-1">67%</div>
+                        <div class="text-xs text-text-muted">284 trades this month</div>
+                      </div>
+                      <div class="bg-dark-surface/30 p-3 rounded-lg text-center">
+                        <div class="text-neon-pink text-sm font-bold">LOW CONFIDENCE</div>
+                        <div class="text-2xl font-bold text-white mt-1">45%</div>
+                        <div class="text-xs text-text-muted">78 trades this month</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Learning Preferences -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Learning & Adaptation</h4>
+                  <div class="space-y-4">
+                    <label class="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-white font-medium">Allow Model Fine-tuning</div>
+                        <div class="text-sm text-text-muted">Let AI learn from your trading patterns</div>
+                      </div>
+                      <div class="relative inline-block w-12 h-6">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div class="w-12 h-6 bg-dark-surface/50 rounded-full peer-checked:bg-neon-green/20 peer-checked:border-neon-green border border-neon-cyan/30 transition-colors"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-neon-green rounded-full transition-transform peer-checked:translate-x-6"></div>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-white font-medium">Share Anonymous Data</div>
+                        <div class="text-sm text-text-muted">Help improve AI models for all users</div>
+                      </div>
+                      <div class="relative inline-block w-12 h-6">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div class="w-12 h-6 bg-dark-surface/50 rounded-full peer-checked:bg-neon-green/20 peer-checked:border-neon-green border border-neon-cyan/30 transition-colors"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-neon-green rounded-full transition-transform peer-checked:translate-x-6"></div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end mt-6 space-x-3">
+                <button class="bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-cyan/30 text-text-secondary px-6 py-2 rounded-lg font-medium transition-colors">
+                  Reset AI Settings
+                </button>
+                <button class="bg-neon-green/20 hover:bg-neon-green/30 border border-neon-green/50 text-neon-green px-6 py-2 rounded-lg font-medium transition-colors">
+                  Update Configuration
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security Tab -->
+          <div class="setting-panel" data-panel="security">
+            <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-pink/30 p-6 mb-6">
+              <h3 class="text-xl font-orbitron font-bold text-neon-pink mb-6 flex items-center">
+                <span class="mr-3">🔒</span>
+                Security & Privacy
+              </h3>
+
+              <div class="space-y-6">
+                <!-- Password Change -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Change Password</h4>
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm text-text-secondary mb-2">Current Password</label>
+                      <input
+                        type="password"
+                        class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-pink transition-colors"
+                      >
+                    </div>
+                    <div>
+                      <label class="block text-sm text-text-secondary mb-2">New Password</label>
+                      <input
+                        type="password"
+                        class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-pink transition-colors"
+                      >
+                    </div>
+                    <div>
+                      <label class="block text-sm text-text-secondary mb-2">Confirm New Password</label>
+                      <input
+                        type="password"
+                        class="w-full bg-dark-surface/50 border border-neon-cyan/30 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-neon-pink transition-colors"
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Two-Factor Authentication -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Two-Factor Authentication</h4>
+                  <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-green/20">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-neon-green font-medium flex items-center">
+                          <span class="w-2 h-2 bg-neon-green rounded-full mr-2"></span>
+                          2FA Enabled
+                        </div>
+                        <div class="text-sm text-text-muted">Using authenticator app</div>
+                      </div>
+                      <button class="bg-neon-pink/20 hover:bg-neon-pink/30 border border-neon-pink/50 text-neon-pink px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Reconfigure
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Active Sessions -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Active Sessions</h4>
+                  <div class="space-y-3">
+                    <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-cyan/20">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <div class="text-white font-medium flex items-center">
+                            <span class="text-lg mr-3">💻</span>
+                            Chrome on Windows
+                          </div>
+                          <div class="text-sm text-text-muted">Current session • IP: 192.168.1.100</div>
+                        </div>
+                        <div class="text-neon-green text-sm">CURRENT</div>
+                      </div>
+                    </div>
+                    <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-cyan/20">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <div class="text-white font-medium flex items-center">
+                            <span class="text-lg mr-3">📱</span>
+                            Mobile App on iPhone
+                          </div>
+                          <div class="text-sm text-text-muted">Last active 2 hours ago • IP: 10.0.1.25</div>
+                        </div>
+                        <button class="bg-neon-pink/20 hover:bg-neon-pink/30 border border-neon-pink/50 text-neon-pink px-3 py-1 rounded text-sm transition-colors">
+                          Revoke
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end mt-6 space-x-3">
+                <button class="bg-neon-pink/20 hover:bg-neon-pink/30 border border-neon-pink/50 text-neon-pink px-6 py-2 rounded-lg font-medium transition-colors">
+                  Update Password
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notifications Tab -->
+          <div class="setting-panel" data-panel="notifications">
+            <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-purple/30 p-6 mb-6">
+              <h3 class="text-xl font-orbitron font-bold text-neon-purple mb-6 flex items-center">
+                <span class="mr-3">🔔</span>
+                Notification Preferences
+              </h3>
+
+              <div class="space-y-6">
+                <!-- Trading Alerts -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Trading Alerts</h4>
+                  <div class="space-y-4">
+                    <label class="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-white font-medium">Trade Execution Alerts</div>
+                        <div class="text-sm text-text-muted">Notify when trades are opened or closed</div>
+                      </div>
+                      <div class="relative inline-block w-12 h-6">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div class="w-12 h-6 bg-dark-surface/50 rounded-full peer-checked:bg-neon-purple/20 peer-checked:border-neon-purple border border-neon-cyan/30 transition-colors"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-neon-purple rounded-full transition-transform peer-checked:translate-x-6"></div>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-white font-medium">Profit/Loss Alerts</div>
+                        <div class="text-sm text-text-muted">Notify on significant P&L changes</div>
+                      </div>
+                      <div class="relative inline-block w-12 h-6">
+                        <input type="checkbox" checked class="sr-only peer">
+                        <div class="w-12 h-6 bg-dark-surface/50 rounded-full peer-checked:bg-neon-purple/20 peer-checked:border-neon-purple border border-neon-cyan/30 transition-colors"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-neon-purple rounded-full transition-transform peer-checked:translate-x-6"></div>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center justify-between cursor-pointer">
+                      <div>
+                        <div class="text-white font-medium">AI Confidence Alerts</div>
+                        <div class="text-sm text-text-muted">Notify when AI confidence is high</div>
+                      </div>
+                      <div class="relative inline-block w-12 h-6">
+                        <input type="checkbox" class="sr-only peer">
+                        <div class="w-12 h-6 bg-dark-surface/50 rounded-full peer-checked:bg-neon-purple/20 peer-checked:border-neon-purple border border-neon-cyan/30 transition-colors"></div>
+                        <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-gray-400 rounded-full transition-transform peer-checked:translate-x-6 peer-checked:bg-neon-purple"></div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Delivery Methods -->
+                <div>
+                  <h4 class="text-lg font-medium text-white mb-4">Delivery Methods</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                      <input type="checkbox" checked class="sr-only peer">
+                      <div class="w-5 h-5 border-2 border-neon-cyan/30 rounded peer-checked:bg-neon-cyan peer-checked:border-neon-cyan transition-colors"></div>
+                      <span class="text-white">📧 Email</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                      <input type="checkbox" checked class="sr-only peer">
+                      <div class="w-5 h-5 border-2 border-neon-cyan/30 rounded peer-checked:bg-neon-cyan peer-checked:border-neon-cyan transition-colors"></div>
+                      <span class="text-white">📱 Push</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                      <input type="checkbox" class="sr-only peer">
+                      <div class="w-5 h-5 border-2 border-neon-cyan/30 rounded peer-checked:bg-neon-cyan peer-checked:border-neon-cyan transition-colors"></div>
+                      <span class="text-white">📲 SMS</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end mt-6 space-x-3">
+                <button class="bg-neon-purple/20 hover:bg-neon-purple/30 border border-neon-purple/50 text-neon-purple px-6 py-2 rounded-lg font-medium transition-colors">
+                  Save Preferences
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subscription Tab -->
+          <div class="setting-panel" data-panel="subscription">
+            <div class="cyberpunk-card bg-dark-card/90 backdrop-blur-md rounded-xl border border-neon-cyan/30 p-6 mb-6">
+              <h3 class="text-xl font-orbitron font-bold text-neon-cyan mb-6 flex items-center">
+                <span class="mr-3">💎</span>
+                Subscription & Billing
+              </h3>
+
+              <!-- Current Plan -->
+              <div class="bg-gradient-to-br from-neon-purple/10 to-neon-cyan/10 p-6 rounded-xl border border-neon-cyan/30 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 class="text-2xl font-orbitron font-bold text-neon-cyan">PRO TRADER</h4>
+                    <p class="text-text-secondary">Advanced AI trading with premium features</p>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-3xl font-bold text-white">$49</div>
+                    <div class="text-sm text-text-muted">/month</div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div class="flex items-center text-sm text-neon-green">
+                    <span class="mr-2">✓</span>
+                    Unlimited AI trades
+                  </div>
+                  <div class="flex items-center text-sm text-neon-green">
+                    <span class="mr-2">✓</span>
+                    Advanced analytics
+                  </div>
+                  <div class="flex items-center text-sm text-neon-green">
+                    <span class="mr-2">✓</span>
+                    Priority support
+                  </div>
+                  <div class="flex items-center text-sm text-neon-green">
+                    <span class="mr-2">✓</span>
+                    Custom strategies
+                  </div>
+                </div>
+
+                <div class="text-sm text-text-muted">
+                  Next billing date: January 15, 2025
+                </div>
+              </div>
+
+              <!-- Usage Stats -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-dark-surface/30 p-4 rounded-lg text-center">
+                  <div class="text-neon-cyan text-sm font-bold">API CALLS</div>
+                  <div class="text-2xl font-bold text-white mt-1">847,392</div>
+                  <div class="text-xs text-text-muted">of unlimited</div>
+                </div>
+                <div class="bg-dark-surface/30 p-4 rounded-lg text-center">
+                  <div class="text-neon-green text-sm font-bold">ACTIVE STRATEGIES</div>
+                  <div class="text-2xl font-bold text-white mt-1">5</div>
+                  <div class="text-xs text-text-muted">of 10 max</div>
+                </div>
+                <div class="bg-dark-surface/30 p-4 rounded-lg text-center">
+                  <div class="text-neon-purple text-sm font-bold">STORAGE USED</div>
+                  <div class="text-2xl font-bold text-white mt-1">2.4GB</div>
+                  <div class="text-xs text-text-muted">of 50GB</div>
+                </div>
+              </div>
+
+              <!-- Plan Options -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-green/20 text-center">
+                  <h5 class="font-bold text-neon-green mb-2">STARTER</h5>
+                  <div class="text-2xl font-bold text-white mb-2">$19</div>
+                  <div class="text-xs text-text-muted mb-4">/month</div>
+                  <button class="w-full bg-dark-surface/50 hover:bg-dark-surface/70 border border-neon-green/30 text-text-secondary py-2 rounded-lg text-sm transition-colors">
+                    Downgrade
+                  </button>
+                </div>
+                <div class="bg-gradient-to-br from-neon-cyan/10 to-neon-purple/10 p-4 rounded-lg border-2 border-neon-cyan text-center">
+                  <h5 class="font-bold text-neon-cyan mb-2">PRO TRADER</h5>
+                  <div class="text-2xl font-bold text-white mb-2">$49</div>
+                  <div class="text-xs text-text-muted mb-4">/month</div>
+                  <button class="w-full bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan py-2 rounded-lg text-sm font-medium cursor-not-allowed">
+                    Current Plan
+                  </button>
+                </div>
+                <div class="bg-dark-surface/30 p-4 rounded-lg border border-neon-pink/20 text-center">
+                  <h5 class="font-bold text-neon-pink mb-2">ENTERPRISE</h5>
+                  <div class="text-2xl font-bold text-white mb-2">$149</div>
+                  <div class="text-xs text-text-muted mb-4">/month</div>
+                  <button class="w-full bg-neon-pink/20 hover:bg-neon-pink/30 border border-neon-pink/50 text-neon-pink py-2 rounded-lg text-sm font-medium transition-colors">
+                    Upgrade
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-center">
+                <button class="text-neon-pink hover:text-neon-pink/80 text-sm underline transition-colors">
+                  Cancel Subscription
+                </button>
+                <button class="bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 text-neon-cyan px-6 py-2 rounded-lg font-medium transition-colors">
+                  Manage Billing
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Settings Page Interactive Script -->
+  <script>
+    // @ts-nocheck
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab switching functionality
+      const tabButtons = document.querySelectorAll('.setting-tab');
+      const panels = document.querySelectorAll('.setting-panel');
+
+      tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const targetTab = this.dataset.tab;
+
+          // Remove active state from all tabs and panels
+          tabButtons.forEach(btn => {
+            btn.classList.remove('bg-neon-cyan/10', 'border-neon-cyan/30', 'text-neon-cyan');
+            btn.classList.add('text-text-secondary');
+          });
+          panels.forEach(panel => {
+            panel.classList.remove('active');
+          });
+
+          // Add active state to clicked tab and corresponding panel
+          this.classList.add('bg-neon-cyan/10', 'border-neon-cyan/30', 'text-neon-cyan');
+          this.classList.remove('text-text-secondary');
+
+          const targetPanel = document.querySelector(`[data-panel="${targetTab}"]`);
+          if (targetPanel) {
+            targetPanel.classList.add('active');
+          }
+        });
+      });
+
+      // Strategy selection
+      const strategyOptions = document.querySelectorAll('.strategy-option');
+      strategyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          strategyOptions.forEach(opt => {
+            opt.classList.remove('active', 'ring-2', 'ring-neon-green');
+          });
+          this.classList.add('active', 'ring-2', 'ring-neon-green');
+        });
+      });
+
+      // Range sliders visual feedback
+      const sliders = document.querySelectorAll('.slider');
+      sliders.forEach(slider => {
+        slider.addEventListener('input', function() {
+          const value = this.value;
+          const min = this.min || 0;
+          const max = this.max || 100;
+          const percentage = (value - min) / (max - min) * 100;
+
+          // Update slider background
+          this.style.background = `linear-gradient(to right, #00ffff 0%, #00ffff ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`;
+
+          // Update value display
+          const valueDisplay = this.parentNode.querySelector('.font-bold');
+          if (valueDisplay) {
+            valueDisplay.textContent = value + (this.parentNode.textContent.includes('%') ? '%' : '');
+          }
+        });
+
+        // Initialize slider appearance
+        slider.dispatchEvent(new Event('input'));
+      });
+
+      // Toggle switches
+      const toggles = document.querySelectorAll('input[type="checkbox"]');
+      toggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+          const slider = this.nextElementSibling;
+          const knob = slider.querySelector('div:last-child');
+
+          if (this.checked) {
+            slider.classList.add('peer-checked:bg-neon-cyan/20', 'peer-checked:border-neon-cyan');
+            knob.classList.add('peer-checked:translate-x-6', 'peer-checked:bg-neon-cyan');
+          } else {
+            slider.classList.remove('peer-checked:bg-neon-cyan/20', 'peer-checked:border-neon-cyan');
+            knob.classList.remove('peer-checked:translate-x-6', 'peer-checked:bg-neon-cyan');
+          }
+        });
+      });
+
+      // Form validation and saving
+      const saveButtons = document.querySelectorAll('button[class*="Save"], button[class*="Update"]');
+      saveButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Show success notification
+          const notification = document.createElement('div');
+          notification.className = 'fixed top-4 right-4 bg-neon-green/20 border border-neon-green/50 text-neon-green px-6 py-3 rounded-lg z-50 animate-fade-in';
+          notification.textContent = 'Settings saved successfully!';
+          document.body.appendChild(notification);
+
+          setTimeout(() => {
+            notification.remove();
+          }, 3000);
+        });
+      });
+    });
+  </script>
+
+  <style>
+    /* Settings page specific styles */
+    .setting-panel {
+      display: none;
+    }
+
+    .setting-panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .strategy-option.active {
+      background: rgba(0, 255, 0, 0.1);
+      border-color: rgba(0, 255, 0, 0.5);
+    }
+
+    /* Custom slider styling */
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #00ffff;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    }
+
+    .slider::-moz-range-thumb {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #00ffff;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    }
+
+    /* Cyberpunk card effects */
+    .cyberpunk-card {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .cyberpunk-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+    }
+
+    .cyberpunk-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 255, 0.03) 50%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .cyberpunk-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateX(100px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .animate-fade-in {
+      animation: fade-in 0.3s ease-out;
+    }
+  </style>
+</Layout>

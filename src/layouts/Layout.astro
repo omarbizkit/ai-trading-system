@@ -1,0 +1,326 @@
+---
+/**
+ * T051: Layout component with cyberpunk theme
+ * Main layout wrapper for all pages with neon cyberpunk styling
+ */
+
+export interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+}
+
+const { title, description = "AI-powered cryptocurrency trading simulator", canonical } = Astro.props;
+const currentUrl = Astro.url.href;
+
+// Import global styles
+import '../styles/globals.css';
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO Meta Tags -->
+    <title>{title} | AI Trading System</title>
+    <meta property="og:title" content={`${title} | AI Trading System`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={currentUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | AI Trading System`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content="/twitter-card.png" />
+    
+    {canonical && <link rel="canonical" href={canonical} />}
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://api.coingecko.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Cyberpunk Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Theme Meta -->
+    <meta name="theme-color" content="#00ffff" />
+    <meta name="color-scheme" content="dark" />
+    
+    <!-- Performance Hints -->
+    <link rel="dns-prefetch" href="//unpkg.com" />
+    
+    <style>
+      /* Critical CSS for instant cyberpunk theme */
+      :root {
+        --neon-cyan: #00ffff;
+        --neon-pink: #ff00ff;
+        --neon-green: #00ff00;
+        --neon-purple: #9d4edd;
+        --neon-blue: #0099ff;
+        --dark-bg: #0a0a0a;
+        --dark-surface: #1a1a2e;
+        --dark-card: #16213e;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --text-muted: #666666;
+        --border-glow: rgba(0, 255, 255, 0.3);
+        --shadow-glow: 0 0 20px rgba(0, 255, 255, 0.2);
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      html {
+        font-family: 'Rajdhani', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--dark-bg);
+        color: var(--text-primary);
+      }
+      
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, 
+          var(--dark-bg) 0%, 
+          #1a1a2e 25%, 
+          #16213e 75%, 
+          var(--dark-bg) 100%
+        );
+        background-attachment: fixed;
+        line-height: 1.6;
+      }
+      
+      /* Cyberpunk glow effects */
+      .glow-text {
+        text-shadow: 0 0 10px currentColor;
+      }
+      
+      .glow-border {
+        border: 1px solid var(--border-glow);
+        box-shadow: var(--shadow-glow), inset 0 0 20px rgba(0, 255, 255, 0.1);
+      }
+      
+      /* Loading screen */
+      .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--dark-bg);
+        display: flex;
+        items-center: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+      }
+      
+      .loading.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      /* Scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: var(--dark-bg);
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+        border-radius: 4px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, var(--neon-pink), var(--neon-cyan));
+      }
+    </style>
+  </head>
+  
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading">
+      <div class="text-center">
+        <div class="animate-spin inline-block w-8 h-8 border-4 border-neon-cyan border-t-transparent rounded-full"></div>
+        <p class="text-neon-cyan mt-4 font-orbitron">INITIALIZING AI TRADING SYSTEM...</p>
+      </div>
+    </div>
+    
+    <!-- Main Application -->
+    <div id="app" class="min-h-screen flex flex-col opacity-0 transition-opacity duration-500">
+      <slot />
+    </div>
+    
+    <!-- Background Animation -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      <div class="absolute inset-0 bg-gradient-to-br from-transparent via-neon-cyan/5 to-neon-purple/5 animate-pulse"></div>
+      <div class="grid-background"></div>
+    </div>
+    
+    <script>
+      // @ts-nocheck
+      // Theme initialization and loading screen
+      document.addEventListener('DOMContentLoaded', function() {
+        const loadingScreen = document.getElementById('loading-screen');
+        const app = document.getElementById('app');
+        
+        // Simulate loading time for dramatic effect
+        setTimeout(() => {
+          if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+          }
+          if (app) {
+            app.classList.remove('opacity-0');
+          }
+        }, 1500);
+        
+        // Add cyberpunk matrix effect
+        createMatrixEffect();
+        
+        // Initialize theme
+        document.documentElement.classList.add('dark');
+        
+        // Add performance monitoring
+        if (typeof window !== 'undefined' && 'performance' in window) {
+          window.addEventListener('load', () => {
+            const loadTime = performance.now();
+            if (loadTime > 3000) {
+              console.warn('Page load time exceeded 3s:', loadTime + 'ms');
+            }
+          });
+        }
+      });
+      
+      // Matrix rain effect for cyberpunk ambiance
+      function createMatrixEffect() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return; // Exit if context is not available
+
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.zIndex = '-1';
+        canvas.style.opacity = '0.1';
+        canvas.style.pointerEvents = 'none';
+        document.body.appendChild(canvas);
+
+        function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const matrix = "01";
+        const matrixArray = matrix.split("");
+        const fontSize = 14;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = [];
+
+        // Initialize drops array
+        for (let x = 0; x < columns; x++) {
+          drops[x] = Math.random() * canvas.height;
+        }
+
+        function drawMatrix() {
+          if (!ctx) return;
+          
+          ctx.fillStyle = 'rgba(10, 10, 10, 0.04)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          ctx.fillStyle = '#00ffff';
+          ctx.font = fontSize + 'px monospace';
+
+          for (let i = 0; i < drops.length; i++) {
+            const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+              drops[i] = 0;
+            }
+            drops[i]++;
+          }
+        }
+
+        setInterval(drawMatrix, 50);
+      }
+      
+      // Global theme utilities
+      window.cyberpunk = {
+        colors: {
+          cyan: '#00ffff',
+          pink: '#ff00ff',
+          green: '#00ff00',
+          purple: '#9d4edd',
+          blue: '#0099ff'
+        },
+        
+        glow: function(element, color) {
+          color = color || '#00ffff';
+          element.style.boxShadow = `0 0 20px ${color}40, inset 0 0 20px ${color}10`;
+          element.style.border = `1px solid ${color}60`;
+        },
+
+        pulse: function(element) {
+          element.classList.add('animate-pulse');
+          setTimeout(() => element.classList.remove('animate-pulse'), 2000);
+        }
+      };
+    </script>
+    
+    <style>
+      /* Additional cyberpunk effects */
+      .grid-background {
+        background-image: 
+          linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: grid-move 20s linear infinite;
+      }
+      
+      @keyframes grid-move {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+      }
+      
+      /* Font families */
+      .font-orbitron {
+        font-family: 'Orbitron', monospace;
+      }
+      
+      .font-rajdhani {
+        font-family: 'Rajdhani', sans-serif;
+      }
+      
+      /* Neon text colors */
+      .text-neon-cyan { color: var(--neon-cyan); }
+      .text-neon-pink { color: var(--neon-pink); }
+      .text-neon-green { color: var(--neon-green); }
+      .text-neon-purple { color: var(--neon-purple); }
+      .text-neon-blue { color: var(--neon-blue); }
+      
+      /* Neon borders */
+      .border-neon-cyan { border-color: var(--neon-cyan); }
+      .border-neon-pink { border-color: var(--neon-pink); }
+      .border-neon-green { border-color: var(--neon-green); }
+      .border-neon-purple { border-color: var(--neon-purple); }
+      .border-neon-blue { border-color: var(--neon-blue); }
+    </style>
+  </body>
+</html>

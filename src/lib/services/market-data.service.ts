@@ -15,7 +15,9 @@ import type {
   OHLCDataPoint,
   MarketSummary,
   PriceAlert,
-  CacheConfig,
+  CacheConfig
+} from "../types/market-data.js";
+import {
   DEFAULT_CACHE_CONFIG,
   MARKET_DATA_CONSTRAINTS
 } from "../types/market-data.js";
