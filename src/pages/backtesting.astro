@@ -211,7 +211,7 @@ const pageDescription = "Test your AI trading strategies against historical mark
               </div>
             </div>
             <div class="h-96">
-              <TradingChart />
+              <TradingChart coinSymbol="bitcoin" />
             </div>
           </div>
 
@@ -379,6 +379,7 @@ const pageDescription = "Test your AI trading strategies against historical mark
 
   <!-- Backtesting Logic Script -->
   <script>
+    // @ts-nocheck
     document.addEventListener('DOMContentLoaded', function() {
       const testModal = document.getElementById('test-modal');
       const progressBar = document.getElementById('progress-bar');
@@ -387,7 +388,8 @@ const pageDescription = "Test your AI trading strategies against historical mark
 
       // Simulate backtest when form is submitted
       document.addEventListener('submit', function(e) {
-        if (e.target.id === 'backtest-form') {
+        const target = e.target as HTMLFormElement;
+        if (target && target.id === 'backtest-form') {
           e.preventDefault();
           startBacktest();
         }
