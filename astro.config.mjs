@@ -9,7 +9,7 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
   ],
-  output: "hybrid",
+  output: "server",
   adapter: node({
     mode: "standalone",
   }),
@@ -24,8 +24,5 @@ export default defineConfig({
     ssr: {
       noExternal: ["@tensorflow/tfjs", "lightweight-charts"],
     },
-  },
-  experimental: {
-    serverIslands: true,
   },
 });
