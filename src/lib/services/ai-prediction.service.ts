@@ -180,8 +180,8 @@ export class AIPredictionService {
 
       // Update prediction in database
       await retryOperation(async () => {
-        const { error } = await supabase
-          .from("ai_predictions")
+        const { error } = await (supabase
+          .from("ai_predictions") as any)
           .update({
             actual_price: actualPrice,
             accuracy_score: accuracyScore,
@@ -348,10 +348,10 @@ export class AIPredictionService {
       predict: (inputs: number[][]) => {
         // Mock prediction logic
         const input = inputs[0];
-        const currentPrice = input[0];
+        const currentPrice = input?.[0] || 0;
 
         // Generate pseudo-random but deterministic predictions
-        const seed = input.reduce((sum, val) => sum + val, 0);
+        const seed = input?.reduce((sum, val) => sum + val, 0) || 0;
         const random = Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000);
 
         const priceChange = (random - 0.5) * 0.1; // ±5% max change
@@ -500,8 +500,8 @@ export class AIPredictionService {
    */
   private async storePrediction(prediction: Omit<AIPrediction, "id">): Promise<AIPrediction> {
     return await retryOperation(async () => {
-      const { data, error } = await supabase
-        .from("ai_predictions")
+      const { data, error } = await (supabase
+        .from("ai_predictions") as any)
         .insert({
           coin_symbol: prediction.coin_symbol,
           model_version: prediction.model_version,
@@ -529,7 +529,7 @@ export class AIPredictionService {
   private calculateRSI(prices: number[]): number {
     if (prices.length < 14) return 50; // Default RSI when insufficient data
 
-    const changes = prices.slice(1).map((price, i) => price - prices[i]);
+    const changes = prices.slice(1).map((price, i) => price - (prices[i] || 0));
     const gains = changes.map(change => change > 0 ? change : 0);
     const losses = changes.map(change => change < 0 ? Math.abs(change) : 0);
 
@@ -553,10 +553,10 @@ export class AIPredictionService {
     if (prices.length === 0) return 0;
 
     const k = 2 / (period + 1);
-    let ema = prices[0];
+    let ema = prices[0] || 0;
 
     for (let i = 1; i < prices.length; i++) {
-      ema = prices[i] * k + ema * (1 - k);
+      ema = (prices[i] || 0) * k + ema * (1 - k);
     }
 
     return ema;
@@ -681,7 +681,7 @@ export class AIPredictionService {
    * Private: Map database prediction to AIPrediction type
    */
   private mapDatabasePredictionToAIPrediction(dbPred: Database["public"]["Tables"]["ai_predictions"]["Row"]): AIPrediction {
-    return {
+    const result: AIPrediction = {
       id: dbPred.id,
       coin_symbol: dbPred.coin_symbol,
       model_version: dbPred.model_version,
@@ -690,11 +690,20 @@ export class AIPredictionService {
       predicted_direction: dbPred.predicted_direction as PredictedDirection,
       confidence_score: dbPred.confidence_score,
       prediction_horizon: dbPred.prediction_horizon,
-      actual_price: dbPred.actual_price,
-      accuracy_score: dbPred.accuracy_score,
-      created_at: dbPred.created_at,
-      resolved_at: dbPred.resolved_at
+      created_at: dbPred.created_at
     };
+
+    if (dbPred.actual_price !== null) {
+      result.actual_price = dbPred.actual_price;
+    }
+    if (dbPred.accuracy_score !== null) {
+      result.accuracy_score = dbPred.accuracy_score;
+    }
+    if (dbPred.resolved_at !== null) {
+      result.resolved_at = dbPred.resolved_at;
+    }
+
+    return result;
   }
 }
 
