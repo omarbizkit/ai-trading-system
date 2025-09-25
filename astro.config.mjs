@@ -19,10 +19,10 @@ export default defineConfig({
   },
   vite: {
     optimizeDeps: {
-      include: ["@tensorflow/tfjs", "lightweight-charts"],
+      include: ["lightweight-charts"],
     },
     ssr: {
-      noExternal: ["@tensorflow/tfjs", "lightweight-charts"],
+      noExternal: ["lightweight-charts"],
     },
   },
 });
