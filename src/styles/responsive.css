@@ -1,0 +1,520 @@
+/**
+ * T072: Responsive design implementation across all components
+ * Mobile-first responsive design utilities and component-specific styles
+ */
+
+/* Base responsive grid system */
+.container {
+  @apply w-full mx-auto px-4;
+}
+
+@media (min-width: 640px) {
+  .container {
+    @apply max-w-screen-sm px-6;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    @apply max-w-screen-md px-8;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    @apply max-w-screen-lg px-12;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    @apply max-w-screen-xl px-16;
+  }
+}
+
+/* Responsive typography scale */
+.text-responsive-xs {
+  @apply text-xs;
+}
+
+.text-responsive-sm {
+  @apply text-sm;
+}
+
+@media (min-width: 768px) {
+  .text-responsive-sm {
+    @apply text-base;
+  }
+}
+
+.text-responsive-base {
+  @apply text-sm;
+}
+
+@media (min-width: 768px) {
+  .text-responsive-base {
+    @apply text-base;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-base {
+    @apply text-lg;
+  }
+}
+
+.text-responsive-lg {
+  @apply text-base;
+}
+
+@media (min-width: 768px) {
+  .text-responsive-lg {
+    @apply text-lg;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-lg {
+    @apply text-xl;
+  }
+}
+
+.text-responsive-xl {
+  @apply text-lg;
+}
+
+@media (min-width: 768px) {
+  .text-responsive-xl {
+    @apply text-xl;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-xl {
+    @apply text-2xl;
+  }
+}
+
+.text-responsive-2xl {
+  @apply text-xl;
+}
+
+@media (min-width: 768px) {
+  .text-responsive-2xl {
+    @apply text-2xl;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-2xl {
+    @apply text-3xl;
+  }
+}
+
+.text-responsive-3xl {
+  @apply text-2xl;
+}
+
+@media (min-width: 768px) {
+  .text-responsive-3xl {
+    @apply text-3xl;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive-3xl {
+    @apply text-4xl;
+  }
+}
+
+/* Component-specific responsive styles */
+
+/* Navigation responsive behavior */
+.nav-responsive {
+  @apply flex flex-col space-y-2;
+}
+
+@media (min-width: 768px) {
+  .nav-responsive {
+    @apply flex-row space-y-0 space-x-6;
+  }
+}
+
+/* Trading chart responsive container */
+.chart-container {
+  @apply w-full h-64 min-h-[16rem];
+}
+
+@media (min-width: 640px) {
+  .chart-container {
+    @apply h-72 min-h-[18rem];
+  }
+}
+
+@media (min-width: 768px) {
+  .chart-container {
+    @apply h-80 min-h-[20rem];
+  }
+}
+
+@media (min-width: 1024px) {
+  .chart-container {
+    @apply h-96 min-h-[24rem];
+  }
+}
+
+@media (min-width: 1280px) {
+  .chart-container {
+    @apply h-[28rem] min-h-[28rem];
+  }
+}
+
+/* Trading controls responsive layout */
+.trading-controls {
+  @apply grid grid-cols-1 gap-4;
+}
+
+@media (min-width: 640px) {
+  .trading-controls {
+    @apply grid-cols-2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .trading-controls {
+    @apply grid-cols-3;
+  }
+}
+
+/* Portfolio metrics responsive grid */
+.portfolio-metrics {
+  @apply grid grid-cols-1 gap-4;
+}
+
+@media (min-width: 640px) {
+  .portfolio-metrics {
+    @apply grid-cols-2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .portfolio-metrics {
+    @apply grid-cols-4;
+  }
+}
+
+/* Trade log responsive table */
+.trade-log-responsive {
+  @apply block overflow-x-auto;
+}
+
+.trade-log-responsive table {
+  @apply min-w-full;
+}
+
+.trade-log-responsive th,
+.trade-log-responsive td {
+  @apply px-2 py-1 text-xs;
+}
+
+@media (min-width: 640px) {
+  .trade-log-responsive th,
+  .trade-log-responsive td {
+    @apply px-3 py-2 text-sm;
+  }
+}
+
+@media (min-width: 768px) {
+  .trade-log-responsive th,
+  .trade-log-responsive td {
+    @apply px-4 py-3 text-base;
+  }
+}
+
+/* AI prediction responsive card */
+.ai-prediction-card {
+  @apply p-3;
+}
+
+@media (min-width: 640px) {
+  .ai-prediction-card {
+    @apply p-4;
+  }
+}
+
+@media (min-width: 768px) {
+  .ai-prediction-card {
+    @apply p-6;
+  }
+}
+
+/* Backtesting form responsive layout */
+.backtest-form {
+  @apply grid grid-cols-1 gap-4;
+}
+
+@media (min-width: 640px) {
+  .backtest-form {
+    @apply grid-cols-2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .backtest-form {
+    @apply grid-cols-3;
+  }
+}
+
+/* Button responsive sizing */
+.btn-responsive {
+  @apply px-3 py-2 text-sm;
+}
+
+@media (min-width: 640px) {
+  .btn-responsive {
+    @apply px-4 py-2 text-base;
+  }
+}
+
+@media (min-width: 768px) {
+  .btn-responsive {
+    @apply px-6 py-3 text-base;
+  }
+}
+
+/* Input responsive sizing */
+.input-responsive {
+  @apply px-3 py-2 text-sm;
+}
+
+@media (min-width: 640px) {
+  .input-responsive {
+    @apply px-3 py-2 text-base;
+  }
+}
+
+@media (min-width: 768px) {
+  .input-responsive {
+    @apply px-4 py-3 text-base;
+  }
+}
+
+/* Card responsive padding */
+.card-responsive {
+  @apply p-3 rounded-lg;
+}
+
+@media (min-width: 640px) {
+  .card-responsive {
+    @apply p-4 rounded-xl;
+  }
+}
+
+@media (min-width: 768px) {
+  .card-responsive {
+    @apply p-6 rounded-xl;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-responsive {
+    @apply p-8 rounded-2xl;
+  }
+}
+
+/* Modal responsive behavior */
+.modal-responsive {
+  @apply fixed inset-4 z-50;
+}
+
+@media (min-width: 640px) {
+  .modal-responsive {
+    @apply inset-8;
+  }
+}
+
+@media (min-width: 768px) {
+  .modal-responsive {
+    @apply inset-x-16 inset-y-8;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-responsive {
+    @apply left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-auto max-h-[90vh] inset-auto;
+  }
+}
+
+/* Dashboard layout responsive */
+.dashboard-layout {
+  @apply grid grid-cols-1 gap-6;
+}
+
+@media (min-width: 768px) {
+  .dashboard-layout {
+    @apply grid-cols-2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-layout {
+    @apply grid-cols-3;
+  }
+}
+
+@media (min-width: 1280px) {
+  .dashboard-layout {
+    @apply grid-cols-4;
+  }
+}
+
+/* Sidebar responsive behavior */
+.sidebar-responsive {
+  @apply fixed inset-y-0 left-0 z-50 w-64 transform -translate-x-full transition-transform duration-300 ease-in-out;
+}
+
+.sidebar-responsive.open {
+  @apply translate-x-0;
+}
+
+@media (min-width: 1024px) {
+  .sidebar-responsive {
+    @apply relative translate-x-0 block;
+  }
+}
+
+/* Hide/show elements at different breakpoints */
+.mobile-only {
+  @apply block;
+}
+
+@media (min-width: 640px) {
+  .mobile-only {
+    @apply hidden;
+  }
+}
+
+.tablet-up {
+  @apply hidden;
+}
+
+@media (min-width: 640px) {
+  .tablet-up {
+    @apply block;
+  }
+}
+
+.desktop-only {
+  @apply hidden;
+}
+
+@media (min-width: 1024px) {
+  .desktop-only {
+    @apply block;
+  }
+}
+
+/* Touch-friendly sizing for mobile */
+.touch-target {
+  @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+}
+
+/* Responsive spacing utilities */
+.space-responsive-y > :not([hidden]) ~ :not([hidden]) {
+  @apply mt-4;
+}
+
+@media (min-width: 768px) {
+  .space-responsive-y > :not([hidden]) ~ :not([hidden]) {
+    @apply mt-6;
+  }
+}
+
+@media (min-width: 1024px) {
+  .space-responsive-y > :not([hidden]) ~ :not([hidden]) {
+    @apply mt-8;
+  }
+}
+
+.space-responsive-x > :not([hidden]) ~ :not([hidden]) {
+  @apply ml-4;
+}
+
+@media (min-width: 768px) {
+  .space-responsive-x > :not([hidden]) ~ :not([hidden]) {
+    @apply ml-6;
+  }
+}
+
+@media (min-width: 1024px) {
+  .space-responsive-x > :not([hidden]) ~ :not([hidden]) {
+    @apply ml-8;
+  }
+}
+
+/* Responsive overflow handling */
+.responsive-scroll {
+  @apply overflow-auto max-h-64;
+}
+
+@media (min-width: 640px) {
+  .responsive-scroll {
+    @apply max-h-80;
+  }
+}
+
+@media (min-width: 768px) {
+  .responsive-scroll {
+    @apply max-h-96;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-scroll {
+    @apply max-h-[32rem];
+  }
+}
+
+/* Responsive flexbox utilities */
+.flex-responsive {
+  @apply flex flex-col;
+}
+
+@media (min-width: 640px) {
+  .flex-responsive {
+    @apply flex-row;
+  }
+}
+
+.flex-responsive-reverse {
+  @apply flex flex-col-reverse;
+}
+
+@media (min-width: 640px) {
+  .flex-responsive-reverse {
+    @apply flex-row-reverse;
+  }
+}
+
+/* Print styles for better accessibility */
+@media print {
+  .no-print {
+    @apply hidden !important;
+  }
+
+  .print-break {
+    page-break-before: always;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid;
+  }
+
+  body {
+    @apply text-black bg-white;
+  }
+
+  .card-responsive {
+    @apply border border-gray-300;
+  }
+}
