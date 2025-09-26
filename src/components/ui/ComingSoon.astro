@@ -1,0 +1,379 @@
+---
+/**
+ * T076: Constitutional compliance - Coming Soon labels for real trading features
+ * Ensures compliance with constitutional requirement for paper trading only
+ */
+
+export interface Props {
+  feature: string;
+  description?: string;
+  variant?: 'banner' | 'card' | 'inline' | 'overlay' | 'badge';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  animated?: boolean;
+  showIcon?: boolean;
+  className?: string;
+}
+
+const {
+  feature,
+  description = `${feature} is coming soon to AI Trading System`,
+  variant = 'banner',
+  size = 'md',
+  animated = true,
+  showIcon = true,
+  className = ''
+} = Astro.props;
+
+// Size classes for different variants
+const sizeClasses = {
+  xs: {
+    text: 'text-xs',
+    padding: 'p-2',
+    icon: 'w-3 h-3'
+  },
+  sm: {
+    text: 'text-sm',
+    padding: 'p-3',
+    icon: 'w-4 h-4'
+  },
+  md: {
+    text: 'text-base',
+    padding: 'p-4',
+    icon: 'w-5 h-5'
+  },
+  lg: {
+    text: 'text-lg',
+    padding: 'p-6',
+    icon: 'w-6 h-6'
+  },
+  xl: {
+    text: 'text-xl',
+    padding: 'p-8',
+    icon: 'w-8 h-8'
+  }
+};
+
+const sizeClass = sizeClasses[size];
+---
+
+<!-- Banner Variant -->
+{variant === 'banner' && (
+  <div class={`coming-soon-banner w-full bg-gradient-to-r from-neon-purple/20 via-neon-pink/20 to-neon-cyan/20 border border-neon-purple/50 rounded-lg ${sizeClass.padding} ${className} ${animated ? 'animate-pulse-glow' : ''}`}>
+    <div class="flex items-center justify-center space-x-3">
+      {showIcon && (
+        <div class={`${sizeClass.icon} text-neon-purple flex-shrink-0`}>
+          <svg fill="currentColor" viewBox="0 0 20 20" class={`${sizeClass.icon} ${animated ? 'animate-spin-slow' : ''}`}>
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+      )}
+      <div class="text-center">
+        <h3 class={`font-display font-bold text-neon-purple text-glow ${sizeClass.text}`}>
+          🚀 {feature} - Coming Soon
+        </h3>
+        <p class={`text-neon-cyan/80 ${sizeClass.text === 'text-xs' ? 'text-xs' : sizeClass.text === 'text-sm' ? 'text-sm' : 'text-sm'} mt-1`}>
+          {description}
+        </p>
+        <div class="text-xs text-gray-400 mt-2 font-mono">
+          📊 Currently: Simulation Mode Only
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+<!-- Card Variant -->
+{variant === 'card' && (
+  <div class={`coming-soon-card card-cyberpunk-glow ${sizeClass.padding} text-center ${className} ${animated ? 'hover:scale-105 transition-transform duration-300' : ''}`}>
+    {showIcon && (
+      <div class={`mx-auto ${sizeClass.icon} text-neon-purple mb-3 ${animated ? 'animate-bounce-slow' : ''}`}>
+        <svg fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+    )}
+    <h3 class={`font-display font-bold text-neon-purple text-glow ${sizeClass.text} mb-2`}>
+      {feature}
+    </h3>
+    <div class="space-y-2">
+      <div class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-neon-purple/10 text-neon-purple border border-neon-purple/30">
+        <span class="w-2 h-2 bg-neon-purple rounded-full mr-2 animate-pulse"></span>
+        Coming Soon
+      </div>
+      <p class={`text-text-secondary ${sizeClass.text === 'text-xs' ? 'text-xs' : 'text-sm'}`}>
+        {description}
+      </p>
+      <div class="text-xs text-yellow-400 bg-yellow-400/10 rounded-lg px-3 py-2 border border-yellow-400/30 mt-3">
+        ⚠️ Currently available in simulation mode only
+      </div>
+    </div>
+  </div>
+)}
+
+<!-- Inline Variant -->
+{variant === 'inline' && (
+  <span class={`coming-soon-inline inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-neon-purple/10 text-neon-purple border border-neon-purple/30 ${sizeClass.text} ${className}`}>
+    {showIcon && (
+      <svg class={`${sizeClass.icon} ${animated ? 'animate-pulse' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+      </svg>
+    )}
+    <span class="font-display font-medium">
+      {feature} - Coming Soon
+    </span>
+  </span>
+)}
+
+<!-- Overlay Variant -->
+{variant === 'overlay' && (
+  <div class={`coming-soon-overlay absolute inset-0 bg-bg-overlay backdrop-blur-sm flex items-center justify-center z-10 rounded-lg ${className}`}>
+    <div class="text-center max-w-md mx-auto p-6">
+      {showIcon && (
+        <div class={`mx-auto ${sizeClass.icon} text-neon-purple mb-4 ${animated ? 'animate-spin-slow' : ''}`}>
+          <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+      )}
+      <h3 class={`font-display font-bold text-neon-purple text-glow ${sizeClass.text} mb-3`}>
+        {feature} Coming Soon
+      </h3>
+      <p class="text-text-secondary text-sm mb-4">
+        {description}
+      </p>
+      <div class="inline-flex items-center px-4 py-2 rounded-lg bg-yellow-400/10 text-yellow-400 border border-yellow-400/30 text-sm">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>
+        Simulation Mode Only
+      </div>
+    </div>
+  </div>
+)}
+
+<!-- Badge Variant -->
+{variant === 'badge' && (
+  <div class={`coming-soon-badge inline-flex items-center space-x-1 px-2 py-1 rounded-md bg-neon-purple/20 text-neon-purple border border-neon-purple/50 ${sizeClass.text} ${className}`}>
+    {showIcon && (
+      <svg class={`${sizeClass.icon} ${animated ? 'animate-pulse' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+    )}
+    <span class="font-display font-medium text-xs">
+      SOON
+    </span>
+  </div>
+)}
+
+<style>
+  /* Custom animations */
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px var(--neon-purple-glow);
+    }
+    50% {
+      box-shadow: 0 0 40px var(--neon-purple-glow);
+    }
+  }
+
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(-10%);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce-slow 2s infinite;
+  }
+
+  /* Interactive states */
+  .coming-soon-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px var(--neon-purple-glow);
+  }
+
+  .coming-soon-inline:hover {
+    background: var(--neon-purple-subtle);
+    transform: scale(1.05);
+  }
+
+  /* Accessibility */
+  .coming-soon-overlay {
+    cursor: not-allowed;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .coming-soon-banner {
+      text-align: center;
+    }
+
+    .coming-soon-banner .flex {
+      flex-direction: column;
+      space-x: 0;
+    }
+
+    .coming-soon-banner .flex > * + * {
+      margin-top: 0.75rem;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse-glow,
+    .animate-spin-slow,
+    .animate-bounce-slow,
+    .animate-pulse {
+      animation: none;
+    }
+
+    .coming-soon-card {
+      transition: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .coming-soon-banner,
+    .coming-soon-card {
+      border-width: 2px;
+    }
+  }
+</style>
+
+<script>
+  // Add interactive functionality for Coming Soon components
+  if (typeof window !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', function() {
+      // Track interactions with coming soon features for analytics
+      const comingSoonElements = document.querySelectorAll('[class*="coming-soon"]');
+
+      comingSoonElements.forEach(element => {
+        element.addEventListener('click', function(e) {
+          // Prevent default action for overlay variants
+          if (element.classList.contains('coming-soon-overlay')) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+
+          // Optional: Track feature interest
+          const feature = element.textContent?.match(/(.+?)\s*-\s*Coming Soon/)?.[1]?.trim();
+          if (feature && window.analytics) {
+            window.analytics.track('Coming Soon Feature Clicked', { feature });
+          }
+
+          // Show toast notification about the feature
+          if (window.showInfo) {
+            window.showInfo(
+              `${feature || 'This feature'} is coming soon! Currently available in simulation mode.`,
+              { duration: 4000 }
+            );
+          }
+        });
+      });
+
+      // Add keyboard navigation for accessibility
+      comingSoonElements.forEach(element => {
+        element.setAttribute('tabindex', '0');
+        element.setAttribute('role', 'button');
+        element.setAttribute('aria-label', `${element.textContent?.trim()} - Feature coming soon`);
+
+        element.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            element.click();
+          }
+        });
+      });
+    });
+
+    // Global utility functions for showing coming soon messages
+    window.ComingSoon = {
+      show: function(feature, options = {}) {
+        const {
+          variant = 'banner',
+          target = document.body,
+          duration = 5000
+        } = options;
+
+        const comingSoon = document.createElement('div');
+        comingSoon.innerHTML = `
+          <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md">
+            <div class="coming-soon-banner bg-gradient-to-r from-neon-purple/20 via-neon-pink/20 to-neon-cyan/20 border border-neon-purple/50 rounded-lg p-4 animate-pulse-glow">
+              <div class="flex items-center justify-center space-x-3">
+                <svg class="w-5 h-5 text-neon-purple animate-spin-slow" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                </svg>
+                <div class="text-center">
+                  <h3 class="font-display font-bold text-neon-purple text-glow text-base">
+                    🚀 ${feature} - Coming Soon
+                  </h3>
+                  <p class="text-neon-cyan/80 text-sm mt-1">
+                    Feature in development for AI Trading System
+                  </p>
+                  <div class="text-xs text-gray-400 mt-2 font-mono">
+                    📊 Currently: Simulation Mode Only
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        target.appendChild(comingSoon);
+
+        // Auto remove after duration
+        setTimeout(() => {
+          comingSoon.style.opacity = '0';
+          comingSoon.style.transform = 'translateY(-20px)';
+          setTimeout(() => {
+            if (comingSoon.parentNode) {
+              comingSoon.parentNode.removeChild(comingSoon);
+            }
+          }, 300);
+        }, duration);
+      }
+    };
+
+    // Show coming soon for any real trading attempts
+    window.showComingSoonForRealTrading = function(action = 'Real Trading') {
+      if (window.showWarning) {
+        window.showWarning(
+          `${action} is coming soon! Currently in simulation mode only.`,
+          {
+            duration: 6000,
+            action: {
+              label: 'Learn More',
+              callback: () => {
+                // Could redirect to documentation or roadmap
+                console.log('Redirecting to roadmap...');
+              }
+            }
+          }
+        );
+      }
+    };
+  }
+</script>

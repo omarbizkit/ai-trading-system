@@ -1,0 +1,422 @@
+---
+/**
+ * T074: Loading states and skeleton components
+ * Comprehensive loading states with cyberpunk aesthetic
+ */
+
+export interface Props {
+  type?: 'spinner' | 'skeleton' | 'pulse' | 'matrix' | 'progress';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'cyan' | 'pink' | 'green' | 'purple' | 'blue';
+  text?: string;
+  progress?: number; // 0-100 for progress type
+  className?: string;
+}
+
+const {
+  type = 'spinner',
+  size = 'md',
+  variant = 'cyan',
+  text,
+  progress = 0,
+  className = ''
+} = Astro.props;
+
+// Size classes
+const sizeClasses = {
+  xs: 'w-4 h-4',
+  sm: 'w-6 h-6',
+  md: 'w-8 h-8',
+  lg: 'w-12 h-12',
+  xl: 'w-16 h-16'
+};
+
+// Variant classes
+const variantClasses = {
+  cyan: 'border-neon-cyan text-neon-cyan',
+  pink: 'border-neon-pink text-neon-pink',
+  green: 'border-neon-green text-neon-green',
+  purple: 'border-neon-purple text-neon-purple',
+  blue: 'border-neon-blue text-neon-blue'
+};
+---
+
+<!-- Spinner Loading -->
+{type === 'spinner' && (
+  <div class={`loading-spinner ${className}`}>
+    <div class={`animate-spin rounded-full border-2 border-t-transparent ${sizeClasses[size]} ${variantClasses[variant]} glow-${variant}`}>
+    </div>
+    {text && (
+      <p class={`mt-2 text-sm font-display ${variantClasses[variant]} text-glow`}>
+        {text}
+      </p>
+    )}
+  </div>
+)}
+
+<!-- Skeleton Loading -->
+{type === 'skeleton' && (
+  <div class={`loading-skeleton ${className}`}>
+    <!-- Chart Skeleton -->
+    <div class="skeleton-chart mb-6">
+      <div class="h-64 bg-gradient-to-r from-bg-surface via-bg-tertiary to-bg-surface rounded-lg animate-pulse relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-neon-cyan/10 to-transparent animate-shimmer"></div>
+        <div class="p-4">
+          <div class="h-4 bg-neon-cyan/20 rounded w-1/4 mb-4 animate-pulse"></div>
+          <div class="flex items-end space-x-1 h-40">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                class={`bg-neon-cyan/30 rounded-t animate-pulse`}
+                style={`height: ${Math.random() * 100 + 20}%; width: 4%; animation-delay: ${i * 50}ms;`}
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards Skeleton -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} class="card-cyberpunk p-4 animate-pulse">
+          <div class="h-3 bg-neon-cyan/20 rounded w-1/2 mb-2"></div>
+          <div class="h-6 bg-neon-cyan/30 rounded w-3/4 mb-1"></div>
+          <div class="h-3 bg-neon-green/20 rounded w-1/3"></div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Table Skeleton -->
+    <div class="card-cyberpunk p-4">
+      <div class="h-5 bg-neon-cyan/20 rounded w-1/4 mb-4"></div>
+      <div class="space-y-2">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} class="flex space-x-4 animate-pulse" style={`animation-delay: ${i * 100}ms;`}>
+            <div class="h-4 bg-neon-cyan/20 rounded w-1/6"></div>
+            <div class="h-4 bg-neon-cyan/20 rounded w-1/4"></div>
+            <div class="h-4 bg-neon-cyan/20 rounded w-1/8"></div>
+            <div class="h-4 bg-neon-cyan/20 rounded w-1/8"></div>
+            <div class="h-4 bg-neon-green/20 rounded w-1/6"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
+<!-- Pulse Loading -->
+{type === 'pulse' && (
+  <div class={`loading-pulse ${className}`}>
+    <div class={`rounded-full animate-ping ${sizeClasses[size]} ${variantClasses[variant]} pulse-${variant}`}>
+    </div>
+    {text && (
+      <p class={`mt-2 text-sm font-display ${variantClasses[variant]} text-glow animate-pulse`}>
+        {text}
+      </p>
+    )}
+  </div>
+)}
+
+<!-- Matrix Loading -->
+{type === 'matrix' && (
+  <div class={`loading-matrix ${className}`}>
+    <div class="relative inline-block">
+      <div class="matrix-loader">
+        <div class="matrix-lines">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              class="matrix-line"
+              style={`animation-delay: ${i * 0.1}s;`}
+            ></div>
+          ))}
+        </div>
+      </div>
+      {text && (
+        <p class="mt-4 text-sm font-display text-neon-cyan text-glow text-center">
+          {text}
+        </p>
+      )}
+    </div>
+  </div>
+)}
+
+<!-- Progress Loading -->
+{type === 'progress' && (
+  <div class={`loading-progress ${className}`}>
+    <div class="w-full max-w-md">
+      {text && (
+        <div class="flex justify-between items-center mb-2">
+          <p class="text-sm font-display text-neon-cyan text-glow">
+            {text}
+          </p>
+          <span class="text-xs text-neon-cyan font-mono">
+            {Math.round(progress)}%
+          </span>
+        </div>
+      )}
+      <div class="w-full bg-bg-surface rounded-full h-2 relative overflow-hidden glow-cyan">
+        <div
+          class="h-full bg-gradient-to-r from-neon-cyan to-neon-blue rounded-full transition-all duration-300 ease-out relative overflow-hidden"
+          style={`width: ${Math.min(Math.max(progress, 0), 100)}%`}
+        >
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .loading-spinner,
+  .loading-pulse,
+  .loading-matrix,
+  .loading-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Shimmer Animation */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  /* Matrix Loader Styles */
+  .matrix-loader {
+    width: 60px;
+    height: 60px;
+    position: relative;
+  }
+
+  .matrix-lines {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .matrix-line {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      var(--neon-cyan) 50%,
+      transparent 100%
+    );
+    animation: matrix-fall 1.5s infinite ease-in-out;
+  }
+
+  .matrix-line:nth-child(1) { left: 10%; }
+  .matrix-line:nth-child(2) { left: 20%; }
+  .matrix-line:nth-child(3) { left: 30%; }
+  .matrix-line:nth-child(4) { left: 40%; }
+  .matrix-line:nth-child(5) { left: 50%; }
+  .matrix-line:nth-child(6) { left: 60%; }
+  .matrix-line:nth-child(7) { left: 70%; }
+  .matrix-line:nth-child(8) { left: 80%; }
+
+  @keyframes matrix-fall {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  /* Enhanced pulse animations for different variants */
+  .pulse-cyan {
+    box-shadow: 0 0 0 0 var(--neon-cyan-glow);
+    animation: pulse-cyan 2s infinite;
+  }
+
+  .pulse-pink {
+    box-shadow: 0 0 0 0 var(--neon-pink-glow);
+    animation: pulse-pink 2s infinite;
+  }
+
+  .pulse-green {
+    box-shadow: 0 0 0 0 var(--neon-green-glow);
+    animation: pulse-green 2s infinite;
+  }
+
+  .pulse-purple {
+    box-shadow: 0 0 0 0 var(--neon-purple-glow);
+    animation: pulse-purple 2s infinite;
+  }
+
+  @keyframes pulse-cyan {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 var(--neon-cyan-glow);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(0, 255, 255, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
+    }
+  }
+
+  @keyframes pulse-pink {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 var(--neon-pink-glow);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(255, 0, 255, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(255, 0, 255, 0);
+    }
+  }
+
+  @keyframes pulse-green {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 var(--neon-green-glow);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+    }
+  }
+
+  @keyframes pulse-purple {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 var(--neon-purple-glow);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(157, 78, 221, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(157, 78, 221, 0);
+    }
+  }
+
+  /* Loading skeleton specific animations */
+  .loading-skeleton .animate-pulse {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .skeleton-chart .h-64 {
+      height: 12rem;
+    }
+
+    .matrix-loader {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  /* Accessibility considerations */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-spin,
+    .animate-ping,
+    .animate-pulse,
+    .animate-shimmer,
+    .matrix-line {
+      animation: none;
+    }
+
+    .loading-spinner div {
+      border-left-color: transparent;
+    }
+  }
+</style>
+
+<script>
+  // Add loading state management utilities
+  if (typeof window !== 'undefined') {
+    window.LoadingStates = {
+      show: function(elementId, type = 'spinner', options = {}) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        const {
+          variant = 'cyan',
+          size = 'md',
+          text = 'Loading...'
+        } = options;
+
+        element.innerHTML = `
+          <div class="loading-${type} flex flex-col items-center justify-center p-8">
+            ${this.getLoadingHTML(type, { variant, size, text })}
+          </div>
+        `;
+      },
+
+      hide: function(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        const loadingElement = element.querySelector('[class*="loading-"]');
+        if (loadingElement) {
+          loadingElement.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+          setTimeout(() => {
+            element.innerHTML = '';
+          }, 300);
+        }
+      },
+
+      getLoadingHTML: function(type, options) {
+        const { variant, size, text } = options;
+
+        switch(type) {
+          case 'spinner':
+            return `
+              <div class="animate-spin rounded-full border-2 border-t-transparent w-8 h-8 border-neon-${variant} glow-${variant}"></div>
+              ${text ? `<p class="mt-2 text-sm font-display text-neon-${variant} text-glow">${text}</p>` : ''}
+            `;
+          case 'pulse':
+            return `
+              <div class="rounded-full animate-ping w-8 h-8 border-neon-${variant} pulse-${variant}"></div>
+              ${text ? `<p class="mt-2 text-sm font-display text-neon-${variant} text-glow animate-pulse">${text}</p>` : ''}
+            `;
+          default:
+            return `<div class="w-8 h-8 border-2 border-neon-${variant} rounded animate-spin"></div>`;
+        }
+      }
+    };
+  }
+</script>

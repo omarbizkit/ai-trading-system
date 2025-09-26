@@ -90,3 +90,10 @@ playwright-report/
 
 # Astro specific
 .astro/
+
+# AI CLI Specific
+CLAUDE.md
+GEMINI.md
+
+# Deployment and sensitive configuration
+DEPLOYMENT.md

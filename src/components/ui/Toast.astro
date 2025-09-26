@@ -1,0 +1,448 @@
+---
+/**
+ * T075: Toast notifications for trade confirmations
+ * Cyberpunk-themed toast notification system with sound effects
+ */
+
+export interface Props {
+  id?: string;
+  className?: string;
+}
+
+const {
+  id = 'toast-container',
+  className = ''
+} = Astro.props;
+---
+
+<div
+  id={id}
+  class={`toast-container fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full pointer-events-none ${className}`}
+  role="region"
+  aria-label="Notifications"
+>
+  <!-- Toast notifications will be dynamically added here -->
+</div>
+
+<style>
+  .toast-container {
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+
+  /* Toast Base Styles */
+  .toast {
+    pointer-events: auto;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    opacity: 0;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .toast.hide {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  /* Toast Types */
+  .toast-success {
+    background: linear-gradient(135deg, var(--bg-surface), var(--bg-tertiary));
+    border: 1px solid var(--neon-green);
+    box-shadow: 0 0 20px var(--neon-green-glow), var(--shadow-lg);
+  }
+
+  .toast-error {
+    background: linear-gradient(135deg, var(--bg-surface), var(--bg-tertiary));
+    border: 1px solid var(--neon-pink);
+    box-shadow: 0 0 20px var(--neon-pink-glow), var(--shadow-lg);
+  }
+
+  .toast-warning {
+    background: linear-gradient(135deg, var(--bg-surface), var(--bg-tertiary));
+    border: 1px solid var(--neon-orange);
+    box-shadow: 0 0 20px var(--neon-orange-glow), var(--shadow-lg);
+  }
+
+  .toast-info {
+    background: linear-gradient(135deg, var(--bg-surface), var(--bg-tertiary));
+    border: 1px solid var(--neon-cyan);
+    box-shadow: 0 0 20px var(--neon-cyan-glow), var(--shadow-lg);
+  }
+
+  .toast-trade {
+    background: linear-gradient(135deg, var(--bg-surface), var(--bg-tertiary));
+    border: 1px solid var(--neon-purple);
+    box-shadow: 0 0 20px var(--neon-purple-glow), var(--shadow-lg);
+  }
+
+  /* Toast Content */
+  .toast-content {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .toast-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+  }
+
+  /* Progress Bar */
+  .toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width linear;
+  }
+
+  /* Icon Animations */
+  .toast-icon {
+    animation: toast-icon-pulse 0.6s ease-out;
+  }
+
+  @keyframes toast-icon-pulse {
+    0% {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Hover Effects */
+  .toast:hover {
+    transform: translateX(-4px) scale(1.02);
+    box-shadow: 0 0 30px currentColor;
+  }
+
+  .toast:hover .toast-progress {
+    animation-play-state: paused;
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 640px) {
+    .toast-container {
+      left: 1rem;
+      right: 1rem;
+      top: 1rem;
+      max-width: none;
+    }
+
+    .toast {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  /* Accessibility */
+  .toast:focus-visible {
+    outline: 2px solid var(--neon-cyan);
+    outline-offset: 2px;
+  }
+
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    .toast {
+      transition: opacity 0.2s ease;
+      transform: none !important;
+    }
+
+    .toast-icon {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // Toast Notification System
+  class ToastManager {
+    constructor(containerId = 'toast-container') {
+      this.container = document.getElementById(containerId);
+      this.toasts = new Map();
+      this.defaultDuration = 5000;
+      this.soundEnabled = true;
+
+      if (!this.container) {
+        console.warn('Toast container not found');
+        return;
+      }
+
+      this.initializeSounds();
+    }
+
+    initializeSounds() {
+      // Create audio context for sound effects (optional)
+      if ('AudioContext' in window || 'webkitAudioContext' in window) {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    show(message, options = {}) {
+      const {
+        type = 'info',
+        duration = this.defaultDuration,
+        persistent = false,
+        action = null,
+        data = null,
+        sound = true
+      } = options;
+
+      const id = this.generateId();
+      const toast = this.createToast(id, message, type, action, data);
+
+      this.container.appendChild(toast);
+      this.toasts.set(id, { element: toast, type, persistent });
+
+      // Trigger show animation
+      requestAnimationFrame(() => {
+        toast.classList.add('show');
+      });
+
+      // Play sound effect
+      if (sound && this.soundEnabled) {
+        this.playSound(type);
+      }
+
+      // Auto dismiss if not persistent
+      if (!persistent && duration > 0) {
+        const progressBar = toast.querySelector('.toast-progress');
+        if (progressBar) {
+          progressBar.style.transitionDuration = `${duration}ms`;
+          requestAnimationFrame(() => {
+            progressBar.style.width = '0%';
+          });
+        }
+
+        setTimeout(() => {
+          this.dismiss(id);
+        }, duration);
+      }
+
+      return id;
+    }
+
+    dismiss(id) {
+      const toast = this.toasts.get(id);
+      if (!toast) return;
+
+      toast.element.classList.add('hide');
+      toast.element.classList.remove('show');
+
+      setTimeout(() => {
+        if (toast.element.parentNode) {
+          toast.element.parentNode.removeChild(toast.element);
+        }
+        this.toasts.delete(id);
+      }, 300);
+    }
+
+    dismissAll() {
+      this.toasts.forEach((_, id) => {
+        this.dismiss(id);
+      });
+    }
+
+    createToast(id, message, type, action, data) {
+      const toast = document.createElement('div');
+      toast.id = `toast-${id}`;
+      toast.className = `toast toast-${type} rounded-lg p-4 mb-2 relative overflow-hidden backdrop-blur-sm`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'polite');
+      toast.tabIndex = 0;
+
+      const icon = this.getIcon(type);
+      const colorClass = this.getColorClass(type);
+
+      toast.innerHTML = `
+        <div class="toast-content flex items-start space-x-3">
+          <div class="toast-icon flex-shrink-0 ${colorClass}">
+            ${icon}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="toast-message text-sm font-medium text-white">
+              ${message}
+            </div>
+            ${data ? `<div class="toast-data text-xs text-gray-300 mt-1 font-mono">${this.formatData(data)}</div>` : ''}
+            ${action ? `
+              <button class="toast-action mt-2 text-xs ${colorClass} hover:underline focus:outline-none focus:underline">
+                ${action.label}
+              </button>
+            ` : ''}
+          </div>
+          <button class="toast-close flex-shrink-0 text-gray-400 hover:text-white focus:outline-none focus:text-white transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="toast-progress absolute bottom-0 left-0 h-0.5 ${colorClass.replace('text-', 'bg-')} w-full transition-all ease-linear"></div>
+      `;
+
+      // Add event listeners
+      const closeButton = toast.querySelector('.toast-close');
+      closeButton.addEventListener('click', () => this.dismiss(id));
+
+      const actionButton = toast.querySelector('.toast-action');
+      if (actionButton && action) {
+        actionButton.addEventListener('click', () => {
+          action.callback(id, data);
+        });
+      }
+
+      // Keyboard navigation
+      toast.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          this.dismiss(id);
+        }
+      });
+
+      return toast;
+    }
+
+    getIcon(type) {
+      const icons = {
+        success: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+        </svg>`,
+        error: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>`,
+        warning: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>`,
+        info: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+        </svg>`,
+        trade: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+        </svg>`
+      };
+      return icons[type] || icons.info;
+    }
+
+    getColorClass(type) {
+      const colors = {
+        success: 'text-neon-green',
+        error: 'text-neon-pink',
+        warning: 'text-neon-orange',
+        info: 'text-neon-cyan',
+        trade: 'text-neon-purple'
+      };
+      return colors[type] || colors.info;
+    }
+
+    formatData(data) {
+      if (typeof data === 'object') {
+        return Object.entries(data)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(' | ');
+      }
+      return String(data);
+    }
+
+    playSound(type) {
+      if (!this.audioContext) return;
+
+      // Create synthetic sound effects using Web Audio API
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+
+      // Different frequencies for different toast types
+      const frequencies = {
+        success: 800,
+        error: 300,
+        warning: 600,
+        info: 500,
+        trade: 400
+      };
+
+      oscillator.frequency.setValueAtTime(frequencies[type], this.audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+
+      oscillator.start();
+      oscillator.stop(this.audioContext.currentTime + 0.3);
+    }
+
+    generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    // Preset methods for common use cases
+    success(message, options = {}) {
+      return this.show(message, { ...options, type: 'success' });
+    }
+
+    error(message, options = {}) {
+      return this.show(message, { ...options, type: 'error' });
+    }
+
+    warning(message, options = {}) {
+      return this.show(message, { ...options, type: 'warning' });
+    }
+
+    info(message, options = {}) {
+      return this.show(message, { ...options, type: 'info' });
+    }
+
+    trade(message, data, options = {}) {
+      return this.show(message, {
+        ...options,
+        type: 'trade',
+        data,
+        duration: 7000 // Longer duration for trade confirmations
+      });
+    }
+  }
+
+  // Initialize toast manager and make it globally available
+  if (typeof window !== 'undefined') {
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeToast);
+    } else {
+      initializeToast();
+    }
+
+    function initializeToast() {
+      window.Toast = new ToastManager();
+
+      // Add convenient global functions
+      window.showToast = (message, options) => window.Toast.show(message, options);
+      window.showSuccess = (message, options) => window.Toast.success(message, options);
+      window.showError = (message, options) => window.Toast.error(message, options);
+      window.showWarning = (message, options) => window.Toast.warning(message, options);
+      window.showInfo = (message, options) => window.Toast.info(message, options);
+      window.showTradeConfirmation = (message, data, options) => window.Toast.trade(message, data, options);
+    }
+
+    // Example usage for development
+    if (import.meta.env.DEV) {
+      setTimeout(() => {
+        if (window.Toast) {
+          // Demo notifications (only in development)
+          console.log('Toast system initialized. Example usage:');
+          console.log('window.showSuccess("Trade executed successfully!");');
+          console.log('window.showTradeConfirmation("Buy Order Filled", { symbol: "BTC", amount: 0.1, price: 45000 });');
+        }
+      }, 1000);
+    }
+  }
+</script>
