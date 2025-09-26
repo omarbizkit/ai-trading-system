@@ -23,9 +23,12 @@ export interface NotificationSettings {
   trade_confirmations: boolean;
   daily_summary: boolean;
   price_alerts: boolean;
+  performance_reports: boolean;
+  market_updates: boolean;
 }
 
 export interface CreateTradingUserRequest {
+  id?: string; // Optional ID, will be generated if not provided
   display_name: string;
   default_capital?: number;
   risk_tolerance?: RiskTolerance;
@@ -41,6 +44,13 @@ export interface UpdateTradingUserRequest {
   notification_settings?: Partial<NotificationSettings>;
 }
 
+// Legacy interface for backward compatibility
+export interface UserPreferences {
+  risk_tolerance: RiskTolerance;
+  preferred_coins: string[];
+  notification_settings: NotificationSettings;
+}
+
 // Validation constraints from data-model.md
 export const TRADING_USER_CONSTRAINTS = {
   DEFAULT_CAPITAL: {
@@ -53,7 +63,8 @@ export const TRADING_USER_CONSTRAINTS = {
     MAX_LENGTH: 50
   },
   PREFERRED_COINS: {
-    MAX_COUNT: 10
+    MAX_COUNT: 10,
+    MAX_COINS: 10  // Legacy alias for MAX_COUNT
   }
 } as const;
 
@@ -63,7 +74,9 @@ export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
   push_notifications: false,
   trade_confirmations: true,
   daily_summary: false,
-  price_alerts: true
+  price_alerts: true,
+  performance_reports: false,
+  market_updates: true
 };
 
 // Type guards
