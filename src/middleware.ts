@@ -85,9 +85,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (session?.user) {
       locals.user = {
         id: session.user.id,
-        email: session.user.email || undefined,
-        user_metadata: session.user.user_metadata,
-        app_metadata: session.user.app_metadata
+        email: session.user.email ?? undefined,
+        user_metadata: session.user.user_metadata ?? undefined,
+        app_metadata: session.user.app_metadata ?? undefined
       };
       locals.session = session;
       locals.isAuthenticated = true;
