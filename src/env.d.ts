@@ -6,9 +6,9 @@ declare namespace App {
   interface Locals {
     user: {
       id: string;
-      email?: string;
-      user_metadata?: any;
-      app_metadata?: any;
+      email?: string | undefined;
+      user_metadata?: any | undefined;
+      app_metadata?: any | undefined;
     } | null;
     session: {
       access_token: string;
@@ -34,4 +34,15 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+}
+
+// Window interface extensions
+interface Window {
+  AIPrediction?: {
+    refresh: () => void;
+    setSymbol: (symbol: string) => void;
+  };
+  BacktestingForm?: {
+    [key: string]: any;
+  };
 }

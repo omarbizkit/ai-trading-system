@@ -21,7 +21,7 @@ const {
 } = Astro.props;
 ---
 
-<div class={`ai-prediction-container ${compact ? 'compact' : ''} ${className}`} data-symbol={symbol}>
+<div class={`ai-prediction-container ${compact ? 'compact' : ''} ${className}`} data-symbol={symbol} data-refresh-interval={refreshInterval}>
   <!-- Header -->
   <div class="prediction-header flex items-center justify-between p-4 border-b border-neon-purple/20">
     <div class="header-title">
@@ -178,7 +178,7 @@ const {
 </div>
 
 <script>
-  let predictionTimer = null;
+  let predictionTimer: number | null = null;
   let currentSymbol = 'bitcoin';
   let autoRefreshEnabled = true;
 
@@ -186,7 +186,7 @@ const {
     // Get component configuration
     const container = document.querySelector('.ai-prediction-container');
     if (container) {
-      currentSymbol = container.dataset.symbol || 'bitcoin';
+      currentSymbol = (container as HTMLElement).dataset.symbol || 'bitcoin';
     }
 
     // Initialize AI prediction
@@ -271,7 +271,7 @@ const {
     }
   }
 
-  function updatePredictionDisplay(prediction) {
+  function updatePredictionDisplay(prediction: any): void {
     // Direction and signal
     const direction = prediction.direction || 'BULLISH';
     const signal = direction === 'BULLISH' ? '📈' : direction === 'BEARISH' ? '📉' : '↔️';
@@ -327,13 +327,13 @@ const {
     updateSignalColors();
   }
 
-  function updateHistoryDisplay(history) {
+  function updateHistoryDisplay(history: any[]): void {
     const historyList = document.getElementById('history-list');
     if (!historyList || !history.length) return;
 
     historyList.innerHTML = '';
 
-    history.forEach(item => {
+    history.forEach((item: any) => {
       const historyItem = createHistoryItem(item);
       historyList.appendChild(historyItem);
     });
@@ -343,7 +343,7 @@ const {
     updateElement('prediction-accuracy', `${accuracy.toFixed(1)}%`);
   }
 
-  function createHistoryItem(item) {
+  function createHistoryItem(item: any): HTMLDivElement {
     const div = document.createElement('div');
     div.className = 'history-item flex items-center justify-between p-3 bg-dark-surface/30 rounded-lg border border-neon-purple/20';
 
@@ -385,9 +385,9 @@ const {
   }
 
   function startPredictionUpdates() {
-    const refreshInterval = parseInt(document.querySelector('.ai-prediction-container')?.dataset.refreshInterval || '60000');
+    const refreshInterval = parseInt((document.querySelector('.ai-prediction-container') as HTMLElement)?.dataset.refreshInterval || '60000');
 
-    predictionTimer = setInterval(() => {
+    predictionTimer = window.setInterval(() => {
       if (autoRefreshEnabled) {
         loadPrediction();
       }
@@ -430,20 +430,20 @@ const {
     return history;
   }
 
-  function calculateAccuracy(history) {
+  function calculateAccuracy(history: Array<{accurate: boolean}>): number {
     if (!history.length) return 0;
     const accurate = history.filter(item => item.accurate).length;
     return (accurate / history.length) * 100;
   }
 
-  function updateStatus(message) {
+  function updateStatus(message: string): void {
     const statusElement = document.getElementById('prediction-status');
     if (statusElement) {
       statusElement.textContent = message;
     }
   }
 
-  function showError(message) {
+  function showError(message: string): void {
     const loadingElement = document.getElementById('prediction-loading');
     const contentElement = document.getElementById('prediction-content');
     const errorElement = document.getElementById('prediction-error');
@@ -456,25 +456,25 @@ const {
   }
 
   // Utility functions
-  function updateElement(id, content) {
+  function updateElement(id: string, content: string): void {
     const element = document.getElementById(id);
     if (element) {
       element.textContent = content;
     }
   }
 
-  function formatCurrency(value, decimals = 2) {
+  function formatCurrency(value: number | null | undefined, decimals: number = 2): string {
     if (value === null || value === undefined) return '$0.00';
-    return '$' + parseFloat(value).toLocaleString('en-US', {
+    return '$' + parseFloat(value.toString()).toLocaleString('en-US', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
     });
   }
 
-  function formatTimeAgo(dateString) {
+  function formatTimeAgo(dateString: string): string {
     const date = new Date(dateString);
     const now = new Date();
-    const diffMs = now - date;
+    const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
@@ -495,7 +495,7 @@ const {
   // Export functions for external use
   window.AIPrediction = {
     refresh: loadPrediction,
-    setSymbol: (symbol) => {
+    setSymbol: (symbol: string) => {
       currentSymbol = symbol;
       loadPrediction();
       loadHistory();

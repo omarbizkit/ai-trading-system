@@ -952,15 +952,15 @@ const {
     };
   }
 
-  function applyConfiguration(config) {
+  function applyConfiguration(config: any): void {
     // Apply risk settings
     if (config.risk) {
-      document.getElementById('stop-loss-pct').value = config.risk.stopLoss || 5;
-      document.getElementById('take-profit-pct').value = config.risk.takeProfit || 10;
-      document.getElementById('max-drawdown').value = config.risk.maxDrawdown || 15;
+      (document.getElementById('stop-loss-pct') as HTMLInputElement)!.value = config.risk.stopLoss || 5;
+      (document.getElementById('take-profit-pct') as HTMLInputElement)!.value = config.risk.takeProfit || 10;
+      (document.getElementById('max-drawdown') as HTMLInputElement)!.value = config.risk.maxDrawdown || 15;
 
-      const trailingCheckbox = document.getElementById('trailing-stop');
-      const trailingMark = trailingCheckbox?.parentElement.querySelector('.checkbox-mark');
+      const trailingCheckbox = document.getElementById('trailing-stop') as HTMLInputElement;
+      const trailingMark = trailingCheckbox?.parentElement?.querySelector('.checkbox-mark');
       if (trailingCheckbox && trailingMark) {
         trailingCheckbox.checked = config.risk.trailingStop || false;
         trailingMark.classList.toggle('hidden', !trailingCheckbox.checked);
@@ -969,12 +969,12 @@ const {
 
     // Apply AI settings
     if (config.ai) {
-      document.getElementById('confidence-threshold').value = config.ai.confidenceThreshold || 75;
-      document.getElementById('prediction-timeframe').value = config.ai.timeframe || '4h';
+      (document.getElementById('confidence-threshold') as HTMLInputElement).value = config.ai.confidenceThreshold || 75;
+      (document.getElementById('prediction-timeframe') as HTMLSelectElement).value = config.ai.timeframe || '4h';
       updateConfidenceValue();
 
-      const aiCheckbox = document.getElementById('use-ai-predictions');
-      const aiMark = aiCheckbox?.parentElement.querySelector('.checkbox-mark');
+      const aiCheckbox = document.getElementById('use-ai-predictions') as HTMLInputElement;
+      const aiMark = aiCheckbox?.parentElement?.querySelector('.checkbox-mark');
       if (aiCheckbox && aiMark) {
         aiCheckbox.checked = config.ai.enabled !== false;
         aiMark.classList.toggle('hidden', !aiCheckbox.checked);
@@ -983,11 +983,11 @@ const {
 
     // Apply execution settings
     if (config.execution) {
-      document.getElementById('slippage').value = config.execution.slippage || 0.1;
-      document.getElementById('commission').value = config.execution.commission || 0.1;
+      (document.getElementById('slippage') as HTMLInputElement).value = config.execution.slippage || 0.1;
+      (document.getElementById('commission') as HTMLInputElement).value = config.execution.commission || 0.1;
 
-      const realisticCheckbox = document.getElementById('realistic-fills');
-      const realisticMark = realisticCheckbox?.parentElement.querySelector('.checkbox-mark');
+      const realisticCheckbox = document.getElementById('realistic-fills') as HTMLInputElement;
+      const realisticMark = realisticCheckbox?.parentElement?.querySelector('.checkbox-mark');
       if (realisticCheckbox && realisticMark) {
         realisticCheckbox.checked = config.execution.realisticFills !== false;
         realisticMark.classList.toggle('hidden', !realisticCheckbox.checked);
@@ -999,11 +999,11 @@ const {
     if (confirm('Reset all settings to default values?')) {
       // Reset form elements
       document.querySelectorAll('input[type="number"]').forEach(input => {
-        input.value = input.getAttribute('value') || '';
+        (input as HTMLInputElement).value = input.getAttribute('value') || '';
       });
 
       document.querySelectorAll('select').forEach(select => {
-        select.selectedIndex = 0;
+        (select as HTMLSelectElement).selectedIndex = 0;
       });
 
       // Reset checkboxes
@@ -1017,16 +1017,16 @@ const {
     }
   }
 
-  function updateStatus(message) {
+  function updateStatus(message: string): void {
     const statusElement = document.getElementById('backtest-status');
     if (statusElement) {
       statusElement.textContent = message;
     }
   }
 
-  function formatCurrency(value, decimals = 0) {
+  function formatCurrency(value: number | null | undefined, decimals: number = 0): string {
     if (value === null || value === undefined) return '$0';
-    return '$' + parseFloat(value).toLocaleString('en-US', {
+    return '$' + parseFloat(value.toString()).toLocaleString('en-US', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
     });
