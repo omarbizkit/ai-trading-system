@@ -11,9 +11,9 @@ import type {
   CreateTradingUserRequest,
   UpdateTradingUserRequest,
   UserPreferences,
-  NotificationSettings,
-  TRADING_USER_CONSTRAINTS
+  NotificationSettings
 } from "../types/trading-user.js";
+import { TRADING_USER_CONSTRAINTS } from "../types/trading-user.js";
 
 export class TradingUserService {
   /**

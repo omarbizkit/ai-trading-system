@@ -4,12 +4,11 @@
  * Based on data-model.md specifications
  */
 
-import { supabase, handleDatabaseError, retryOperation } from "../supabase";
-import type { Database } from "../supabase";
+import { supabase, handleDatabaseError, retryOperation } from "../supabase.js";
+import type { Database } from "../supabase.js";
 import type {
   AIPrediction,
   PredictedDirection,
-  PredictionRequest,
   PredictionResponse,
   InputFeatures,
   TechnicalIndicators,
@@ -17,14 +16,14 @@ import type {
   ModelPerformance,
   PredictionValidation,
   ModelConfig
-} from "../types/ai-prediction";
+} from "../types/ai-prediction.js";
 import {
   DEFAULT_MODEL_CONFIG,
   AI_PREDICTION_CONSTRAINTS
-} from "../types/ai-prediction";
-import type { MarketData } from "../types/market-data";
-import { modelLoader, createPredictionInput } from "../ml/model-loader";
-import type { PredictionInput, PredictionOutput } from "../ml/model-loader";
+} from "../types/ai-prediction.js";
+import type { MarketData } from "../types/market-data.js";
+import { modelLoader, createPredictionInput } from "../ml/model-loader.js";
+import type { PredictionOutput } from "../ml/model-loader.js";
 
 export class AIPredictionService {
   private modelConfig: ModelConfig;
@@ -382,32 +381,6 @@ export class AIPredictionService {
     return modelLoader.getMemoryStats();
   }
 
-  /**
-   * Private: Convert features to array format for model
-   */
-  private featuresToArray(features: InputFeatures): number[] {
-    return [
-      features.current_price,
-      features.volume_24h,
-      features.price_change_24h,
-      features.market_cap,
-      features.sentiment_score,
-      features.fear_greed_index,
-      features.technical_indicators.rsi,
-      features.technical_indicators.macd,
-      features.technical_indicators.bollinger_upper,
-      features.technical_indicators.bollinger_lower,
-      features.technical_indicators.moving_average_50,
-      features.technical_indicators.moving_average_200,
-      features.technical_indicators.support_level,
-      features.technical_indicators.resistance_level,
-      features.external_factors?.news_sentiment || 0,
-      features.external_factors?.social_media_mentions || 0,
-      features.external_factors?.institutional_flow || 0,
-      features.external_factors?.correlation_btc || 0,
-      features.external_factors?.market_volatility || 0
-    ];
-  }
 
   /**
    * Private: Store prediction in database

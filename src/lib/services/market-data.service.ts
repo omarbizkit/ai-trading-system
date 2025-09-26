@@ -18,8 +18,7 @@ import type {
   CacheConfig
 } from "../types/market-data.js";
 import {
-  DEFAULT_CACHE_CONFIG,
-  MARKET_DATA_CONSTRAINTS
+  DEFAULT_CACHE_CONFIG
 } from "../types/market-data.js";
 
 export class MarketDataService {
@@ -77,12 +76,7 @@ export class MarketDataService {
       const fromTimestamp = Math.floor(new Date(request.from).getTime() / 1000);
       const toTimestamp = Math.floor(new Date(request.to).getTime() / 1000);
 
-      // Map interval to CoinGecko parameters
-      const intervalMapping = {
-        "1h": 1,
-        "4h": 4,
-        "1d": 24
-      };
+      // Note: CoinGecko API doesn't use interval parameters for market_chart/range
 
       const url = `${this.baseUrl}/coins/${coinSymbol}/market_chart/range`;
       const params = new URLSearchParams({
@@ -348,8 +342,8 @@ export class MarketDataService {
     const marketData = this.transformCoinGeckoData(coinGeckoData);
 
     return await retryOperation(async () => {
-      const { data, error } = await supabase
-        .from("market_data")
+      const { data, error } = await (supabase
+        .from("market_data") as any)
         .insert({
           coin_symbol: marketData.coin_symbol,
           price_source: "coingecko",
@@ -367,6 +361,10 @@ export class MarketDataService {
 
       if (error) {
         handleDatabaseError(error, "store market data");
+      }
+
+      if (!data) {
+        throw new Error("Failed to store market data - no data returned");
       }
 
       return this.mapDatabaseMarketDataToMarketData(data);
@@ -471,8 +469,8 @@ export class MarketDataService {
     for (const [intervalStart, group] of groupedData) {
       if (group.prices.length === 0) continue;
 
-      const open = group.prices[0];
-      const close = group.prices[group.prices.length - 1];
+      const open = group.prices[0] || 0;
+      const close = group.prices[group.prices.length - 1] || 0;
       const high = Math.max(...group.prices);
       const low = Math.min(...group.prices);
       const volume = group.volumes.reduce((sum, vol) => sum + vol, 0);
