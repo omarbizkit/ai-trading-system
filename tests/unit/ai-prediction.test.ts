@@ -3,14 +3,12 @@
  * Testing the accuracy calculation and validation logic
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi, MockedFunction } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type MockedFunction } from 'vitest';
 import { AIPredictionService } from '../../src/lib/services/ai-prediction.service.js';
 import type {
   AIPrediction,
   PredictedDirection,
-  InputFeatures,
-  ModelPerformance,
-  PredictionValidation
+  InputFeatures
 } from '../../src/lib/types/ai-prediction.js';
 import type { MarketData } from '../../src/lib/types/market-data.js';
 
@@ -56,15 +54,12 @@ describe('AIPredictionService - Accuracy Testing', () => {
     mockMarketData = {
       coin_symbol: 'BTC',
       current_price: 50000,
-      price_change_24h: 1000,
-      price_change_percentage_24h: 2.0,
+      price_change_24h: 2.0,
       volume_24h: 25000000000,
       market_cap: 950000000000,
-      circulating_supply: 19000000,
-      total_supply: 21000000,
       fear_greed_index: 65,
       sentiment_score: 0.2,
-      data_source: 'coingecko',
+      price_source: 'coingecko',
       last_updated: '2025-01-01T12:00:00.000Z',
       historical_data: [
         { timestamp: '2025-01-01T11:00:00.000Z', price: 49500, volume: 1000000 },
@@ -81,14 +76,15 @@ describe('AIPredictionService - Accuracy Testing', () => {
       input_features: {
         current_price: 50000,
         volume_24h: 25000000000,
+        price_change_24h: 2.0,
         market_cap: 950000000000,
         sentiment_score: 0.2,
         fear_greed_index: 65,
-        price_volatility: 0.05,
         technical_indicators: {
           rsi: 45.0,
           macd: 120.5,
-          moving_average_20: 49500,
+          bollinger_upper: 52000,
+          bollinger_lower: 48000,
           moving_average_50: 48000,
           moving_average_200: 45000,
           support_level: 48000,
@@ -106,10 +102,7 @@ describe('AIPredictionService - Accuracy Testing', () => {
       predicted_direction: 'up' as PredictedDirection,
       confidence_score: 0.85,
       prediction_horizon: 60,
-      created_at: '2025-01-01T12:00:00.000Z',
-      resolved_at: null,
-      actual_price: null,
-      accuracy_score: null
+      created_at: '2025-01-01T12:00:00.000Z'
     };
   });
 
@@ -396,14 +389,15 @@ describe('AIPredictionService - Accuracy Testing', () => {
       const validFeatures: InputFeatures = {
         current_price: 50000,
         volume_24h: 25000000000,
+        price_change_24h: 2.0,
         market_cap: 950000000000,
         sentiment_score: 0.5,
         fear_greed_index: 65,
-        price_volatility: 0.05,
         technical_indicators: {
           rsi: 45,
           macd: 120,
-          moving_average_20: 49500,
+          bollinger_upper: 52000,
+          bollinger_lower: 48000,
           moving_average_50: 48000,
           moving_average_200: 45000,
           support_level: 48000,

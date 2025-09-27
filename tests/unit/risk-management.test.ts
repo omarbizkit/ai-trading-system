@@ -3,14 +3,13 @@
  * Testing risk controls, position sizing, and validation across services
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi, MockedFunction } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type MockedFunction } from 'vitest';
 import { TradeService } from '../../src/lib/services/trade.service.js';
 import { BacktestingService } from '../../src/lib/services/backtesting.service.js';
 import { AIPredictionService } from '../../src/lib/services/ai-prediction.service.js';
 import type { CreateTradeRequest, FeeStructure } from '../../src/lib/types/trade.js';
 import type { BacktestRequest } from '../../src/lib/services/backtesting.service.js';
 import type { InputFeatures } from '../../src/lib/types/ai-prediction.js';
-import type { TradingRun } from '../../src/lib/types/trading-run.js';
 
 // Mock dependencies
 vi.mock('../../src/lib/supabase.js', () => ({
@@ -215,7 +214,7 @@ describe('Risk Management Tests', () => {
     it('should track cumulative drawdown during backtesting', () => {
       const portfolioValues = [10000, 11000, 9500, 8800, 10200, 12000, 9000];
       let maxDrawdown = 0;
-      let peak = portfolioValues[0];
+      let peak: number = portfolioValues[0];
 
       for (const value of portfolioValues) {
         if (value > peak) {
@@ -234,7 +233,7 @@ describe('Risk Management Tests', () => {
     it('should handle cases with no drawdown (always increasing)', () => {
       const increasingValues = [10000, 10500, 11000, 11500, 12000];
       let maxDrawdown = 0;
-      let peak = increasingValues[0];
+      let peak: number = increasingValues[0];
 
       for (const value of increasingValues) {
         if (value > peak) {
@@ -255,14 +254,15 @@ describe('Risk Management Tests', () => {
       const validFeatures: InputFeatures = {
         current_price: 50000,
         volume_24h: 25000000000,
+        price_change_24h: 2.0,
         market_cap: 950000000000,
         sentiment_score: 0.3, // Valid range [-1, 1]
         fear_greed_index: 45, // Valid range [0, 100]
-        price_volatility: 0.05,
         technical_indicators: {
           rsi: 45,
           macd: 120,
-          moving_average_20: 49500,
+          bollinger_upper: 52000,
+          bollinger_lower: 48000,
           moving_average_50: 48000,
           moving_average_200: 45000,
           support_level: 48000,
@@ -542,14 +542,15 @@ function validInputFeatures(): InputFeatures {
   return {
     current_price: 50000,
     volume_24h: 25000000000,
+    price_change_24h: 2.0,
     market_cap: 950000000000,
     sentiment_score: 0.3,
     fear_greed_index: 45,
-    price_volatility: 0.05,
     technical_indicators: {
       rsi: 45,
       macd: 120,
-      moving_average_20: 49500,
+      bollinger_upper: 52000,
+      bollinger_lower: 48000,
       moving_average_50: 48000,
       moving_average_200: 45000,
       support_level: 48000,

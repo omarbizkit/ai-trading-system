@@ -3,8 +3,8 @@
  * Testing performance metrics, timeline generation, and trade logic
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi, MockedFunction } from 'vitest';
-import { BacktestingService, type BacktestRequest, type BacktestResult } from '../../src/lib/services/backtesting.service.js';
+import { describe, it, expect, beforeEach, afterEach, vi, type MockedFunction } from 'vitest';
+import { BacktestingService, type BacktestRequest } from '../../src/lib/services/backtesting.service.js';
 import type { TradingRun } from '../../src/lib/types/trading-run.js';
 import type { Trade } from '../../src/lib/types/trade.js';
 
@@ -63,8 +63,13 @@ describe('BacktestingService - Calculation Tests', () => {
       starting_capital: 10000,
       final_capital: 11500,
       total_trades: 5,
-      successful_trades: 3,
+      winning_trades: 3,
+      win_rate: 60.0,
+      total_return: 15.0,
       max_drawdown: 0.05,
+      time_period_start: '2025-01-01T00:00:00.000Z',
+      time_period_end: '2025-01-10T00:00:00.000Z',
+      ai_model_version: '1.0.0',
       parameters: {
         risk_per_trade: 2,
         stop_loss_percent: 5,
@@ -84,15 +89,18 @@ describe('BacktestingService - Calculation Tests', () => {
         trade_type: 'buy',
         coin_symbol: 'BTC',
         quantity: 0.2,
-        price_per_unit: 50000,
+        price: 50000,
         total_value: 10000,
-        fee_amount: 10,
+        fee: 10,
+        net_value: 10010,
         profit_loss: 500,
         portfolio_value_before: 10000,
         portfolio_value_after: 10500,
         execution_time: '2025-01-02T10:00:00.000Z',
         trade_reason: 'ai_signal',
-        ai_confidence: 0.8
+        ai_confidence: 0.8,
+        market_price: 50000,
+        created_at: '2025-01-02T10:00:00.000Z'
       },
       {
         id: 'trade-2',
@@ -101,15 +109,18 @@ describe('BacktestingService - Calculation Tests', () => {
         trade_type: 'sell',
         coin_symbol: 'BTC',
         quantity: 0.1,
-        price_per_unit: 51000,
+        price: 51000,
         total_value: 5100,
-        fee_amount: 5,
+        fee: 5,
+        net_value: 5095,
         profit_loss: -200,
         portfolio_value_before: 10500,
         portfolio_value_after: 10300,
         execution_time: '2025-01-03T14:00:00.000Z',
         trade_reason: 'ai_signal',
-        ai_confidence: 0.6
+        ai_confidence: 0.6,
+        market_price: 51000,
+        created_at: '2025-01-03T14:00:00.000Z'
       },
       {
         id: 'trade-3',
@@ -118,15 +129,18 @@ describe('BacktestingService - Calculation Tests', () => {
         trade_type: 'buy',
         coin_symbol: 'BTC',
         quantity: 0.15,
-        price_per_unit: 49000,
+        price: 49000,
         total_value: 7350,
-        fee_amount: 7,
+        fee: 7,
+        net_value: 7357,
         profit_loss: 800,
         portfolio_value_before: 10300,
         portfolio_value_after: 11100,
         execution_time: '2025-01-05T09:00:00.000Z',
         trade_reason: 'ai_signal',
-        ai_confidence: 0.9
+        ai_confidence: 0.9,
+        market_price: 49000,
+        created_at: '2025-01-05T09:00:00.000Z'
       },
       {
         id: 'trade-4',
@@ -135,15 +149,18 @@ describe('BacktestingService - Calculation Tests', () => {
         trade_type: 'sell',
         coin_symbol: 'BTC',
         quantity: 0.25,
-        price_per_unit: 52000,
+        price: 52000,
         total_value: 13000,
-        fee_amount: 13,
+        fee: 13,
+        net_value: 12987,
         profit_loss: 400,
         portfolio_value_before: 11100,
         portfolio_value_after: 11500,
         execution_time: '2025-01-08T16:00:00.000Z',
         trade_reason: 'ai_signal',
-        ai_confidence: 0.75
+        ai_confidence: 0.75,
+        market_price: 52000,
+        created_at: '2025-01-08T16:00:00.000Z'
       }
     ];
   });
