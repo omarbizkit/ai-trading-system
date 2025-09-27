@@ -3,13 +3,12 @@
  * Comprehensive testing of CRUD operations and business logic
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi, MockedFunction } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type MockedFunction } from 'vitest';
 import { TradingUserService } from '../../src/lib/services/trading-user.service.js';
 import type {
   TradingUser,
   CreateTradingUserRequest,
   UpdateTradingUserRequest,
-  UserPreferences,
   NotificationSettings
 } from '../../src/lib/types/trading-user.js';
 
@@ -54,9 +53,10 @@ describe('TradingUserService', () => {
         email_alerts: false,
         push_notifications: true,
         trade_confirmations: true,
+        daily_summary: true,
+        price_alerts: false,
         performance_reports: true,
-        market_updates: false,
-        ai_insights: true
+        market_updates: false
       },
       created_at: '2025-01-01T00:00:00.000Z',
       updated_at: '2025-01-01T00:00:00.000Z'
@@ -90,9 +90,10 @@ describe('TradingUserService', () => {
           email_alerts: true,
           push_notifications: true,
           trade_confirmations: true,
+          daily_summary: true,
+          price_alerts: true,
           performance_reports: true,
-          market_updates: true,
-          ai_insights: true
+          market_updates: true
         }
       };
 
@@ -132,9 +133,10 @@ describe('TradingUserService', () => {
           email_alerts: false,
           push_notifications: true,
           trade_confirmations: true,
+          daily_summary: true,
+          price_alerts: false,
           performance_reports: true,
-          market_updates: false,
-          ai_insights: true
+          market_updates: false
         }
       };
 
@@ -466,9 +468,10 @@ describe('TradingUserService', () => {
         email_alerts: false,
         push_notifications: true,
         trade_confirmations: true,
+        daily_summary: true,
+        price_alerts: false,
         performance_reports: true,
-        market_updates: false,
-        ai_insights: true
+        market_updates: false
       });
     });
 
