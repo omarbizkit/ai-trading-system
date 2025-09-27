@@ -7,7 +7,6 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { supabase } from "../../../lib/supabase.js";
 import { tradingUserService } from "../../../lib/services/trading-user.service.js";
 import type {
   TradingUser,
@@ -15,33 +14,18 @@ import type {
   UserPreferences
 } from "../../../lib/types/trading-user.js";
 
+// Helper function to get user from middleware context
+function getUserFromContext(locals: any) {
+  if (!locals.isAuthenticated || !locals.user) {
+    throw new Error('Authentication required');
+  }
+  return locals.user;
+}
+
 // GET /api/user/profile - Get user profile
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   try {
-    // Get user from Supabase Auth
-    const authorization = request.headers.get("Authorization");
-    if (!authorization?.startsWith("Bearer ")) {
-      return new Response(
-        JSON.stringify({ error: "Missing or invalid authorization header" }),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
-
-    const token = authorization.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Invalid or expired token" }),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
+    const user = getUserFromContext(locals);
 
     // Get or create user profile
     let tradingUser = await tradingUserService.getUserById(user.id);
@@ -92,32 +76,9 @@ export const GET: APIRoute = async ({ request }) => {
 };
 
 // PUT /api/user/profile - Update user profile
-export const PUT: APIRoute = async ({ request }) => {
+export const PUT: APIRoute = async ({ request, locals }) => {
   try {
-    // Get user from Supabase Auth
-    const authorization = request.headers.get("Authorization");
-    if (!authorization?.startsWith("Bearer ")) {
-      return new Response(
-        JSON.stringify({ error: "Missing or invalid authorization header" }),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
-
-    const token = authorization.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Invalid or expired token" }),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
+    const user = getUserFromContext(locals);
 
     // Parse request body
     const body = await request.json();

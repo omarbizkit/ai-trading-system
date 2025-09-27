@@ -6,9 +6,9 @@
  */
 
 import type { APIRoute } from 'astro';
-import { apiHealthService } from '../../../lib/services/api-health.service';
-import { databaseHealthService } from '../../../lib/services/database-health.service';
-import { buildConfigService } from '../../../lib/services/build-config.service';
+import { APIHealthService } from '../../../lib/services/api-health.service';
+import { DatabaseHealthService } from '../../../lib/services/database-health.service';
+import { BuildConfigService } from '../../../lib/services/build-config.service';
 
 interface SystemHealth {
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -35,10 +35,12 @@ export const GET: APIRoute = async ({ request }) => {
     const uptime = Math.floor((Date.now() - startTime) / 1000);
     
     // Check database health
-    const databaseHealth = await databaseHealthService.testAllConnections('production');
+    const dbHealthService = new DatabaseHealthService();
+    const databaseHealth = await dbHealthService.testAllConnections('production');
     const databaseStatus = getDatabaseHealthStatus(databaseHealth);
     
     // Check API endpoints health
+    const apiHealthService = new APIHealthService();
     const apiHealth = await apiHealthService.checkAllEndpoints('production');
     const apiStatus = getAPIHealthStatus(apiHealth);
     
@@ -46,6 +48,7 @@ export const GET: APIRoute = async ({ request }) => {
     const externalServicesStatus = await checkExternalServices();
     
     // Check build system
+    const buildConfigService = new BuildConfigService();
     const buildConfigs = buildConfigService.getBuildConfigs({ environment: 'production' });
     const buildStatus = getBuildSystemStatus(buildConfigs);
     
