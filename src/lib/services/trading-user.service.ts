@@ -5,6 +5,7 @@
  */
 
 import { supabase, handleDatabaseError, retryOperation } from "../supabase.js";
+import { databaseOptimizationService } from "./database-optimization.service.js";
 import type { Database } from "../supabase.js";
 import type {
   TradingUser,
@@ -50,26 +51,33 @@ export class TradingUserService {
   }
 
   /**
-   * Get user by ID
+   * Get user by ID with query optimization
    */
   async getUserById(userId: string): Promise<TradingUser | null> {
     try {
-      return await retryOperation(async () => {
-        const { data, error } = await supabase
-          .from("trading_users")
-          .select("*")
-          .eq("id", userId)
-          .single();
+      return await databaseOptimizationService.executeQuery(
+        'getUserById',
+        async () => {
+          return await retryOperation(async () => {
+            const { data, error } = await supabase
+              .from("trading_users")
+              .select("*")
+              .eq("id", userId)
+              .single();
 
-        if (error) {
-          if (error.code === "PGRST116") {
-            return null; // User not found
-          }
-          handleDatabaseError(error, "get trading user");
-        }
+            if (error) {
+              if (error.code === "PGRST116") {
+                return null; // User not found
+              }
+              handleDatabaseError(error, "get trading user");
+            }
 
-        return data ? this.mapDatabaseUserToTradingUser(data) : null;
-      });
+            return data ? this.mapDatabaseUserToTradingUser(data) : null;
+          });
+        },
+        `user_${userId}`, // Cache key
+        300000 // 5 minutes cache TTL
+      );
     } catch (error: any) {
       console.error("Failed to get trading user:", error);
       throw new Error(`Failed to retrieve user profile: ${error.message}`);

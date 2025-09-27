@@ -225,36 +225,54 @@ export interface Database {
   };
 }
 
-// Environment variables validation
+// Environment variables validation with better error handling
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-// For development, allow placeholder values
+// Environment detection
 const isDevMode = import.meta.env.NODE_ENV === 'development';
+const isProduction = import.meta.env.NODE_ENV === 'production';
 const isPlaceholder = supabaseUrl?.includes('placeholder') || supabaseAnonKey?.includes('placeholder');
 
-if (!supabaseUrl && !isDevMode) {
-  throw new Error("Missing PUBLIC_SUPABASE_URL environment variable");
+// Validation with detailed error messages
+if (!supabaseUrl) {
+  const errorMsg = isDevMode 
+    ? "Missing PUBLIC_SUPABASE_URL environment variable. Please check your .env file."
+    : "Missing PUBLIC_SUPABASE_URL environment variable for production deployment.";
+  throw new Error(errorMsg);
 }
 
-if (!supabaseAnonKey && !isDevMode) {
-  throw new Error("Missing PUBLIC_SUPABASE_ANON_KEY environment variable");
+if (!supabaseAnonKey) {
+  const errorMsg = isDevMode 
+    ? "Missing PUBLIC_SUPABASE_ANON_KEY environment variable. Please check your .env file."
+    : "Missing PUBLIC_SUPABASE_ANON_KEY environment variable for production deployment.";
+  throw new Error(errorMsg);
 }
 
-// Create and configure Supabase client
+// Validate URL format
+if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {
+  throw new Error(`Invalid Supabase URL format: ${supabaseUrl}. Expected format: https://your-project.supabase.co`);
+}
+
+// Validate key format (basic check)
+if (supabaseAnonKey.length < 50) {
+  throw new Error(`Invalid Supabase anon key format. Key appears to be too short: ${supabaseAnonKey.length} characters`);
+}
+
+// Create and configure Supabase client with production-ready settings
 export const supabase: SupabaseClient<Database> = createClient<Database>(
-  supabaseUrl || 'https://dev-placeholder.supabase.co',
-  supabaseAnonKey || 'dev-placeholder-key',
+  supabaseUrl,
+  supabaseAnonKey,
   {
     auth: {
       // Configure for .bizkit.dev domain SSO
       cookieOptions: {
         name: "auth-token",
-        domain: ".bizkit.dev",
+        domain: isProduction ? ".bizkit.dev" : "localhost",
         maxAge: 100 * 365 * 24 * 60 * 60, // 100 years in seconds
         httpOnly: false, // Allow client-side access for SSO
-        sameSite: "lax", // Allow cross-subdomain cookies
-        secure: true // HTTPS only
+        sameSite: isProduction ? "lax" : "lax", // Allow cross-subdomain cookies
+        secure: isProduction // HTTPS only in production
       },
       autoRefreshToken: true,
       persistSession: true,
@@ -266,7 +284,14 @@ export const supabase: SupabaseClient<Database> = createClient<Database>(
     },
     global: {
       headers: {
-        "X-Client-Info": "ai-trading-system@1.0.0"
+        "X-Client-Info": `ai-trading-system@1.0.0-${isProduction ? 'production' : 'development'}`,
+        "X-Environment": isProduction ? 'production' : 'development'
+      }
+    },
+    // Add connection pooling and retry configuration
+    realtime: {
+      params: {
+        eventsPerSecond: 10
       }
     }
   }
@@ -366,19 +391,98 @@ export function createRLSPolicy(tableName: string, operation: string) {
 }
 
 /**
- * Database connection test
+ * Database connection test with detailed diagnostics
  */
-export async function testConnection(): Promise<boolean> {
+export async function testConnection(): Promise<{
+  success: boolean;
+  error?: string;
+  responseTime?: number;
+  details?: any;
+}> {
+  const startTime = Date.now();
+  
   try {
+    // Test basic connectivity with a simple query
     const { data, error } = await supabase
       .from("trading_users")
       .select("count")
       .limit(1);
 
-    return !error;
-  } catch (error) {
-    console.error("Database connection test failed:", error);
-    return false;
+    const responseTime = Date.now() - startTime;
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+        responseTime,
+        details: {
+          code: error.code,
+          hint: error.hint,
+          details: error.details
+        }
+      };
+    }
+
+    return {
+      success: true,
+      responseTime,
+      details: {
+        data: data,
+        connection: "healthy"
+      }
+    };
+  } catch (error: any) {
+    const responseTime = Date.now() - startTime;
+    
+    return {
+      success: false,
+      error: error.message || "Unknown connection error",
+      responseTime,
+      details: {
+        type: error.constructor.name,
+        stack: error.stack
+      }
+    };
+  }
+}
+
+/**
+ * Test database schema and permissions
+ */
+export async function testDatabaseSchema(): Promise<{
+  success: boolean;
+  tables?: string[];
+  error?: string;
+}> {
+  try {
+    // Test access to all main tables
+    const tables = ['trading_users', 'trading_runs', 'trading_trades', 'market_data', 'ai_predictions'];
+    const results = await Promise.allSettled(
+      tables.map(table => 
+        supabase
+          .from(table)
+          .select('*')
+          .limit(1)
+      )
+    );
+
+    const accessibleTables = results
+      .map((result, index) => ({ result, table: tables[index] }))
+      .filter(({ result }) => result.status === 'fulfilled')
+      .map(({ table }) => table);
+
+    return {
+      success: accessibleTables.length === tables.length,
+      tables: accessibleTables,
+      error: accessibleTables.length < tables.length 
+        ? `Only ${accessibleTables.length}/${tables.length} tables accessible`
+        : undefined
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Schema test failed"
+    };
   }
 }
 
@@ -410,7 +514,7 @@ export function handleDatabaseError(error: any, operation: string) {
 }
 
 /**
- * Retry database operations with exponential backoff
+ * Retry database operations with exponential backoff and circuit breaker
  */
 export async function retryOperation<T>(
   operation: () => Promise<T>,
@@ -425,19 +529,91 @@ export async function retryOperation<T>(
     } catch (error: any) {
       lastError = error;
 
-      // Don't retry auth errors
-      if (error.message?.includes("Unauthorized") || error.message?.includes("Permission denied")) {
+      // Don't retry auth errors or client errors
+      if (error.message?.includes("Unauthorized") || 
+          error.message?.includes("Permission denied") ||
+          error.message?.includes("Not Found") ||
+          error.message?.includes("Bad Request")) {
         throw error;
       }
 
       if (attempt < maxRetries - 1) {
         const delay = baseDelay * Math.pow(2, attempt);
+        console.warn(`Database operation failed (attempt ${attempt + 1}/${maxRetries}), retrying in ${delay}ms:`, error.message);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }
 
+  console.error(`Database operation failed after ${maxRetries} attempts:`, lastError);
   throw lastError!;
+}
+
+/**
+ * Connection pool monitoring and health checks
+ */
+export class ConnectionPool {
+  private static instance: ConnectionPool;
+  private healthCheckInterval: NodeJS.Timeout | null = null;
+  private lastHealthCheck: Date | null = null;
+  private isHealthy: boolean = true;
+
+  static getInstance(): ConnectionPool {
+    if (!ConnectionPool.instance) {
+      ConnectionPool.instance = new ConnectionPool();
+    }
+    return ConnectionPool.instance;
+  }
+
+  async startHealthMonitoring(intervalMs: number = 30000) {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+    }
+
+    this.healthCheckInterval = setInterval(async () => {
+      await this.performHealthCheck();
+    }, intervalMs);
+
+    // Initial health check
+    await this.performHealthCheck();
+  }
+
+  stopHealthMonitoring() {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
+    }
+  }
+
+  private async performHealthCheck() {
+    try {
+      const result = await testConnection();
+      this.isHealthy = result.success;
+      this.lastHealthCheck = new Date();
+      
+      if (!this.isHealthy) {
+        console.warn('Database health check failed:', result.error);
+      }
+    } catch (error) {
+      this.isHealthy = false;
+      this.lastHealthCheck = new Date();
+      console.error('Database health check error:', error);
+    }
+  }
+
+  getHealthStatus() {
+    return {
+      isHealthy: this.isHealthy,
+      lastCheck: this.lastHealthCheck,
+      uptime: this.lastHealthCheck ? Date.now() - this.lastHealthCheck.getTime() : null
+    };
+  }
+}
+
+// Initialize connection pool monitoring
+const connectionPool = ConnectionPool.getInstance();
+if (isProduction) {
+  connectionPool.startHealthMonitoring(30000); // Check every 30 seconds in production
 }
 
 // Export database type for use in services

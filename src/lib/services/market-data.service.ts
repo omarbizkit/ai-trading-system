@@ -5,6 +5,7 @@
  */
 
 import { supabase, handleDatabaseError, retryOperation } from "../supabase.js";
+import { externalAPIErrorHandler } from "./external-api-error-handler.service.js";
 import type { Database } from "../supabase.js";
 import type {
   MarketData,
@@ -318,21 +319,32 @@ export class MarketDataService {
       sparkline: includeHistorical.toString()
     });
 
-    const response = await fetch(`${url}?${params}`, {
-      headers: this.getHeaders()
-    });
+    // Use error handler with fallback data
+    const fallbackData = externalAPIErrorHandler.getFallbackData(`market_data_${coinSymbol}`);
+    
+    return await externalAPIErrorHandler.executeWithErrorHandling(
+      'CoinGecko',
+      async () => {
+        const response = await fetch(`${url}?${params}`, {
+          headers: this.getHeaders()
+        });
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error(`Cryptocurrency '${coinSymbol}' not found`);
-      }
-      throw new Error(`CoinGecko API error: ${response.status} ${response.statusText}`);
-    }
+        if (!response.ok) {
+          const error = new Error(`CoinGecko API error: ${response.status} ${response.statusText}`);
+          (error as any).status = response.status;
+          throw error;
+        }
 
-    const data = await response.json();
-    this.updateRateLimit();
+        const data = await response.json();
+        this.updateRateLimit();
 
-    return data;
+        // Cache successful response as fallback data
+        externalAPIErrorHandler.setFallbackData(`market_data_${coinSymbol}`, data);
+
+        return data;
+      },
+      fallbackData
+    );
   }
 
   /**
