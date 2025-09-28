@@ -249,14 +249,22 @@ if (!supabaseAnonKey) {
   throw new Error(errorMsg);
 }
 
-// Validate URL format
-if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {
+// Check if we're in development mode with placeholder values
+const isDevelopmentPlaceholder = supabaseUrl.includes('dev-placeholder') || supabaseAnonKey.includes('dev-placeholder');
+
+// Validate URL format (skip validation for development placeholders)
+if (!isDevelopmentPlaceholder && (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co'))) {
   throw new Error(`Invalid Supabase URL format: ${supabaseUrl}. Expected format: https://your-project.supabase.co`);
 }
 
-// Validate key format (basic check)
-if (supabaseAnonKey.length < 50) {
+// Validate key format (skip validation for development placeholders)
+if (!isDevelopmentPlaceholder && supabaseAnonKey.length < 50) {
   throw new Error(`Invalid Supabase anon key format. Key appears to be too short: ${supabaseAnonKey.length} characters`);
+}
+
+// Warn in development if using placeholder values
+if (isDevelopmentPlaceholder && !isProduction) {
+  console.warn('🔧 Development mode: Using Supabase placeholder values. Real data operations will be mocked.');
 }
 
 // Create and configure Supabase client with production-ready settings

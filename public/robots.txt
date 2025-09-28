@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://ai-trading.bizkit.dev/sitemap.xml
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Disallow debug endpoints
+Disallow: /debug/
