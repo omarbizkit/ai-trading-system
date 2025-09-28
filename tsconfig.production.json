@@ -1,41 +1,51 @@
 {
-  "extends": "astro/tsconfigs/strict",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    // Target and module settings
+    // Production-specific optimizations
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     
+    // Strict type checking for production
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    
     // Module resolution
     "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     
-    // Type checking
-    "strict": true,
-    "exactOptionalPropertyTypes": false,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": false,
-    "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    
-    // Build settings
-    "noEmit": true,
+    // Performance optimizations
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    
+    // Build optimizations
+    "noEmit": true,
+    "preserveConstEnums": false,
+    "removeComments": true,
+    "sourceMap": false,
+    "declaration": false,
+    "declarationMap": false,
+    
+    // Advanced options
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
     
-    // Advanced options
+    // Type checking improvements
     "useDefineForClassFields": true,
-    "importsNotUsedAsValues": "remove",
+    "importsNotUsedAsValues": "error",
     "preserveValueImports": false,
     
     // Path mapping
@@ -48,21 +58,15 @@
       "@/types/*": ["./src/lib/types/*"],
       "@/services/*": ["./src/lib/services/*"],
       "@/utils/*": ["./src/lib/utils/*"],
-      "@/middleware/*": ["./src/lib/middleware/*"],
-      "@/debug/*": ["./src/lib/debug/*"]
-    },
-    
-    // Type definitions
-    "types": ["astro/client"],
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+      "@/middleware/*": ["./src/lib/middleware/*"]
+    }
   },
   "include": [
     "src/**/*",
     "tests/**/*",
     "scripts/**/*",
     "astro.config.mjs",
-    "vite.config.ts",
-    ".astro/types.d.ts"
+    "vite.config.ts"
   ],
   "exclude": [
     "node_modules",
@@ -70,6 +74,10 @@
     "build",
     ".astro",
     "coverage",
+    "**/*.d.ts",
     "public/**/*"
-  ]
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }

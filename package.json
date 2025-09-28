@@ -18,9 +18,14 @@
     "test:quickstart:scenario": "node scripts/validate-quickstart.js scenario",
     "validate": "npm run test:unit && npm run test:performance && npm run test:quickstart",
     "type-check": "astro check",
+    "type-check:production": "astro check --tsconfig ./tsconfig.production.json",
     "lint": "eslint . --ext .js,.ts,.astro",
     "lint:fix": "eslint . --ext .js,.ts,.astro --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "analyze-bundle": "node scripts/analyze-bundle.js",
+    "optimize-assets": "node scripts/optimize-assets.js",
+    "build:analyze": "npm run build && npm run analyze-bundle",
+    "build:production": "npm run optimize-assets && npm run type-check:production && npm run build && npm run analyze-bundle"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

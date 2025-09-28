@@ -1,0 +1,38 @@
+# AI Trading System - Development Container
+# Optimized for local development and testing
+
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci --include=dev
+
+# Copy source code
+COPY . .
+
+# Set development environment
+ENV NODE_ENV=development
+ENV PORT=4321
+ENV HOST=0.0.0.0
+
+# Expose development port
+EXPOSE 4321
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD npm run dev > /dev/null 2>&1 || exit 1
+
+# Start development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

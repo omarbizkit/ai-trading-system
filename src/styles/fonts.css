@@ -1,0 +1,212 @@
+/**
+ * T064: Optimized Font Loading Configuration
+ * Production-ready font loading with performance optimizations
+ */
+
+/* Primary font - Inter (Critical) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2'),
+       url('/fonts/Inter-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block; /* Block for critical font */
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Medium.woff2') format('woff2'),
+       url('/fonts/Inter-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap; /* Swap for secondary weights */
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2'),
+       url('/fonts/Inter-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.woff2') format('woff2'),
+       url('/fonts/Inter-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Monospace font - Monaco/Menlo (Optional) */
+@font-face {
+  font-family: 'Monaco';
+  src: url('/fonts/Monaco-Regular.woff2') format('woff2'),
+       url('/fonts/Monaco-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: optional; /* Optional for code blocks */
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Font fallback stack optimizations */
+.font-sans {
+  font-family: 'Inter', 
+               system-ui, 
+               -apple-system, 
+               BlinkMacSystemFont, 
+               'Segoe UI', 
+               Roboto, 
+               'Helvetica Neue', 
+               Arial, 
+               sans-serif;
+  font-optical-sizing: auto;
+  font-variation-settings: normal;
+}
+
+.font-mono {
+  font-family: 'Monaco',
+               'SF Mono',
+               Monaco,
+               'Inconsolata',
+               'Roboto Mono',
+               'Source Code Pro',
+               Menlo,
+               Consolas,
+               'DejaVu Sans Mono',
+               monospace;
+  font-optical-sizing: auto;
+}
+
+/* Font loading states */
+.font-loading {
+  visibility: hidden;
+}
+
+.fonts-loaded .font-loading {
+  visibility: visible;
+}
+
+/* Font metrics adjustments for better fallback matching */
+@font-face {
+  font-family: 'Inter Fallback';
+  size-adjust: 94%;
+  ascent-override: 110%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+  src: local('Arial'), local('Helvetica'), local('sans-serif');
+}
+
+/* Prevent layout shift during font loading */
+html {
+  font-family: system-ui, sans-serif; /* Fallback until fonts load */
+}
+
+.fonts-loaded html {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Performance optimizations */
+* {
+  /* Prevent font loading from blocking rendering */
+  text-rendering: optimizeSpeed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  /* Re-enable optimized rendering for headings */
+  text-rendering: optimizeLegibility;
+}
+
+/* Critical path CSS for font loading */
+@media screen {
+  /* Hide text until critical fonts are loaded */
+  .critical-text {
+    visibility: hidden;
+  }
+  
+  .fonts-loaded .critical-text {
+    visibility: visible;
+  }
+}
+
+/* Fallback for no-JS environments */
+.no-js .critical-text,
+.no-js .font-loading {
+  visibility: visible !important;
+}
+
+/* Font feature settings for better typography */
+.font-features {
+  font-feature-settings: 
+    'kern' 1,      /* Enable kerning */
+    'liga' 1,      /* Enable ligatures */
+    'calt' 1,      /* Enable contextual alternates */
+    'case' 1,      /* Enable case-sensitive forms */
+    'ss01' 1;      /* Enable stylistic set 1 */
+}
+
+/* Number formatting for trading data */
+.tabular-nums {
+  font-feature-settings: 'tnum' 1; /* Tabular numbers */
+  font-variant-numeric: tabular-nums;
+}
+
+.proportional-nums {
+  font-feature-settings: 'pnum' 1; /* Proportional numbers */
+  font-variant-numeric: proportional-nums;
+}
+
+/* Variable font adjustments (if using variable fonts) */
+@supports (font-variation-settings: normal) {
+  .font-sans {
+    font-family: 'Inter var', 'Inter', system-ui, sans-serif;
+    font-variation-settings: 'wght' 400, 'slnt' 0;
+  }
+  
+  .font-weight-medium {
+    font-variation-settings: 'wght' 500;
+  }
+  
+  .font-weight-semibold {
+    font-variation-settings: 'wght' 600;
+  }
+  
+  .font-weight-bold {
+    font-variation-settings: 'wght' 700;
+  }
+}
+
+/* Dark mode font adjustments */
+@media (prefers-color-scheme: dark) {
+  html {
+    /* Slightly lighter font weight in dark mode */
+    font-weight: 300;
+  }
+  
+  .font-weight-normal {
+    font-weight: 400;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  * {
+    /* Better font smoothing on high DPI displays */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .font-loading {
+    /* Show text immediately if motion is reduced */
+    visibility: visible;
+  }
+}
