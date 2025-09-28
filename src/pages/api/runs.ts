@@ -7,7 +7,6 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { supabase } from "../../lib/supabase.js";
 import { tradingRunService } from "../../lib/services/trading-run.service.js";
 import { tradingUserService } from "../../lib/services/trading-user.service.js";
 import type {
@@ -16,38 +15,18 @@ import type {
   RunParameters
 } from "../../lib/types/trading-run.js";
 
-// Helper function to authenticate user
-async function authenticateUser(request: Request) {
-  const authorization = request.headers.get("Authorization");
-  if (!authorization?.startsWith("Bearer ")) {
-    return { error: "Missing or invalid authorization header", status: 401 };
+// Helper function to get user from middleware context
+function getUserFromContext(locals: any) {
+  if (!locals.isAuthenticated || !locals.user) {
+    throw new Error('Authentication required');
   }
-
-  const token = authorization.replace("Bearer ", "");
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-  if (authError || !user) {
-    return { error: "Invalid or expired token", status: 401 };
-  }
-
-  return { user };
+  return locals.user;
 }
 
 // GET /api/runs - Get user's trading runs
-export const GET: APIRoute = async ({ request, url }) => {
+export const GET: APIRoute = async ({ request, url, locals }) => {
   try {
-    const auth = await authenticateUser(request);
-    if ("error" in auth) {
-      return new Response(
-        JSON.stringify({ error: auth.error }),
-        {
-          status: auth.status,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
-
-    const { user } = auth;
+    const user = getUserFromContext(locals);
 
     // Parse query parameters
     const limit = Math.min(parseInt(url.searchParams.get("limit") || "20"), 100);
@@ -119,20 +98,9 @@ export const GET: APIRoute = async ({ request, url }) => {
 };
 
 // POST /api/runs - Create new trading run
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    const auth = await authenticateUser(request);
-    if ("error" in auth) {
-      return new Response(
-        JSON.stringify({ error: auth.error }),
-        {
-          status: auth.status,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
-
-    const { user } = auth;
+    const user = getUserFromContext(locals);
 
     // Parse request body
     const body = await request.json();
