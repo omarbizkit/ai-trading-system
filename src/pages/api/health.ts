@@ -28,7 +28,7 @@ export const GET: APIRoute = async ({ request }) => {
     // Get package.json version
     let version = '1.0.0';
     try {
-      const packageJson = await import('../../../../package.json');
+      const packageJson = { version: '1.0.0' }; // Static version for build
       version = packageJson.default?.version || '1.0.0';
     } catch (error) {
       // Fallback to default version if package.json can't be loaded
