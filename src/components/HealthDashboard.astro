@@ -1,0 +1,469 @@
+---
+// Health Dashboard Component for Production Monitoring
+// Provides real-time system health monitoring and alerts
+
+interface SystemHealth {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  timestamp: string;
+  version: string;
+  uptime: number;
+  components: {
+    database: HealthStatus;
+    api_endpoints: HealthStatus;
+    external_services: HealthStatus;
+    build_system: HealthStatus;
+  };
+}
+
+interface HealthStatus {
+  status: 'healthy' | 'degraded' | 'failed' | 'unknown';
+  response_time?: number;
+  error_message?: string;
+  last_checked: string;
+}
+
+// Server-side health check data
+let systemHealth: SystemHealth | null = null;
+let healthError: string | null = null;
+
+try {
+  // Fetch current system health status
+  const healthResponse = await fetch(`${Astro.url.origin}/api/health`);
+  if (healthResponse.ok) {
+    systemHealth = await healthResponse.json();
+  } else {
+    healthError = `Health check failed: ${healthResponse.status} ${healthResponse.statusText}`;
+  }
+} catch (error) {
+  healthError = `Health check error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+}
+
+// Helper function to get status color class
+function getStatusColor(status: string): string {
+  switch (status) {
+    case 'healthy': return 'text-green-400 border-green-400';
+    case 'degraded': return 'text-yellow-400 border-yellow-400';
+    case 'failed':
+    case 'unhealthy': return 'text-red-400 border-red-400';
+    default: return 'text-gray-400 border-gray-400';
+  }
+}
+
+// Helper function to get status icon
+function getStatusIcon(status: string): string {
+  switch (status) {
+    case 'healthy': return '✅';
+    case 'degraded': return '⚠️';
+    case 'failed':
+    case 'unhealthy': return '❌';
+    default: return '❓';
+  }
+}
+
+// Format uptime in human readable format
+function formatUptime(seconds: number): string {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
+---
+
+<div class="health-dashboard bg-black/20 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6 max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold text-cyan-400 font-orbitron">
+      <span class="mr-2">🏥</span>System Health Dashboard
+    </h2>
+    <button
+      id="refresh-health"
+      class="px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded-lg text-cyan-400 hover:bg-cyan-500/30 transition-colors"
+    >
+      🔄 Refresh
+    </button>
+  </div>
+
+  {healthError ? (
+    <div class="error-state text-center py-8">
+      <div class="text-red-400 text-6xl mb-4">⚠️</div>
+      <h3 class="text-xl font-bold text-red-400 mb-2">Health Check Failed</h3>
+      <p class="text-gray-400">{healthError}</p>
+      <button
+        id="retry-health"
+        class="mt-4 px-6 py-2 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 hover:bg-red-500/30 transition-colors"
+      >
+        Retry Health Check
+      </button>
+    </div>
+  ) : systemHealth ? (
+    <div class="health-content">
+      <!-- Overall System Status -->
+      <div class={`overall-status border-2 rounded-lg p-4 mb-6 ${getStatusColor(systemHealth.status)}`}>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <span class="text-3xl">{getStatusIcon(systemHealth.status)}</span>
+            <div>
+              <h3 class="text-xl font-bold font-orbitron">System Status: {systemHealth.status.toUpperCase()}</h3>
+              <p class="text-sm opacity-75">
+                Uptime: {formatUptime(systemHealth.uptime)} | Version: {systemHealth.version}
+              </p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-sm opacity-75">Last Updated</p>
+            <p class="font-mono text-sm">{new Date(systemHealth.timestamp).toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Component Health Grid -->
+      <div class="components-grid grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- Database Health -->
+        <div class={`component-card border rounded-lg p-4 ${getStatusColor(systemHealth.components.database.status)}`}>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-bold font-orbitron">🗄️ Database</h4>
+            <span class="text-2xl">{getStatusIcon(systemHealth.components.database.status)}</span>
+          </div>
+          <p class="text-sm opacity-75 mb-1">Status: {systemHealth.components.database.status}</p>
+          {systemHealth.components.database.response_time && (
+            <p class="text-sm opacity-75 mb-1">Response: {systemHealth.components.database.response_time}ms</p>
+          )}
+          <p class="text-xs opacity-60">Last checked: {new Date(systemHealth.components.database.last_checked).toLocaleTimeString()}</p>
+          {systemHealth.components.database.error_message && (
+            <p class="text-xs text-red-400 mt-2">Error: {systemHealth.components.database.error_message}</p>
+          )}
+        </div>
+
+        <!-- API Endpoints Health -->
+        <div class={`component-card border rounded-lg p-4 ${getStatusColor(systemHealth.components.api_endpoints.status)}`}>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-bold font-orbitron">🔗 API Endpoints</h4>
+            <span class="text-2xl">{getStatusIcon(systemHealth.components.api_endpoints.status)}</span>
+          </div>
+          <p class="text-sm opacity-75 mb-1">Status: {systemHealth.components.api_endpoints.status}</p>
+          {systemHealth.components.api_endpoints.response_time && (
+            <p class="text-sm opacity-75 mb-1">Avg Response: {systemHealth.components.api_endpoints.response_time}ms</p>
+          )}
+          <p class="text-xs opacity-60">Last checked: {new Date(systemHealth.components.api_endpoints.last_checked).toLocaleTimeString()}</p>
+          {systemHealth.components.api_endpoints.error_message && (
+            <p class="text-xs text-red-400 mt-2">Error: {systemHealth.components.api_endpoints.error_message}</p>
+          )}
+        </div>
+
+        <!-- External Services Health -->
+        <div class={`component-card border rounded-lg p-4 ${getStatusColor(systemHealth.components.external_services.status)}`}>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-bold font-orbitron">🌐 External Services</h4>
+            <span class="text-2xl">{getStatusIcon(systemHealth.components.external_services.status)}</span>
+          </div>
+          <p class="text-sm opacity-75 mb-1">Status: {systemHealth.components.external_services.status}</p>
+          {systemHealth.components.external_services.response_time && (
+            <p class="text-sm opacity-75 mb-1">Response: {systemHealth.components.external_services.response_time}ms</p>
+          )}
+          <p class="text-xs opacity-60">Last checked: {new Date(systemHealth.components.external_services.last_checked).toLocaleTimeString()}</p>
+          {systemHealth.components.external_services.error_message && (
+            <p class="text-xs text-red-400 mt-2">Error: {systemHealth.components.external_services.error_message}</p>
+          )}
+        </div>
+
+        <!-- Build System Health -->
+        <div class={`component-card border rounded-lg p-4 ${getStatusColor(systemHealth.components.build_system.status)}`}>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-bold font-orbitron">⚙️ Build System</h4>
+            <span class="text-2xl">{getStatusIcon(systemHealth.components.build_system.status)}</span>
+          </div>
+          <p class="text-sm opacity-75 mb-1">Status: {systemHealth.components.build_system.status}</p>
+          {systemHealth.components.build_system.response_time && (
+            <p class="text-sm opacity-75 mb-1">Last build: {systemHealth.components.build_system.response_time}s</p>
+          )}
+          <p class="text-xs opacity-60">Last checked: {new Date(systemHealth.components.build_system.last_checked).toLocaleTimeString()}</p>
+          {systemHealth.components.build_system.error_message && (
+            <p class="text-xs text-red-400 mt-2">Error: {systemHealth.components.build_system.error_message}</p>
+          )}
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions border border-cyan-500/30 rounded-lg p-4">
+        <h4 class="font-bold text-cyan-400 mb-3 font-orbitron">🔧 Quick Actions</h4>
+        <div class="flex flex-wrap gap-2">
+          <button
+            class="action-btn px-3 py-1 bg-blue-500/20 border border-blue-500/50 rounded text-blue-400 hover:bg-blue-500/30 transition-colors text-sm"
+            onclick="checkDatabaseHealth()"
+          >
+            Test Database
+          </button>
+          <button
+            class="action-btn px-3 py-1 bg-green-500/20 border border-green-500/50 rounded text-green-400 hover:bg-green-500/30 transition-colors text-sm"
+            onclick="checkAPIEndpoints()"
+          >
+            Test APIs
+          </button>
+          <button
+            class="action-btn px-3 py-1 bg-purple-500/20 border border-purple-500/50 rounded text-purple-400 hover:bg-purple-500/30 transition-colors text-sm"
+            onclick="runDiagnostics()"
+          >
+            Run Diagnostics
+          </button>
+          <button
+            class="action-btn px-3 py-1 bg-orange-500/20 border border-orange-500/50 rounded text-orange-400 hover:bg-orange-500/30 transition-colors text-sm"
+            onclick="viewLogs()"
+          >
+            View Logs
+          </button>
+        </div>
+      </div>
+
+      <!-- Health History Chart Container -->
+      <div id="health-history-chart" class="health-chart mt-6 border border-cyan-500/30 rounded-lg p-4">
+        <h4 class="font-bold text-cyan-400 mb-3 font-orbitron">📊 Health History</h4>
+        <div class="chart-placeholder text-center py-8 text-gray-400">
+          <p>Health history chart will be rendered here</p>
+          <button
+            id="load-health-history"
+            class="mt-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded text-cyan-400 hover:bg-cyan-500/30 transition-colors"
+          >
+            Load Health History
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div class="loading-state text-center py-8">
+      <div class="animate-pulse">
+        <div class="text-cyan-400 text-6xl mb-4">⏳</div>
+        <h3 class="text-xl font-bold text-cyan-400 mb-2">Loading Health Status...</h3>
+        <p class="text-gray-400">Checking system components</p>
+      </div>
+    </div>
+  )}
+</div>
+
+<script>
+  // Auto-refresh functionality
+  let refreshInterval: NodeJS.Timeout | null = null;
+  let isAutoRefreshEnabled = false;
+
+  // Start auto-refresh
+  function startAutoRefresh() {
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(refreshHealthData, 30000); // Refresh every 30 seconds
+    isAutoRefreshEnabled = true;
+    updateRefreshButton();
+  }
+
+  // Stop auto-refresh
+  function stopAutoRefresh() {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
+    isAutoRefreshEnabled = false;
+    updateRefreshButton();
+  }
+
+  // Update refresh button text
+  function updateRefreshButton() {
+    const button = document.getElementById('refresh-health');
+    if (button) {
+      button.textContent = isAutoRefreshEnabled ? '⏸️ Stop Auto-Refresh' : '🔄 Start Auto-Refresh';
+    }
+  }
+
+  // Refresh health data
+  async function refreshHealthData() {
+    try {
+      const response = await fetch('/api/health');
+      if (response.ok) {
+        // Reload the page to update health data
+        window.location.reload();
+      } else {
+        console.error('Health check failed:', response.status);
+        showNotification('Health check failed', 'error');
+      }
+    } catch (error) {
+      console.error('Health check error:', error);
+      showNotification('Failed to check system health', 'error');
+    }
+  }
+
+  // Quick action functions
+  async function checkDatabaseHealth() {
+    showNotification('Testing database connection...', 'info');
+    try {
+      const response = await fetch('/api/health/database');
+      const data = await response.json();
+      if (response.ok && data.connection_status === 'connected') {
+        showNotification('Database connection successful', 'success');
+      } else {
+        showNotification(`Database check failed: ${data.error_message || 'Unknown error'}`, 'error');
+      }
+    } catch (error) {
+      showNotification('Database check failed', 'error');
+    }
+  }
+
+  async function checkAPIEndpoints() {
+    showNotification('Testing API endpoints...', 'info');
+    try {
+      const response = await fetch('/api/health/endpoints');
+      const data = await response.json();
+      if (response.ok) {
+        const healthyCount = data.filter((endpoint: any) => endpoint.status === 'healthy').length;
+        showNotification(`${healthyCount}/${data.length} endpoints healthy`, 'success');
+      } else {
+        showNotification('API endpoints check failed', 'error');
+      }
+    } catch (error) {
+      showNotification('API endpoints check failed', 'error');
+    }
+  }
+
+  async function runDiagnostics() {
+    showNotification('Running system diagnostics...', 'info');
+    try {
+      // Run multiple diagnostic checks
+      const [healthCheck, dbCheck, endpointsCheck] = await Promise.all([
+        fetch('/api/health'),
+        fetch('/api/health/database'),
+        fetch('/api/health/endpoints')
+      ]);
+
+      let issuesFound = 0;
+      if (!healthCheck.ok) issuesFound++;
+      if (!dbCheck.ok) issuesFound++;
+      if (!endpointsCheck.ok) issuesFound++;
+
+      if (issuesFound === 0) {
+        showNotification('All diagnostics passed', 'success');
+      } else {
+        showNotification(`${issuesFound} issues found in diagnostics`, 'warning');
+      }
+    } catch (error) {
+      showNotification('Diagnostics failed to complete', 'error');
+    }
+  }
+
+  function viewLogs() {
+    // Open debug page or logs in new tab
+    window.open('/debug', '_blank');
+  }
+
+  async function loadHealthHistory() {
+    const chartContainer = document.getElementById('health-history-chart');
+    if (!chartContainer) return;
+
+    try {
+      // This would typically fetch historical health data
+      // For now, show a placeholder
+      const placeholder = chartContainer.querySelector('.chart-placeholder');
+      if (placeholder) {
+        placeholder.innerHTML = `
+          <div class="text-center">
+            <p class="text-gray-400 mb-2">Health history feature requires backend implementation</p>
+            <p class="text-sm text-gray-500">This would show system health trends over time</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Failed to load health history:', error);
+    }
+  }
+
+  // Show notification
+  function showNotification(message: string, type: 'success' | 'error' | 'warning' | 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg border max-w-sm ${
+      type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' :
+      type === 'error' ? 'bg-red-500/20 border-red-500/50 text-red-400' :
+      type === 'warning' ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400' :
+      'bg-blue-500/20 border-blue-500/50 text-blue-400'
+    }`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+
+  // Event listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    // Refresh button
+    const refreshButton = document.getElementById('refresh-health');
+    if (refreshButton) {
+      refreshButton.addEventListener('click', () => {
+        if (isAutoRefreshEnabled) {
+          stopAutoRefresh();
+        } else {
+          startAutoRefresh();
+        }
+      });
+    }
+
+    // Retry button
+    const retryButton = document.getElementById('retry-health');
+    if (retryButton) {
+      retryButton.addEventListener('click', refreshHealthData);
+    }
+
+    // Load health history button
+    const loadHistoryButton = document.getElementById('load-health-history');
+    if (loadHistoryButton) {
+      loadHistoryButton.addEventListener('click', loadHealthHistory);
+    }
+
+    // Start auto-refresh by default
+    startAutoRefresh();
+  });
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    stopAutoRefresh();
+  });
+</script>
+
+<style>
+  .health-dashboard {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(157, 78, 221, 0.05) 100%);
+  }
+
+  .component-card {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .component-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.2);
+  }
+
+  .action-btn {
+    transition: all 0.3s ease;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+  }
+
+  .overall-status {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 5px currentColor; }
+    50% { box-shadow: 0 0 20px currentColor; }
+  }
+
+  .health-dashboard .text-green-400 { animation: pulse-glow 3s ease-in-out infinite; }
+  .health-dashboard .text-red-400 { animation: pulse-glow 2s ease-in-out infinite; }
+  .health-dashboard .text-yellow-400 { animation: pulse-glow 2.5s ease-in-out infinite; }
+</style>
