@@ -385,9 +385,9 @@ const {
 </div>
 
 <script>
-  let backtestConfig = {};
+  let backtestConfig: any = {};
   let isRunning = false;
-  let progressInterval = null;
+  let progressInterval: NodeJS.Timeout | null = null;
 
   document.addEventListener('DOMContentLoaded', function() {
     initializeForm();
@@ -506,7 +506,7 @@ const {
     });
   }
 
-  function setDatePreset(period) {
+  function setDatePreset(period: string) {
     const endDate = new Date();
     const startDate = new Date();
 
@@ -564,8 +564,9 @@ const {
       }
     } catch (error) {
       console.error('Backtest failed:', error);
-      updateStatus('Backtest failed: ' + error.message);
-      alert('Backtest failed: ' + error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      updateStatus('Backtest failed: ' + errorMessage);
+      alert('Backtest failed: ' + errorMessage);
     } finally {
       isRunning = false;
       hideProgressModal();
@@ -573,7 +574,7 @@ const {
   }
 
   function collectConfiguration() {
-    const selectedAssets = [];
+    const selectedAssets: string[] = [];
     document.querySelectorAll('.asset-checkbox:checked').forEach(cb => {
       selectedAssets.push(cb.value);
     });
@@ -610,7 +611,7 @@ const {
     };
   }
 
-  function validateConfiguration(config) {
+  function validateConfiguration(config: any) {
     if (!config.timeRange.start || !config.timeRange.end) {
       alert('Please select both start and end dates');
       return false;
@@ -634,7 +635,7 @@ const {
     return true;
   }
 
-  async function runBacktest(config) {
+  async function runBacktest(config: any) {
     try {
       const response = await fetch('/api/backtest', {
         method: 'POST',
@@ -660,7 +661,7 @@ const {
     }
   }
 
-  function generateMockResults(config) {
+  function generateMockResults(config: any) {
     const totalReturn = (Math.random() - 0.4) * 0.5; // -20% to +30%
     const finalCapital = config.initialCapital * (1 + totalReturn);
     const maxDrawdown = Math.random() * 0.25; // 0-25%
@@ -684,7 +685,7 @@ const {
     };
   }
 
-  function generateMockTrades(count, assets) {
+  function generateMockTrades(count: number, assets: string[]) {
     const trades = [];
     for (let i = 0; i < count; i++) {
       const asset = assets[Math.floor(Math.random() * assets.length)];
@@ -703,7 +704,7 @@ const {
     return trades;
   }
 
-  function generateMockPerformance(config) {
+  function generateMockPerformance(config: any) {
     const days = Math.floor((new Date(config.timeRange.end) - new Date(config.timeRange.start)) / (1000 * 60 * 60 * 24));
     const performance = [];
 
@@ -761,7 +762,7 @@ const {
 
       if (progress >= 100) {
         progress = 100;
-        clearInterval(progressInterval);
+        if (progressInterval) clearInterval(progressInterval);
       }
 
       // Update stage
@@ -791,7 +792,7 @@ const {
     updateStatus('Backtest cancelled');
   }
 
-  function displayResults(results) {
+  function displayResults(results: any) {
     const resultsContainer = document.getElementById('backtest-results');
     if (!resultsContainer) return;
 
@@ -874,8 +875,8 @@ const {
   }
 
   function loadConfiguration() {
-    const select = document.getElementById('saved-config');
-    const configName = select.value;
+    const select = document.getElementById('saved-config') as HTMLSelectElement;
+    const configName = select?.value;
 
     if (!configName) return;
 

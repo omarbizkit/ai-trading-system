@@ -6,23 +6,15 @@
  */
 
 import type { APIRoute } from 'astro';
-import { deploymentService } from '../../../../lib/services/deployment.service';
+import { zeaburDeployment } from '../../../lib/services/zeabur-deployment.service';
 
 export const GET: APIRoute = async ({ request, url }) => {
   try {
     // Get version from query parameter or default to latest
     const version = url.searchParams.get('version');
     
-    let deployment;
-    if (version) {
-      // Get specific deployment by version
-      const deployments = deploymentService.getDeployments({ version });
-      deployment = deployments[0]; // Get the latest deployment for this version
-    } else {
-      // Get latest deployment
-      const deployments = deploymentService.getDeployments();
-      deployment = deployments[0]; // Get the latest deployment
-    }
+    // Get deployment status from the new service
+    const deployment = await zeaburDeployment.getDeploymentStatus();
     
     if (!deployment) {
       return new Response(JSON.stringify({
