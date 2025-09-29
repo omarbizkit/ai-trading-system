@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && node scripts/fix-ssr-assets.js",
+    "build": "astro build",
     "build:check": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
