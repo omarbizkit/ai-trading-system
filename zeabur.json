@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npx astro build && node scripts/fix-ssr-assets.js",
   "startCommand": "node dist/server/entry.mjs",
   "installCommand": "npm ci",
   "buildDir": "dist",
