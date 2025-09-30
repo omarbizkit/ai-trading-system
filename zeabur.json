@@ -1,7 +1,12 @@
 {
-  "buildCommand": "npx astro build && node scripts/fix-ssr-assets.js",
+  "buildCommand": "npm run build",
   "startCommand": "node dist/server/entry.mjs",
   "installCommand": "npm ci",
   "buildDir": "dist",
-  "outputDir": "dist"
+  "outputDir": "dist",
+  "environment": {
+    "NODE_ENV": "production",
+    "HOST": "0.0.0.0",
+    "ASTRO_TELEMETRY_DISABLED": "1"
+  }
 }
