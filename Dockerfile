@@ -37,38 +37,43 @@ FROM node:18-alpine AS runner
 WORKDIR /app
 
 # Install production dependencies only
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat dumb-init
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 astro
 
-# Copy built application
+# Copy package files first and install dependencies as root
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json* ./
+
+# Install production dependencies as root to avoid permission issues
+RUN npm ci --omit=dev --production && npm cache clean --force
+
+# Copy built application with proper ownership
 COPY --from=builder --chown=astro:nodejs /app/dist ./dist
-COPY --from=builder --chown=astro:nodejs /app/package.json ./package.json
-COPY --from=builder --chown=astro:nodejs /app/package-lock.json* ./
-
-# Install production dependencies
-RUN npm ci --omit=dev
-
-# Copy additional files needed for runtime
-COPY --from=builder --chown=astro:nodejs /app/astro.config.mjs ./
 COPY --from=builder --chown=astro:nodejs /app/public ./public
+COPY --from=builder --chown=astro:nodejs /app/scripts/start-production.js ./scripts/start-production.js
 
-# Set user
+# Set user after all setup is complete
 USER astro
 
-# Expose port (Zeabur will assign the actual port)
+# Expose port (Zeabur will assign the actual port via PORT env var)
 EXPOSE 4321
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "const http = require('http'); const req = http.request({host: 'localhost', port: process.env.PORT || 4321, path: '/api/health', timeout: 2000}, (res) => process.exit(res.statusCode === 200 ? 0 : 1)); req.on('error', () => process.exit(1)); req.end();"
-
-# Set environment variables
+# Set default environment variables (can be overridden by Zeabur)
 ENV NODE_ENV=production
-ENV PORT=4321
 ENV HOST=0.0.0.0
+ENV PORT=4321
+ENV ASTRO_TELEMETRY_DISABLED=1
 
-# Start the application
-CMD ["node", "./dist/server/entry.mjs"]
+# Set reasonable defaults for missing environment variables
+ENV SUPABASE_URL=http://localhost:54321
+ENV SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOuoQ2ZJuoUVnK_iBbShbmOcNbq5czJFfEn0
+ENV COINGECKO_API_KEY=""
+
+# Use dumb-init to handle signals properly in containers
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application using our production startup script
+CMD ["node", "./scripts/start-production.js"]

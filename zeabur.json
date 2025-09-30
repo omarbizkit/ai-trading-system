@@ -1,12 +1,22 @@
 {
   "buildCommand": "npm run build",
-  "startCommand": "node dist/server/entry.mjs",
+  "startCommand": "node scripts/start-production.js",
   "installCommand": "npm ci",
   "buildDir": "dist",
   "outputDir": "dist",
   "environment": {
     "NODE_ENV": "production",
     "HOST": "0.0.0.0",
-    "ASTRO_TELEMETRY_DISABLED": "1"
+    "PORT": "${PORT}",
+    "ASTRO_TELEMETRY_DISABLED": "1",
+    "SUPABASE_URL": "${SUPABASE_URL}",
+    "SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}",
+    "COINGECKO_API_KEY": "${COINGECKO_API_KEY}"
+  },
+  "expose": 4321,
+  "healthCheck": {
+    "path": "/api/health",
+    "timeout": 30,
+    "interval": 30
   }
 }
