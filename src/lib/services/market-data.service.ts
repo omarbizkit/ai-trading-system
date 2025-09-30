@@ -42,10 +42,22 @@ export class MarketDataService {
     try {
       const coinSymbol = request.coin_symbol.toUpperCase();
 
-      // Check cache first
-      const cached = await this.getCachedMarketData(coinSymbol);
-      if (cached && !this.isDataStale(cached.last_updated, this.cacheConfig.current_price_ttl)) {
-        return cached;
+      // Check memory cache first
+      const memoryCache = this.priceCache.get(coinSymbol);
+      if (memoryCache && !this.isDataStale(new Date(memoryCache.timestamp).toISOString(), this.cacheConfig.current_price_ttl)) {
+        return memoryCache.data;
+      }
+
+      // Try to check database cache (with fallback)
+      try {
+        const cached = await this.getCachedMarketData(coinSymbol);
+        if (cached && !this.isDataStale(cached.last_updated, this.cacheConfig.current_price_ttl)) {
+          // Update memory cache
+          this.updateCache(coinSymbol, cached);
+          return cached;
+        }
+      } catch (dbError: any) {
+        console.warn("Database cache unavailable, continuing with API fetch:", dbError.message);
       }
 
       // Check rate limits
@@ -54,11 +66,25 @@ export class MarketDataService {
       // Fetch from CoinGecko API
       const coinGeckoData = await this.fetchFromCoinGecko(coinSymbol, request.include_historical);
 
-      // Store in database and cache
-      const marketData = await this.storeMarketData(coinGeckoData);
-      this.updateCache(coinSymbol, marketData);
+      // Transform the data
+      const marketData = this.transformCoinGeckoData(coinGeckoData);
 
-      return marketData;
+      // Try to store in database (with fallback)
+      try {
+        const storedData = await this.storeMarketData(coinGeckoData);
+        this.updateCache(coinSymbol, storedData);
+        return storedData;
+      } catch (dbError: any) {
+        console.warn("Database storage unavailable, using memory cache only:", dbError.message);
+        // Create a complete MarketData object for memory cache
+        const fallbackData: MarketData = {
+          id: `${coinSymbol}-${Date.now()}`,
+          ...marketData,
+          created_at: new Date().toISOString()
+        };
+        this.updateCache(coinSymbol, fallbackData);
+        return fallbackData;
+      }
     } catch (error: any) {
       console.error("Failed to get market data:", error);
       throw new Error(`Failed to get market data: ${error.message}`);
@@ -196,14 +222,19 @@ export class MarketDataService {
           if (error.code === "PGRST116") {
             return null; // No data found
           }
+          // For permission errors, throw to trigger fallback
+          if (error.code === "42501" || error.message?.includes("Permission denied")) {
+            throw new Error(`Database access denied: ${error.message}`);
+          }
           handleDatabaseError(error, "get cached market data");
         }
 
         return data ? this.mapDatabaseMarketDataToMarketData(data) : null;
       });
     } catch (error: any) {
-      console.error("Failed to get cached market data:", error);
-      return null;
+      console.warn("Database cache lookup failed:", error.message);
+      // Re-throw to allow caller to handle gracefully
+      throw error;
     }
   }
 
