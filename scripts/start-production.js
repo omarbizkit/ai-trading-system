@@ -24,6 +24,13 @@ if (existsSync(envFile)) {
       if (!process.env[key]) {
         process.env[key] = valueParts.join('=');
       }
+      // Also set PUBLIC_ versions for Astro if the key doesn't start with PUBLIC_
+      if (key === 'SUPABASE_URL' && !process.env.PUBLIC_SUPABASE_URL) {
+        process.env.PUBLIC_SUPABASE_URL = valueParts.join('=');
+      }
+      if (key === 'SUPABASE_ANON_KEY' && !process.env.PUBLIC_SUPABASE_ANON_KEY) {
+        process.env.PUBLIC_SUPABASE_ANON_KEY = valueParts.join('=');
+      }
     }
   });
 }
@@ -48,8 +55,20 @@ console.log('==========================================');
 console.log(`Environment: ${process.env.NODE_ENV}`);
 console.log(`Host: ${process.env.HOST}`);
 console.log(`Port: ${process.env.PORT}`);
-console.log(`Supabase URL: ${process.env.SUPABASE_URL ? 'Configured' : 'Not configured'}`);
+console.log(`Supabase URL: ${process.env.PUBLIC_SUPABASE_URL ? 'Configured' : 'Not configured'}`);
+console.log(`Supabase Key: ${process.env.PUBLIC_SUPABASE_ANON_KEY ? 'Configured' : 'Not configured'}`);
 console.log(`CoinGecko API: ${process.env.COINGECKO_API_KEY ? 'Configured' : 'Not configured'}`);
+
+// Check for database placeholder values
+const isPlaceholderDB = process.env.PUBLIC_SUPABASE_URL?.includes('localhost:54321') ||
+                        process.env.PUBLIC_SUPABASE_ANON_KEY?.includes('demo');
+
+if (isPlaceholderDB) {
+  console.warn('⚠️  Using placeholder Supabase configuration - database features will use fallback mode');
+  console.warn('   This is normal for initial deployment testing');
+} else {
+  console.log('✅ Production database configuration detected');
+}
 
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
