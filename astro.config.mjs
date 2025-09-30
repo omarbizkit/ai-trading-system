@@ -32,21 +32,21 @@ export default defineConfig({
       minify: "esbuild",
       target: "es2020",
       cssMinify: "esbuild",
-        rollupOptions: {
-          output: {
-            // Code splitting for better caching
-            manualChunks: {
-              // Vendor chunks for better caching
-              'vendor-charts': ['lightweight-charts'],
-              'vendor-supabase': ['@supabase/supabase-js'],
-              'vendor-react': ['react', 'react-dom'],
-            },
-            // Asset naming for better caching
-            assetFileNames: 'assets/[name]-[hash][extname]',
-            chunkFileNames: 'assets/[name]-[hash].js',
-            entryFileNames: 'assets/[name]-[hash].js',
+      // Simplified rollup options to avoid server build issues
+      rollupOptions: {
+        output: {
+          // Only apply manual chunks for client build
+          manualChunks: (id) => {
+            if (id.includes('node_modules/lightweight-charts')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('node_modules/@supabase')) {
+              return 'vendor-supabase';
+            }
+            return null;
           },
         },
+      },
     },
     optimizeDeps: {
       include: [
@@ -58,9 +58,7 @@ export default defineConfig({
       noExternal: [
         "lightweight-charts",
         "@supabase/supabase-js",
-        "@astrojs/ssr",
       ],
-      // Fix asset resolution for SSR
       target: "node",
     },
     // Improve dev server performance
