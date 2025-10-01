@@ -4,7 +4,7 @@
  * Based on data-model.md specifications
  */
 
-import { supabase, handleDatabaseError, retryOperation } from "../supabase.js";
+import { supabase, supabaseServer, handleDatabaseError, retryOperation } from "../supabase.js";
 import type { Database } from "../supabase.js";
 import type {
   AIPrediction,
@@ -159,9 +159,9 @@ export class AIPredictionService {
       // For now, we'll use a simplified approach
       const directionCorrect = this.isDirectionCorrect(prediction, actualPrice);
 
-      // Update prediction in database
+      // Update prediction in database (use server client for write operations)
       await retryOperation(async () => {
-        const { error } = await (supabase
+        const { error } = await (supabaseServer
           .from("ai_predictions") as any)
           .update({
             actual_price: actualPrice,
@@ -387,7 +387,8 @@ export class AIPredictionService {
    */
   private async storePrediction(prediction: Omit<AIPrediction, "id">): Promise<AIPrediction> {
     return await retryOperation(async () => {
-      const { data, error } = await (supabase
+      // Use server client for write operations (bypasses RLS)
+      const { data, error} = await (supabaseServer
         .from("ai_predictions") as any)
         .insert({
           coin_symbol: prediction.coin_symbol,
