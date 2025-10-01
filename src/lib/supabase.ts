@@ -4,7 +4,7 @@
  * Based on research.md technical decisions
  */
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 
 // Database type definitions for better TypeScript support
 export interface Database {
@@ -268,20 +268,11 @@ if (isDevelopmentPlaceholder && !isProduction) {
 }
 
 // Create and configure Supabase client with production-ready settings
-export const supabase: SupabaseClient<Database> = createClient<Database>(
+export const supabase = createClient<Database>(
   supabaseUrl,
   supabaseAnonKey,
   {
     auth: {
-      // Configure for .bizkit.dev domain SSO
-      cookieOptions: {
-        name: "auth-token",
-        domain: isProduction ? ".bizkit.dev" : "localhost",
-        maxAge: 100 * 365 * 24 * 60 * 60, // 100 years in seconds
-        httpOnly: false, // Allow client-side access for SSO
-        sameSite: isProduction ? "lax" : "lax", // Allow cross-subdomain cookies
-        secure: isProduction // HTTPS only in production
-      },
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
@@ -529,7 +520,7 @@ export async function retryOperation<T>(
   maxRetries: number = 3,
   baseDelay: number = 1000
 ): Promise<T> {
-  let lastError: Error;
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -538,7 +529,7 @@ export async function retryOperation<T>(
       lastError = error;
 
       // Don't retry auth errors or client errors
-      if (error.message?.includes("Unauthorized") || 
+      if (error.message?.includes("Unauthorized") ||
           error.message?.includes("Permission denied") ||
           error.message?.includes("Not Found") ||
           error.message?.includes("Bad Request")) {
@@ -554,7 +545,7 @@ export async function retryOperation<T>(
   }
 
   console.error(`Database operation failed after ${maxRetries} attempts:`, lastError);
-  throw lastError!;
+  throw lastError || new Error("Database operation failed after all retries");
 }
 
 /**
@@ -624,6 +615,39 @@ if (isProduction) {
   connectionPool.startHealthMonitoring(30000); // Check every 30 seconds in production
 }
 
-// Export database type for use in services
-export type { Database };
+/**
+ * Server-side Supabase client with service role key
+ * Use this for backend operations that require elevated permissions (bypass RLS)
+ * NEVER expose this client to the browser - server-side only!
+ */
+export const createServerClient = () => {
+  // Get service role key from environment (server-side only)
+  const serviceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!serviceRoleKey || serviceRoleKey.includes('placeholder')) {
+    console.warn('⚠️  Server-side Supabase client: Service role key not configured, using anon key (limited permissions)');
+    return supabase; // Fallback to anon client
+  }
+
+  // Create server client with service role key (bypasses RLS)
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false
+    },
+    db: {
+      schema: "public"
+    },
+    global: {
+      headers: {
+        "X-Client-Info": `ai-trading-system-server@1.0.0-${isProduction ? 'production' : 'development'}`,
+        "X-Environment": isProduction ? 'production' : 'development'
+      }
+    }
+  });
+};
+
+// Export both clients
+export const supabaseServer = createServerClient();
 export default supabase;

@@ -4,7 +4,7 @@
  * Based on data-model.md specifications
  */
 
-import { supabase, handleDatabaseError, retryOperation } from "../supabase.js";
+import { supabase, supabaseServer, handleDatabaseError, retryOperation } from "../supabase.js";
 import { externalAPIErrorHandler } from "./external-api-error-handler.service.js";
 import type { Database } from "../supabase.js";
 import type {
@@ -317,7 +317,8 @@ export class MarketDataService {
       const cutoffTime = new Date(Date.now() - olderThanHours * 60 * 60 * 1000).toISOString();
 
       await retryOperation(async () => {
-        const { error } = await supabase
+        // Use server client for write operations (bypasses RLS)
+        const { error } = await supabaseServer
           .from("market_data")
           .delete()
           .lt("created_at", cutoffTime);
@@ -385,7 +386,8 @@ export class MarketDataService {
     const marketData = this.transformCoinGeckoData(coinGeckoData);
 
     return await retryOperation(async () => {
-      const { data, error } = await (supabase
+      // Use server client for write operations (bypasses RLS)
+      const { data, error } = await (supabaseServer
         .from("market_data") as any)
         .insert({
           coin_symbol: marketData.coin_symbol,
